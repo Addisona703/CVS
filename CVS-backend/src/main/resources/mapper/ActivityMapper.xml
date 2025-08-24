@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hngy.cvs.mapper.ActivityMapper">
+
+    <!-- 活动VO结果映射 -->
+    <resultMap id="ActivityVOMap" type="com.hngy.cvs.dto.response.ActivityVO">
+        <id column="id" property="id"/>
+        <result column="title" property="title"/>
+        <result column="description" property="description"/>
+        <result column="location" property="location"/>
+        <result column="start_time" property="startTime"/>
+        <result column="end_time" property="endTime"/>
+        <result column="registration_deadline" property="registrationDeadline"/>
+        <result column="max_participants" property="maxParticipants"/>
+        <result column="status" property="status"/>
+        <result column="requirements" property="requirements"/>
+        <result column="contact_info" property="contactInfo"/>
+        <result column="points" property="points"/>
+        <result column="organizer_id" property="organizerId"/>
+        <result column="organizer_name" property="organizerName"/>
+        <result column="current_participants" property="currentParticipants"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <!-- 分页查询活动列表 -->
+    <select id="selectActivityPage" resultMap="ActivityVOMap">
+        SELECT 
+            va.*,
+            u.name as organizer_name,
+            COALESCE(signup_count.count, 0) as current_participants
+        FROM activity_twb va
+        LEFT JOIN user_twb u ON va.organizer_id = u.id
+        LEFT JOIN (
+            SELECT activity_id, COUNT(*) as count 
+            FROM signup_twb 
+            WHERE status = 'APPROVED' 
+            GROUP BY activity_id
+        ) signup_count ON va.id = signup_count.activity_id
+        WHERE va.deleted = 0
+        <if test="searchDTO.title != null and searchDTO.title != ''">
+            AND va.title LIKE CONCAT('%', #{searchDTO.title}, '%')
+        </if>
+        <if test="searchDTO.organizerName != null and searchDTO.organizerName != ''">
+            AND u.name LIKE CONCAT('%', #{searchDTO.organizerName}, '%')
+        </if>
+        <if test="searchDTO.location != null and searchDTO.location != ''">
+            AND va.location LIKE CONCAT('%', #{searchDTO.location}, '%')
+        </if>
+        <if test="searchDTO.status != null and searchDTO.status != ''">
+            AND va.status = #{searchDTO.status}
+        </if>
+        <if test="searchDTO.startTimeFrom != null">
+            AND va.start_time >= #{searchDTO.startTimeFrom}
+        </if>
+        <if test="searchDTO.startTimeTo != null">
+            AND va.start_time &lt;= #{searchDTO.startTimeTo}
+        </if>
+        ORDER BY va.created_at DESC
+    </select>
+
+    <!-- 查询我的活动 -->
+    <select id="selectMyActivities" resultMap="ActivityVOMap">
+        SELECT 
+            va.*,
+            u.name as organizer_name,
+            COALESCE(signup_count.count, 0) as current_participants
+        FROM activity_twb va
+        LEFT JOIN user_twb u ON va.organizer_id = u.id
+        LEFT JOIN (
+            SELECT activity_id, COUNT(*) as count 
+            FROM signup_twb 
+            WHERE status = 'APPROVED' 
+            GROUP BY activity_id
+        ) signup_count ON va.id = signup_count.activity_id
+        WHERE va.deleted = 0 AND va.organizer_id = #{organizerId}
+        <if test="searchDTO.title != null and searchDTO.title != ''">
+            AND va.title LIKE CONCAT('%', #{searchDTO.title}, '%')
+        </if>
+        <if test="searchDTO.status != null and searchDTO.status != ''">
+            AND va.status = #{searchDTO.status}
+        </if>
+        ORDER BY va.created_at DESC
+    </select>
+
+</mapper>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hngy.cvs.mapper.SignupMapper">
+
+    <!-- 报名VO结果映射 -->
+    <resultMap id="SignupVOMap" type="com.hngy.cvs.dto.response.SignupVO">
+        <id column="id" property="id"/>
+        <result column="activity_id" property="activityId"/>
+        <result column="activity_title" property="activityTitle"/>
+        <result column="user_id" property="userId"/>
+        <result column="user_name" property="userName"/>
+        <result column="status" property="status"/>
+        <result column="reason" property="reason"/>
+        <result column="reject_reason" property="rejectReason"/>
+        <result column="signed_in" property="signedIn"/>
+        <result column="signed_out" property="signedOut"/>
+        <result column="sign_in_time" property="signInTime"/>
+        <result column="sign_out_time" property="signOutTime"/>
+        <result column="created_at" property="createdAt"/>
+    </resultMap>
+
+    <!-- 查询用户的报名记录 -->
+    <select id="selectMySignups" resultMap="SignupVOMap">
+        SELECT 
+            s.*,
+            a.title as activity_title,
+            u.name as user_name
+        FROM signup_twb s
+        LEFT JOIN activity_twb a ON s.activity_id = a.id
+        LEFT JOIN user_twb u ON s.user_id = u.id
+        WHERE s.user_id = #{userId}
+        ORDER BY s.created_at DESC
+    </select>
+
+    <!-- 查询活动的报名记录 -->
+    <select id="selectActivitySignups" resultMap="SignupVOMap">
+        SELECT 
+            s.*,
+            a.title as activity_title,
+            u.name as user_name
+        FROM signup_twb s
+        LEFT JOIN activity_twb a ON s.activity_id = a.id
+        LEFT JOIN user_twb u ON s.user_id = u.id
+        WHERE s.activity_id = #{activityId}
+        ORDER BY s.created_at DESC
+    </select>
+
+    <!-- 分页查询报名列表 -->
+    <select id="selectSignupPage" resultMap="SignupVOMap">
+        SELECT 
+            s.*,
+            a.title as activity_title,
+            u.name as user_name
+        FROM signup_twb s
+        LEFT JOIN activity_twb a ON s.activity_id = a.id AND a.deleted = 0
+        LEFT JOIN user_twb u ON s.user_id = u.id AND u.deleted = 0
+        WHERE true
+        <if test="searchDTO.activityTitle != null and searchDTO.activityTitle != ''">
+            AND a.title LIKE CONCAT('%', #{searchDTO.activityTitle}, '%')
+        </if>
+        <if test="searchDTO.userName != null and searchDTO.userName != ''">
+            AND u.name LIKE CONCAT('%', #{searchDTO.userName}, '%')
+        </if>
+        <if test="searchDTO.status != null and searchDTO.status != ''">
+            AND s.status = #{searchDTO.status}
+        </if>
+        <if test="searchDTO.activityId != null">
+            AND s.activity_id = #{searchDTO.activityId}
+        </if>
+        <if test="searchDTO.userId != null">
+            AND s.user_id = #{searchDTO.userId}
+        </if>
+        ORDER BY s.created_at DESC
+    </select>
+
+</mapper>

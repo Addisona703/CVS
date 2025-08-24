@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hngy.cvs.mapper.RecordMapper">
+
+    <!-- 服务记录VO结果映射 -->
+    <resultMap id="ServiceRecordVOMap" type="com.hngy.cvs.dto.response.ServiceRecordVO">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="activity_id" property="activityId"/>
+        <result column="duration_minutes" property="durationMinutes"/>
+        <result column="description" property="description"/>
+        <result column="evaluation" property="evaluation"/>
+        <result column="rating" property="rating"/>
+        <result column="points_earned" property="pointsEarned"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="activity_title" property="activityTitle"/>
+        <result column="user_name" property="userName"/>
+    </resultMap>
+
+    <!-- 查询我的服务记录 -->
+    <select id="selectMyRecords" resultMap="ServiceRecordVOMap">
+        SELECT 
+            sr.*,
+            va.title as activity_title,
+            u.real_name as user_name
+        FROM record_twb sr
+        LEFT JOIN activity_twb va ON sr.activity_id = va.id
+        LEFT JOIN user_twb u ON sr.user_id = u.id
+        WHERE sr.user_id = #{userId}
+        ORDER BY sr.created_at DESC
+    </select>
+
+    <!-- 查询活动的服务记录 -->
+    <select id="selectActivityRecords" resultMap="ServiceRecordVOMap">
+        SELECT 
+            sr.*,
+            va.title as activity_title,
+            u.real_name as user_name
+        FROM record_twb sr
+        LEFT JOIN activity_twb va ON sr.activity_id = va.id
+        LEFT JOIN user_twb u ON sr.user_id = u.id
+        WHERE sr.activity_id = #{activityId}
+        ORDER BY sr.created_at DESC
+    </select>
+
+</mapper>

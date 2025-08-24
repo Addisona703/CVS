@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hngy.cvs.mapper.CertificateMapper">
+
+    <!-- 证明VO结果映射 -->
+    <resultMap id="CertificateVOMap" type="com.hngy.cvs.dto.response.CertificateVO">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="certificate_number" property="certificateNumber"/>
+        <result column="purpose" property="purpose"/>
+        <result column="start_date" property="startDate"/>
+        <result column="end_date" property="endDate"/>
+        <result column="status" property="status"/>
+        <result column="reject_reason" property="rejectReason"/>
+        <result column="approver_id" property="approverId"/>
+        <result column="approved_at" property="approvedAt"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="user_name" property="userName"/>
+        <result column="approver_name" property="approverName"/>
+    </resultMap>
+
+    <!-- 查询我的证明记录 -->
+    <select id="selectMyCertificates" resultMap="CertificateVOMap">
+        SELECT 
+            vc.*,
+            u.real_name as user_name,
+            approver.real_name as approver_name
+        FROM cert_twb vc
+        LEFT JOIN user_twb u ON vc.user_id = u.id
+        LEFT JOIN user_twb approver ON vc.approver_id = approver.id
+        WHERE vc.user_id = #{userId}
+        ORDER BY vc.created_at DESC
+    </select>
+
+    <!-- 查询所有证明记录 -->
+    <select id="selectAllCertificates" resultMap="CertificateVOMap">
+        SELECT 
+            vc.*,
+            u.real_name as user_name,
+            approver.real_name as approver_name
+        FROM cert_twb vc
+        LEFT JOIN user_twb u ON vc.user_id = u.id
+        LEFT JOIN user_twb approver ON vc.approver_id = approver.id
+        ORDER BY vc.created_at DESC
+    </select>
+
+</mapper>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hngy.cvs.mapper.PointsMapper">
+
+    <!-- 积分记录VO结果映射 -->
+    <resultMap id="PointsRecordVOMap" type="com.hngy.cvs.dto.response.PointsRecordVO">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="points" property="points"/>
+        <result column="user_name" property="userName"/>
+        <result column="total_points" property="totalPoints"/>
+    </resultMap>
+
+    <!-- 查询我的积分记录 -->
+    <select id="selectMyPoints" resultMap="PointsRecordVOMap">
+        SELECT
+            pr.id,
+            pr.user_id,
+            pr.points,
+            u.name as user_name,
+            (SELECT SUM(points) FROM points_twb WHERE user_id = pr.user_id) as total_points
+        FROM points_twb pr
+        LEFT JOIN user_twb u ON pr.user_id = u.id
+        WHERE pr.user_id = #{userId}
+        ORDER BY pr.id DESC
+    </select>
+
+</mapper>

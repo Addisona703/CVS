@@ -1,0 +1,11 @@
+// API统一导出
+export { authAPI } from './auth'
+export { userAPI } from './user'
+export { activityAPI } from './activity'
+export { signupAPI } from './signup'
+export { pointsAPI } from './points'
+export { certificateAPI } from './certificate'
+export { statisticsAPI } from './statistics'
+export { serviceRecordAPI } from './serviceRecord'
+export { roleAPI } from './role'
+// export { systemAPI } from './system'
