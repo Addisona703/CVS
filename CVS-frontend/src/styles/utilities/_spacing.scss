@@ -1,0 +1,137 @@
+/**
+ * 间距工具类
+ * 基于 8px 基准的间距系统
+ * 使用方式: .m-4 (margin: var(--space-4)), .p-6 (padding: var(--space-6))
+ */
+
+// Margin 工具类
+@for $i from 0 through 24 {
+  .m-#{$i} {
+    margin: var(--space-#{$i}) !important;
+  }
+  
+  .mt-#{$i} {
+    margin-top: var(--space-#{$i}) !important;
+  }
+  
+  .mb-#{$i} {
+    margin-bottom: var(--space-#{$i}) !important;
+  }
+  
+  .ml-#{$i} {
+    margin-left: var(--space-#{$i}) !important;
+  }
+  
+  .mr-#{$i} {
+    margin-right: var(--space-#{$i}) !important;
+  }
+  
+  .mx-#{$i} {
+    margin-left: var(--space-#{$i}) !important;
+    margin-right: var(--space-#{$i}) !important;
+  }
+  
+  .my-#{$i} {
+    margin-top: var(--space-#{$i}) !important;
+    margin-bottom: var(--space-#{$i}) !important;
+  }
+}
+
+// Padding 工具类
+@for $i from 0 through 24 {
+  .p-#{$i} {
+    padding: var(--space-#{$i}) !important;
+  }
+  
+  .pt-#{$i} {
+    padding-top: var(--space-#{$i}) !important;
+  }
+  
+  .pb-#{$i} {
+    padding-bottom: var(--space-#{$i}) !important;
+  }
+  
+  .pl-#{$i} {
+    padding-left: var(--space-#{$i}) !important;
+  }
+  
+  .pr-#{$i} {
+    padding-right: var(--space-#{$i}) !important;
+  }
+  
+  .px-#{$i} {
+    padding-left: var(--space-#{$i}) !important;
+    padding-right: var(--space-#{$i}) !important;
+  }
+  
+  .py-#{$i} {
+    padding-top: var(--space-#{$i}) !important;
+    padding-bottom: var(--space-#{$i}) !important;
+  }
+}
+
+// Gap 工具类
+@for $i from 0 through 24 {
+  .gap-#{$i} {
+    gap: var(--space-#{$i}) !important;
+  }
+}
+
+// 响应式间距工具类
+.padding-responsive {
+  @include mobile {
+    padding: var(--padding-mobile) !important;
+  }
+  
+  @include tablet {
+    padding: var(--padding-tablet) !important;
+  }
+  
+  @include desktop {
+    padding: var(--padding-desktop) !important;
+  }
+}
+
+// 常用间距组合
+.section-spacing {
+  margin-bottom: var(--section-gap) !important;
+}
+
+.page-spacing {
+  margin-bottom: var(--page-gap) !important;
+}
+
+.layout-spacing {
+  gap: var(--layout-gap) !important;
+}
+
+// 自动间距
+.m-auto {
+  margin: auto !important;
+}
+
+.mx-auto {
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+.my-auto {
+  margin-top: auto !important;
+  margin-bottom: auto !important;
+}
+
+.mt-auto {
+  margin-top: auto !important;
+}
+
+.mb-auto {
+  margin-bottom: auto !important;
+}
+
+.ml-auto {
+  margin-left: auto !important;
+}
+
+.mr-auto {
+  margin-right: auto !important;
+}

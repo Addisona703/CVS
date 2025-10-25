@@ -1,0 +1,183 @@
+/**
+ * 动画工具类
+ * 基于 design.md 第 6 章节规范
+ */
+
+// 淡入淡出动画
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+// 滑入动画
+@keyframes slide-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-in-down {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+// 缩放动画
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes scale-out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+}
+
+// 旋转动画
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// 脉冲动画
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+// 弹跳动画
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+// 工具类
+.fade-in {
+  animation: fade-in var(--animation-duration-fade) var(--transition-timing);
+}
+
+.fade-out {
+  animation: fade-out var(--animation-duration-fade) var(--transition-timing);
+}
+
+.slide-in-up {
+  animation: slide-in-up var(--animation-duration-slide) var(--transition-timing);
+}
+
+.slide-in-down {
+  animation: slide-in-down var(--animation-duration-slide) var(--transition-timing);
+}
+
+.slide-in-left {
+  animation: slide-in-left var(--animation-duration-slide) var(--transition-timing);
+}
+
+.slide-in-right {
+  animation: slide-in-right var(--animation-duration-slide) var(--transition-timing);
+}
+
+.scale-in {
+  animation: scale-in var(--animation-duration-fade) var(--transition-timing);
+}
+
+.scale-out {
+  animation: scale-out var(--animation-duration-fade) var(--transition-timing);
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+.pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.bounce {
+  animation: bounce 1s ease-in-out infinite;
+}
+
+// 动效降级
+@media (prefers-reduced-motion: reduce) {
+  .fade-in,
+  .fade-out,
+  .slide-in-up,
+  .slide-in-down,
+  .slide-in-left,
+  .slide-in-right,
+  .scale-in,
+  .scale-out,
+  .spin,
+  .pulse,
+  .bounce {
+    animation: none;
+  }
+}

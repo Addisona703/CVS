@@ -1,0 +1,52 @@
+/**
+ * 颜色系统
+ * 基于 design.md 第 3 章节规范
+ * 定义基础颜色变量，角色主题会覆盖这些变量
+ */
+
+:root {
+  // 基础品牌色
+  --color-blue: #409eff;
+  --color-green: #67c23a;
+  --color-blue-vivid: #1f6bff;
+  
+  // 功能色 - 状态提示
+  --color-success: #67c23a;
+  --color-warning: #e6a23c;
+  --color-error: #f56c6c;
+  --color-info: #409eff;
+  
+  // 中性色
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --color-gray-50: #fafafa;
+  --color-gray-100: #f5f5f5;
+  --color-gray-200: #eeeeee;
+  --color-gray-300: #e0e0e0;
+  --color-gray-400: #bdbdbd;
+  --color-gray-500: #9e9e9e;
+  --color-gray-600: #757575;
+  --color-gray-700: #616161;
+  --color-gray-800: #424242;
+  --color-gray-900: #212121;
+  
+  // 文本颜色 (默认值，会被角色主题覆盖)
+  --text-color-primary: #303133;
+  --text-color-regular: #606266;
+  --text-color-secondary: #909399;
+  --text-color-placeholder: #c0c4cc;
+  
+  // 背景颜色 (默认值，会被角色主题覆盖)
+  --bg-color-page: #f0f2f5;
+  --bg-color-base: #ffffff;
+  --bg-color-overlay: rgba(0, 0, 0, 0.5);
+  
+  // 边框颜色
+  --border-color-base: #dcdfe6;
+  --border-color-light: #e4e7ed;
+  --border-color-lighter: #ebeef5;
+  --border-color-extra-light: #f2f6fc;
+  
+  // 分隔线颜色
+  --divider-color: rgba(0, 0, 0, 0.06);
+}

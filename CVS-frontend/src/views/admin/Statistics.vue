@@ -69,9 +69,9 @@
               <el-icon size="32"><Clock /></el-icon>
             </div>
             <div class="stat-info">
-              <div class="stat-number">{{ overviewStats.totalServiceHours }}</div>
+              <div class="stat-number">{{ Math.round((overviewStats.totalServiceHours || 0) * 10) / 10 }}</div>
               <div class="stat-label">服务时长(小时)</div>
-              <div class="stat-change positive">+{{ overviewStats.newServiceHours }} 新增</div>
+              <div class="stat-change positive">+{{ Math.round((overviewStats.newServiceHours || 0) * 10) / 10 }} 新增</div>
             </div>
           </div>
         </el-card>
@@ -145,7 +145,7 @@
     <el-card title="活动统计详情">
       <el-table :data="activityStats" stripe>
         <el-table-column prop="title" label="活动名称" />
-        <el-table-column prop="creatorName" label="创建者" />
+        <el-table-column prop="organizerName" label="创建者" />
         <el-table-column prop="signupCount" label="报名人数" />
         <el-table-column prop="participantCount" label="参与人数" />
         <el-table-column prop="serviceHours" label="服务时长" />
@@ -206,7 +206,7 @@ const topUsers = ref([
 const activityStats = ref([
   {
     title: '社区环保志愿活动',
-    creatorName: '张老师',
+    organizerName: '张老师',
     signupCount: 30,
     participantCount: 28,
     serviceHours: 84,
@@ -215,7 +215,7 @@ const activityStats = ref([
   },
   {
     title: '敬老院志愿服务',
-    creatorName: '李老师',
+    organizerName: '李老师',
     signupCount: 25,
     participantCount: 23,
     serviceHours: 69,
@@ -244,9 +244,19 @@ const getStatusType = (status) => {
 
 const fetchOverviewStats = async () => {
   try {
-    const response = await statisticsAPI.getOverallStats()
+    const response = await statisticsAPI.getAdminDashboardStats()
     if (response.code === 200) {
-      Object.assign(overviewStats, response.data)
+      // 适配管理员仪表板数据到统计页面的显示格式
+      Object.assign(overviewStats, {
+        totalUsers: response.data.totalUsers || 0,
+        totalActivities: response.data.totalActivities || 0,
+        totalSignups: response.data.totalSignups || 0,
+        totalServiceHours: response.data.totalServiceRecords || 0, // 用服务记录数代替
+        newUsers: 0, // 这些字段后端暂时未提供
+        newActivities: 0,
+        newSignups: 0,
+        newServiceHours: 0
+      })
     }
   } catch (error) {
     console.error('获取统计数据失败:', error)

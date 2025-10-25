@@ -18,7 +18,7 @@ public class Signup {
     /**
      * 主键ID
      */
-    @TableId(type = IdType.ASSIGN_ID)
+    @TableId(type = IdType.AUTO)
     private Long id;
 
     /**
@@ -49,22 +49,56 @@ public class Signup {
     /**
      * 是否签到
      */
+    @TableField("signed_in")
     private Boolean signedIn;
 
     /**
      * 是否签退
      */
+    @TableField("signed_out")
     private Boolean signedOut;
 
     /**
      * 签到时间
      */
+    @TableField("sign_in_time")
     private LocalDateTime signInTime;
 
     /**
      * 签退时间
      */
+    @TableField("sign_out_time")
     private LocalDateTime signOutTime;
+
+    /**
+     * 学生自评分（1-5）
+     */
+    @TableField("student_rating")
+    private Integer studentRating;
+
+    /**
+     * 学生自评内容
+     */
+    @TableField("student_evaluation")
+    private String studentEvaluation;
+
+    /**
+     * 教师最终评分（触发积分计算）
+     */
+    @TableField("teacher_rating")
+    private Integer teacherRating;
+
+    /**
+     * 教师最终评语
+     */
+    @TableField("teacher_evaluation")
+    private String teacherEvaluation;
+
+    /**
+     * 教师确认最终评分时间
+     */
+    @TableField("teacher_rating_confirmed_at")
+    private LocalDateTime teacherRatingConfirmedAt;
 
     /**
      * 创建时间

@@ -1,5 +1,6 @@
 package com.hngy.cvs.dto.request;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.hngy.cvs.entity.enums.SignupStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -27,4 +28,8 @@ public class SignupSearchDTO {
 
     @Schema(description = "用户ID", example = "1")
     private Long userId;
+
+    private Boolean signedIn;
+
+    private Boolean signedOut;
 }

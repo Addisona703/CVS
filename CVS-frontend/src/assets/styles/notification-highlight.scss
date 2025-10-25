@@ -1,0 +1,52 @@
+/* 通知高亮样式 */
+.notification-highlight {
+  border: 1px solid #409eff;
+  border-radius: 8px;
+  background-color: rgba(64, 158, 255, 0.08);
+  box-shadow: none;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.notification-highlight:hover {
+  background-color: rgba(64, 158, 255, 0.12);
+}
+
+/* 特定区域的高亮样式 */
+.signin-section.notification-highlight,
+.checkin-section.notification-highlight,
+.approval-success.notification-highlight,
+.status-approved.notification-highlight,
+.checkout-success.notification-highlight {
+  border-color: #67c23a;
+  background-color: rgba(103, 194, 58, 0.1);
+}
+
+.signout-section.notification-highlight,
+.checkout-section.notification-highlight {
+  border-color: #e6a23c;
+  background-color: rgba(230, 162, 60, 0.1);
+}
+
+.approval-rejected.notification-highlight,
+.status-rejected.notification-highlight,
+.checkout-rejected.notification-highlight {
+  border-color: #f56c6c;
+  background-color: rgba(245, 108, 108, 0.1);
+}
+
+/* 通知来源标识 */
+.from-notification {
+  position: relative;
+}
+
+.from-notification::after {
+  content: '来自通知';
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: #409eff;
+  color: #fff;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 10px;
+}

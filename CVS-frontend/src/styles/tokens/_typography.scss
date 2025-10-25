@@ -1,0 +1,225 @@
+/**
+ * 字体系统
+ * 基于 design.md 第 4 章节规范
+ */
+
+:root {
+  // 字体家族 - 优化跨语言显示
+  // 英文优先：Inter, Roboto 提供现代感
+  // 中文优先：思源黑体 > 微软雅黑 > 系统默认
+  // 系统回退：确保在任何环境下都有合适的字体
+  --font-family-base: 
+    "Inter", 
+    "Roboto", 
+    "Source Han Sans SC", 
+    "思源黑体", 
+    "Noto Sans CJK SC", 
+    "Microsoft YaHei", 
+    "微软雅黑", 
+    "PingFang SC", 
+    "Hiragino Sans GB", 
+    "Heiti SC", 
+    -apple-system, 
+    BlinkMacSystemFont, 
+    "Segoe UI", 
+    "Helvetica Neue", 
+    Arial, 
+    sans-serif;
+  
+  // 等宽字体 - 代码显示
+  --font-family-mono: 
+    "SF Mono", 
+    "Monaco", 
+    "Inconsolata", 
+    "Roboto Mono", 
+    "Source Code Pro", 
+    "Menlo", 
+    "Consolas", 
+    "Liberation Mono", 
+    "Courier New", 
+    monospace;
+  
+  // 字体大小 - 基于 design.md 规范，确保跨语言一致性
+  --font-size-xs: 12px;    // 辅助文字、标签、说明
+  --font-size-sm: 14px;    // 正文小、表格内容、按钮文字
+  --font-size-base: 16px;  // 正文、表单输入、导航
+  --font-size-lg: 18px;    // 标题小、卡片标题
+  --font-size-xl: 20px;    // 标题中、页面副标题
+  --font-size-2xl: 24px;   // 标题大、页面主标题
+  --font-size-3xl: 30px;   // 大标题、欢迎页标题
+  --font-size-4xl: 36px;   // 超大标题、品牌标题
+  
+  // 行高 - 针对中英文混排优化
+  --line-height-tight: 1.25;      // 紧凑标题
+  --line-height-snug: 1.375;      // 副标题
+  --line-height-normal: 1.5;      // 正文（中文最佳）
+  --line-height-relaxed: 1.625;   // 长文本阅读
+  --line-height-loose: 2;         // 特殊用途
+  
+  // 字重
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  
+  // 字母间距 - 针对不同语言优化
+  --letter-spacing-tighter: -0.05em;  // 英文标题
+  --letter-spacing-tight: -0.025em;   // 英文副标题
+  --letter-spacing-normal: 0;         // 中文正文（默认）
+  --letter-spacing-wide: 0.025em;     // 英文正文
+  --letter-spacing-wider: 0.05em;     // 按钮文字
+  --letter-spacing-widest: 0.1em;     // 特殊强调
+}
+
+/**
+ * 字体加载优化
+ * 确保字体加载失败时有合适的回退
+ */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap; /* 优化字体加载性能 */
+  src: local('Inter'), local('Inter-Regular');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: local('Inter Medium'), local('Inter-Medium');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('Inter SemiBold'), local('Inter-SemiBold');
+}
+
+/**
+ * 语言特定优化
+ * 针对不同语言环境的字体渲染优化
+ */
+
+/* 中文环境优化 */
+:root:lang(zh),
+:root:lang(zh-CN),
+:root:lang(zh-TW) {
+  --font-family-base: 
+    "Source Han Sans SC", 
+    "思源黑体", 
+    "Noto Sans CJK SC", 
+    "Microsoft YaHei", 
+    "微软雅黑", 
+    "PingFang SC", 
+    "Hiragino Sans GB", 
+    "Inter", 
+    "Roboto", 
+    -apple-system, 
+    BlinkMacSystemFont, 
+    "Segoe UI", 
+    sans-serif;
+}
+
+/* 英文环境优化 */
+:root:lang(en) {
+  --font-family-base: 
+    "Inter", 
+    "Roboto", 
+    -apple-system, 
+    BlinkMacSystemFont, 
+    "Segoe UI", 
+    "Helvetica Neue", 
+    Arial, 
+    sans-serif;
+}
+
+/**
+ * 字体渲染优化
+ * 确保在不同设备和浏览器上的一致性
+ */
+body {
+  /* 字体渲染优化 */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  
+  /* 确保字体回退时的平滑过渡 */
+  font-synthesis: none;
+  
+  /* 针对高分辨率屏幕优化 */
+  @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    -webkit-font-smoothing: subpixel-antialiased;
+  }
+}
+
+/**
+ * 设备特定的字体调整
+ * 根据设备类型优化字体显示
+ */
+
+/* 移动设备字体优化 */
+body.device-mobile {
+  --font-size-base: 15px;  /* 移动端稍小的基础字体 */
+  --line-height-normal: 1.6; /* 移动端更大的行高 */
+  
+  /* 移动端字体大小调整 */
+  --font-size-xs: 11px;
+  --font-size-sm: 13px;
+  --font-size-lg: 17px;
+  --font-size-xl: 19px;
+  --font-size-2xl: 22px;
+  --font-size-3xl: 26px;
+  --font-size-4xl: 30px;
+}
+
+/* 平板设备字体优化 */
+body.device-tablet {
+  --font-size-base: 15px;
+  --line-height-normal: 1.55;
+}
+
+/* 桌面设备字体优化 */
+body.device-desktop {
+  --font-size-base: 16px;
+  --line-height-normal: 1.5;
+}
+
+/**
+ * 字体加载状态样式
+ * 处理字体加载过程中的显示
+ */
+
+/* 字体加载完成 */
+body.fonts-loaded {
+  font-family: var(--font-family-base);
+}
+
+/* 字体加载失败回退 */
+body.fonts-fallback {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", "微软雅黑", sans-serif;
+}
+
+/**
+ * 无障碍访问优化
+ * 支持用户自定义字体大小
+ */
+
+/* 尊重用户的字体大小偏好 */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* 支持大字体模式 */
+@media (min-resolution: 192dpi) and (max-width: 768px) {
+  body {
+    --font-size-base: 17px;
+    --line-height-normal: 1.65;
+  }
+}

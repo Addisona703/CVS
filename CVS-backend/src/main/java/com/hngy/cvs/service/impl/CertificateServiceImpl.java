@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.hngy.cvs.common.exception.BusinessException;
 import com.hngy.cvs.common.result.ResultCode;
+import com.hngy.cvs.common.util.AssertUtils;
 import com.hngy.cvs.common.util.BeanUtil;
 import com.hngy.cvs.dto.request.CertificateApprovalDTO;
 import com.hngy.cvs.dto.request.CertificateCreateDTO;
@@ -13,6 +14,7 @@ import com.hngy.cvs.entity.Certificate;
 import com.hngy.cvs.entity.enums.CertificateStatus;
 import com.hngy.cvs.mapper.CertificateMapper;
 import com.hngy.cvs.service.CertificateService;
+import com.hngy.cvs.service.strategy.EligibilityResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -32,16 +34,31 @@ import java.time.format.DateTimeFormatter;
 public class CertificateServiceImpl implements CertificateService {
 
     private final CertificateMapper certificateMapper;
+    private final com.hngy.cvs.service.strategy.CertificateEligibilityStrategy eligibilityStrategy;
+    private final com.hngy.cvs.service.PdfService pdfService;
+    private final com.hngy.cvs.mapper.UserMapper userMapper;
 
     @Override
     @Transactional
     public CertificateVO applyCertificate(CertificateCreateDTO request, Long userId) {
-        // 验证日期
+        // 1. 验证资格（使用策略模式）
+        EligibilityResult eligibilityResult = eligibilityStrategy.validate(userId);
+        AssertUtils.isTrue(eligibilityResult.isEligible(), eligibilityResult.getMessage());
+        
+        // 2. 检查是否有待审核的申请
+        long pendingCount = certificateMapper.selectCount(
+            new LambdaQueryWrapper<Certificate>()
+                .eq(Certificate::getUserId, userId)
+                .eq(Certificate::getStatus, CertificateStatus.PENDING)
+        );
+        com.hngy.cvs.common.util.AssertUtils.isTrue(pendingCount == 0, "您有待审核的证书申请，请等待审核完成");
+        
+        // 3. 验证日期
         if (request.getEndDate().isBefore(request.getStartDate())) {
             throw new BusinessException(ResultCode.BAD_REQUEST.getCode(), "结束日期不能早于开始日期");
         }
 
-        // 创建证明申请
+        // 4. 创建证明申请
         Certificate certificate = BeanUtil.to(request, Certificate.class);
         certificate.setUserId(userId);
         certificate.setStatus(CertificateStatus.PENDING);
@@ -123,8 +140,7 @@ public class CertificateServiceImpl implements CertificateService {
     @Override
     public IPage<CertificateVO> getPendingCertificates(int page, int size) {
         Page<CertificateVO> certificatePage = new Page<>(page, size);
-        // 这里需要在Mapper中实现查询待审核证明的方法
-        return certificatePage; // 临时返回空页面
+        return certificateMapper.selectPendingCertificates(certificatePage);
     }
 
     @Override
@@ -187,6 +203,64 @@ public class CertificateServiceImpl implements CertificateService {
     @Override
     public Long countByCondition(LambdaQueryWrapper<Certificate> wrapper) {
         return certificateMapper.selectCount(wrapper);
+    }
+
+    @Override
+    public byte[] generateCertificatePdf(Long certificateId, Long userId, com.hngy.cvs.entity.enums.UserRole userRole) {
+        // 1. 验证权限
+        validateCertificateAccess(certificateId, userId, userRole);
+        
+        // 2. 获取证书记录
+        Certificate certificate = certificateMapper.selectById(certificateId);
+        com.hngy.cvs.common.util.AssertUtils.notNull(certificate, "证书不存在");
+        
+        // 3. 验证证书状态
+        com.hngy.cvs.common.util.AssertUtils.isTrue(
+            certificate.getStatus() == CertificateStatus.APPROVED,
+            "证书尚未通过审核，无法生成"
+        );
+        
+        // 4. 获取用户信息
+        com.hngy.cvs.entity.User user = userMapper.selectById(certificate.getUserId());
+        com.hngy.cvs.common.util.AssertUtils.notNull(user, "用户不存在");
+        
+        // 5. 准备PDF数据
+        java.util.Map<String, String> data = new java.util.HashMap<>();
+        data.put("name", user.getName());
+        data.put("username", user.getUsername());
+        data.put("serial", certificate.getCertificateNumber());
+        data.put("issueDate", formatDate(certificate.getApprovedAt()));
+        
+        // 6. 调用PdfService生成PDF
+        return pdfService.generateCertificatePdf(data);
+    }
+
+    /**
+     * 验证证书访问权限
+     *
+     * @param certificateId 证书ID
+     * @param userId 用户ID
+     * @param role 用户角色
+     */
+    private void validateCertificateAccess(Long certificateId, Long userId, com.hngy.cvs.entity.enums.UserRole role) {
+        Certificate certificate = certificateMapper.selectById(certificateId);
+        com.hngy.cvs.common.util.AssertUtils.notNull(certificate, "证书不存在");
+        
+        // 管理员可以访问所有证书
+        if (role == com.hngy.cvs.entity.enums.UserRole.ADMIN) {
+            return;
+        }
+        
+        // 普通用户只能访问自己的证书
+        com.hngy.cvs.common.util.AssertUtils.isTrue(
+            certificate.getUserId().equals(userId),
+            "无权访问该证书"
+        );
+    }
+
+    private String formatDate(LocalDateTime dateTime) {
+        if (dateTime == null) return "";
+        return dateTime.format(DateTimeFormatter.ofPattern("yyyy年MM月dd日"));
     }
 
     private CertificateVO convertToVO(Certificate certificate) {

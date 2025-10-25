@@ -8,9 +8,12 @@ import com.hngy.cvs.dto.response.UserVO;
 import com.hngy.cvs.dto.request.SendCodeDTO;
 import com.hngy.cvs.dto.request.VerifyCodeDTO;
 import com.hngy.cvs.dto.response.VerifyCodeVO;
+import com.hngy.cvs.dto.request.ResetPasswordDTO;
+import com.hngy.cvs.dto.request.ForgotPasswordDTO;
 import com.hngy.cvs.service.EmailService;
 import com.hngy.cvs.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -68,6 +71,20 @@ public class AuthController {
     public Result<Void> sendVerificationCode(@Valid @RequestBody SendCodeDTO dto) {
         emailService.sendVerificationCode(dto);
         return Result.success("验证码发送成功");
+    }
+
+    @PostMapping("/reset-password")
+    @Operation(summary = "重置密码")
+    public Result<Void> resetPassword(@Valid @RequestBody ResetPasswordDTO dto) {
+        userService.resetPassword(dto.getToken(), dto.getNewPassword());
+        return Result.success("密码重置成功，请重新登录");
+    }
+
+    @PostMapping("/forgot-password")
+    @Operation(summary = "忘记密码")
+    public Result<Void> forgotPassword(@Valid @RequestBody ForgotPasswordDTO dto) {
+        userService.forgotPassword(dto.getEmail());
+        return Result.success("重置密码链接已发送，请检查邮箱");
     }
 
     @PostMapping("/verify-code")

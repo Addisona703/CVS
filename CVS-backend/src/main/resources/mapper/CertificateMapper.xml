@@ -6,6 +6,7 @@
     <resultMap id="CertificateVOMap" type="com.hngy.cvs.dto.response.CertificateVO">
         <id column="id" property="id"/>
         <result column="user_id" property="userId"/>
+        <result column="username" property="username"/>
         <result column="certificate_number" property="certificateNumber"/>
         <result column="purpose" property="purpose"/>
         <result column="start_date" property="startDate"/>
@@ -15,16 +16,35 @@
         <result column="approver_id" property="approverId"/>
         <result column="approved_at" property="approvedAt"/>
         <result column="created_at" property="createdAt"/>
-        <result column="user_name" property="userName"/>
+        <result column="user_name" property="name"/>
         <result column="approver_name" property="approverName"/>
+        <association property="statistics" javaType="com.hngy.cvs.dto.response.CertificateVO$ServiceStatistics">
+            <result column="completed_activity_count" property="completedActivityCount"/>
+            <result column="total_service_hours" property="totalServiceHours"/>
+        </association>
     </resultMap>
 
     <!-- 查询我的证明记录 -->
     <select id="selectMyCertificates" resultMap="CertificateVOMap">
         SELECT 
             vc.*,
-            u.real_name as user_name,
-            approver.real_name as approver_name
+            u.username as username,
+            u.name as user_name,
+            approver.name as approver_name,
+            (SELECT COUNT(DISTINCT s.activity_id) 
+             FROM signup_twb s 
+             WHERE s.user_id = vc.user_id 
+             AND s.status = 'APPROVED'
+             AND s.signed_in = 1
+             AND s.signed_out = 1
+             AND DATE(s.sign_in_time) BETWEEN vc.start_date AND vc.end_date) as completed_activity_count,
+            (SELECT COALESCE(SUM(TIMESTAMPDIFF(HOUR, s.sign_in_time, s.sign_out_time)), 0) 
+             FROM signup_twb s 
+             WHERE s.user_id = vc.user_id 
+             AND s.status = 'APPROVED'
+             AND s.signed_in = 1
+             AND s.signed_out = 1
+             AND DATE(s.sign_in_time) BETWEEN vc.start_date AND vc.end_date) as total_service_hours
         FROM cert_twb vc
         LEFT JOIN user_twb u ON vc.user_id = u.id
         LEFT JOIN user_twb approver ON vc.approver_id = approver.id
@@ -36,11 +56,54 @@
     <select id="selectAllCertificates" resultMap="CertificateVOMap">
         SELECT 
             vc.*,
-            u.real_name as user_name,
-            approver.real_name as approver_name
+            u.username as username,
+            u.name as user_name,
+            approver.name as approver_name,
+            (SELECT COUNT(DISTINCT s.activity_id) 
+             FROM signup_twb s 
+             WHERE s.user_id = vc.user_id 
+             AND s.status = 'APPROVED'
+             AND s.signed_in = 1
+             AND s.signed_out = 1
+             AND DATE(s.sign_in_time) BETWEEN vc.start_date AND vc.end_date) as completed_activity_count,
+            (SELECT COALESCE(SUM(TIMESTAMPDIFF(HOUR, s.sign_in_time, s.sign_out_time)), 0) 
+             FROM signup_twb s 
+             WHERE s.user_id = vc.user_id 
+             AND s.status = 'APPROVED'
+             AND s.signed_in = 1
+             AND s.signed_out = 1
+             AND DATE(s.sign_in_time) BETWEEN vc.start_date AND vc.end_date) as total_service_hours
         FROM cert_twb vc
         LEFT JOIN user_twb u ON vc.user_id = u.id
         LEFT JOIN user_twb approver ON vc.approver_id = approver.id
+        ORDER BY vc.created_at DESC
+    </select>
+
+    <!-- 查询待审核的证明记录 -->
+    <select id="selectPendingCertificates" resultMap="CertificateVOMap">
+        SELECT 
+            vc.*,
+            u.username as username,
+            u.name as user_name,
+            approver.name as approver_name,
+            (SELECT COUNT(DISTINCT s.activity_id) 
+             FROM signup_twb s 
+             WHERE s.user_id = vc.user_id 
+             AND s.status = 'APPROVED'
+             AND s.signed_in = 1
+             AND s.signed_out = 1
+             AND DATE(s.sign_in_time) BETWEEN vc.start_date AND vc.end_date) as completed_activity_count,
+            (SELECT COALESCE(SUM(TIMESTAMPDIFF(HOUR, s.sign_in_time, s.sign_out_time)), 0) 
+             FROM signup_twb s 
+             WHERE s.user_id = vc.user_id 
+             AND s.status = 'APPROVED'
+             AND s.signed_in = 1
+             AND s.signed_out = 1
+             AND DATE(s.sign_in_time) BETWEEN vc.start_date AND vc.end_date) as total_service_hours
+        FROM cert_twb vc
+        LEFT JOIN user_twb u ON vc.user_id = u.id
+        LEFT JOIN user_twb approver ON vc.approver_id = approver.id
+        WHERE vc.status = 'PENDING'
         ORDER BY vc.created_at DESC
     </select>
 

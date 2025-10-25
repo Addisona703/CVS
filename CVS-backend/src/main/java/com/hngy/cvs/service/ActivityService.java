@@ -4,6 +4,7 @@ import com.hngy.cvs.dto.request.ActivityCreateDTO;
 import com.hngy.cvs.dto.request.ActivitySearchDTO;
 import com.hngy.cvs.dto.request.ActivityUpdateDTO;
 import com.hngy.cvs.dto.request.PageDTO;
+import com.hngy.cvs.dto.response.ActivityStatisticsVO;
 import com.hngy.cvs.dto.response.ActivityVO;
 import com.hngy.cvs.dto.response.PageVO;
 
@@ -47,9 +48,18 @@ public interface ActivityService {
     PageVO<ActivityVO> getMyActivitiesList(PageDTO<ActivitySearchDTO> pageRequest, Long organizerId);
 
     /**
-     * 发布活动
+     * 发布活动（提交审核）
      */
     void publishActivity(Long id, Long organizerId);
+
+    /**
+     * 审核活动（管理员）
+     * @param id 活动ID
+     * @param approved 是否通过
+     * @param rejectReason 拒绝原因（拒绝时必填）
+     * @param approverId 审核人ID
+     */
+    void approveActivity(Long id, Boolean approved, String rejectReason, Long approverId);
 
     /**
      * 取消活动
@@ -65,4 +75,12 @@ public interface ActivityService {
      * 统计用户创建的活动数量
      */
     Long countActivitiesByOrganizer(Long organizerId);
+
+    /**
+     * 获取活动统计数据
+     * 
+     * @param days 统计天数 (7, 30, 90)
+     * @return 活动统计数据
+     */
+    ActivityStatisticsVO getActivityStatistics(Integer days);
 }

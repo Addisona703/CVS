@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hngy.cvs.mapper.ProductMapper">
+
+    <!-- 扣减商品库存（使用乐观锁） -->
+    <update id="decreaseStock">
+        UPDATE product_twb 
+        SET stock = stock - 1,
+            updated_at = NOW()
+        WHERE id = #{productId} 
+          AND stock > 0
+          AND deleted = 0
+    </update>
+
+    <!-- 增加商品库存 -->
+    <update id="increaseStock">
+        UPDATE product_twb 
+        SET stock = stock + 1,
+            updated_at = NOW()
+        WHERE id = #{productId}
+          AND deleted = 0
+    </update>
+
+    <!-- 获取库存预警商品列表 -->
+    <select id="selectLowStockProducts" resultType="com.hngy.cvs.dto.response.ProductVO">
+        SELECT 
+            p.id,
+            p.name,
+            p.description,
+            p.points_required as pointsRequired,
+            p.stock,
+            p.image_url as imageUrl,
+            p.category_id as categoryId,
+            c.name as categoryName,
+            p.status,
+            CASE p.status
+                WHEN 0 THEN '下架'
+                WHEN 1 THEN '上架'
+                ELSE '未知'
+            END as statusText,
+            p.stock_warning as stockWarning,
+            p.created_at as createdAt,
+            p.updated_at as updatedAt
+        FROM product_twb p
+        LEFT JOIN category_twb c ON p.category_id = c.id
+        WHERE p.deleted = 0
+          AND p.status = 1
+          AND p.stock &lt;= p.stock_warning
+        ORDER BY p.stock ASC, p.updated_at DESC
+    </select>
+
+</mapper>

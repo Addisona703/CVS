@@ -6,6 +6,7 @@ import lombok.Data;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import java.util.List;
 
 /**
  * 报名审批请求DTO
@@ -17,11 +18,12 @@ import jakarta.validation.constraints.Size;
 public class SignupApprovalDTO {
 
     @Schema(description = "报名ID", example = "1")
-    @NotNull(message = "报名ID不能为空")
     private Long signupId;
 
+    @Schema(description = "报名ID列表（批量操作时使用）")
+    private List<Long> signupIds;
+
     @Schema(description = "审批状态", example = "APPROVED")
-    @NotNull(message = "审批状态不能为空")
     private SignupStatus status;
 
     @Schema(description = "拒绝原因", example = "时间冲突，无法参加")

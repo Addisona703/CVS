@@ -212,4 +212,28 @@ public class AssertUtils {
             throw new BusinessException(resultCode);
         }
     }
+
+    /**
+     * 断言字符串不为空白（notBlank 别名方法）
+     *
+     * @param str 字符串
+     * @param resultCode 错误码
+     */
+    public static void notBlank(String str, ResultCode resultCode) {
+        if (StrUtil.isBlank(str)) {
+            throw new BusinessException(resultCode);
+        }
+    }
+
+    /**
+     * 断言字符串不为空白
+     *
+     * @param str 字符串
+     * @param message 错误消息
+     */
+    public static void notBlank(String str, String message) {
+        if (StrUtil.isBlank(str)) {
+            throw new BusinessException(message);
+        }
+    }
 }

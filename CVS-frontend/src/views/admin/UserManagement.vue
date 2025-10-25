@@ -2,10 +2,10 @@
   <div class="user-management">
     <div class="page-header">
       <h1>用户管理</h1>
-      <el-button type="primary" @click="showAddDialog = true">
+      <!-- <el-button type="primary" @click="showAddDialog = true">
         <el-icon><Plus /></el-icon>
         添加用户
-      </el-button>
+      </el-button> -->
     </div>
     
     <!-- 搜索筛选 -->
@@ -14,12 +14,17 @@
         <el-form-item label="用户名">
           <el-input v-model="searchForm.username" placeholder="请输入用户名" clearable />
         </el-form-item>
+        <el-form-item label="姓名">
+          <el-input v-model="searchForm.name" placeholder="请输入姓名" clearable />
+        </el-form-item>
         <el-form-item label="角色">
           <el-select v-model="searchForm.role" placeholder="请选择角色" clearable>
-            <el-option label="管理员" value="ADMIN" />
             <el-option label="教师" value="TEACHER" />
             <el-option label="学生" value="STUDENT" />
           </el-select>
+        </el-form-item>
+        <el-form-item label="邮箱">
+          <el-input v-model="searchForm.email" placeholder="请输入邮箱" clearable />
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="handleSearch">搜索</el-button>
@@ -82,14 +87,13 @@
     >
       <el-form ref="userFormRef" :model="userForm" :rules="userRules" label-width="80px">
         <el-form-item label="用户名" prop="username">
-          <el-input v-model="userForm.username" placeholder="请输入用户名" />
+          <el-input v-model="userForm.username" placeholder="请输入用户名" :disabled="!!editingUser" />
         </el-form-item>
         <el-form-item label="姓名" prop="name">
           <el-input v-model="userForm.name" placeholder="请输入姓名" />
         </el-form-item>
         <el-form-item label="角色" prop="role">
-          <el-select v-model="userForm.role" placeholder="请选择角色">
-            <el-option label="管理员" value="ADMIN" />
+          <el-select v-model="userForm.role" placeholder="请选择角色" :disabled="!!editingUser">
             <el-option label="教师" value="TEACHER" />
             <el-option label="学生" value="STUDENT" />
           </el-select>
@@ -134,10 +138,14 @@ const userFormRef = ref()
 
 const searchForm = reactive({
   username: '',
-  role: ''
+  name: '',
+  role: '',
+  email: '',
+  phone: ''
 })
 
 const userForm = reactive({
+  id: null,
   username: '',
   name: '',
   role: '',
@@ -187,9 +195,11 @@ const fetchUserList = async () => {
   loading.value = true
   try {
     const params = {
-      current: pagination.current,
-      size: pagination.size,
-      ...searchForm
+      pageNum: pagination.current,
+      pageSize: pagination.size,
+      params: {
+        ...searchForm
+      }
     }
     const response = await userAPI.getUserList(params)
     if (response.code === 200) {
@@ -198,6 +208,7 @@ const fetchUserList = async () => {
     }
   } catch (error) {
     console.error('获取用户列表失败:', error)
+    ElMessage.error('获取用户列表失败')
   } finally {
     loading.value = false
   }
@@ -211,7 +222,10 @@ const handleSearch = () => {
 const handleReset = () => {
   Object.assign(searchForm, {
     username: '',
-    role: ''
+    name: '',
+    role: '',
+    email: '',
+    phone: ''
   })
   handleSearch()
 }
@@ -219,6 +233,7 @@ const handleReset = () => {
 const handleEdit = (row) => {
   editingUser.value = row
   Object.assign(userForm, {
+    id: row.id,  // 添加ID字段
     username: row.username,
     name: row.name,
     role: row.role,
@@ -257,11 +272,19 @@ const handleSubmit = async () => {
     submitting.value = true
     
     if (editingUser.value) {
-      await userAPI.updateUser(editingUser.value.id, userForm)
+      // 编辑用户，只提交允许修改的字段
+      const updateData = {
+        id: userForm.id,
+        name: userForm.name,
+        email: userForm.email,
+        phone: userForm.phone
+      }
+      await userAPI.updateUser(updateData)
       ElMessage.success('更新成功')
     } else {
-      await userAPI.createUser(userForm)
-      ElMessage.success('添加成功')
+      // 添加用户（注册功能不在这里实现，应该通过注册接口）
+      ElMessage.warning('添加用户功能尚未实现，请通过注册功能添加用户')
+      return
     }
     
     showAddDialog.value = false
@@ -269,6 +292,7 @@ const handleSubmit = async () => {
     fetchUserList()
   } catch (error) {
     console.error('提交失败:', error)
+    ElMessage.error('操作失败，请重试')
   } finally {
     submitting.value = false
   }
@@ -277,6 +301,7 @@ const handleSubmit = async () => {
 const resetForm = () => {
   editingUser.value = null
   Object.assign(userForm, {
+    id: null,
     username: '',
     name: '',
     role: '',

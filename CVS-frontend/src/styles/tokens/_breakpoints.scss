@@ -1,0 +1,27 @@
+/**
+ * 响应式断点系统
+ * 基于 design.md 第 5 章节规范
+ */
+
+:root {
+  // 断点值
+  --breakpoint-mobile: 768px;
+  --breakpoint-tablet: 1024px;
+  --breakpoint-desktop: 1280px;
+  --breakpoint-wide: 1536px;
+  
+  // 侧边栏宽度
+  --sidebar-width: 240px;
+  --sidebar-width-teacher: 240px;
+  --sidebar-width-student: 260px;
+  --sidebar-collapsed-width: 64px;
+  
+  // 最小触摸目标尺寸 (移动端可访问性)
+  --touch-target-min: 44px;
+}
+
+// SCSS 变量供 mixins 使用
+$breakpoint-mobile: 768px;
+$breakpoint-tablet: 1024px;
+$breakpoint-desktop: 1280px;
+$breakpoint-wide: 1536px;

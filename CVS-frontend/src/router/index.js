@@ -10,7 +10,9 @@ import StudentLayout from '@/layouts/StudentLayout.vue'
 const routes = [
   {
     path: '/',
-    redirect: '/auth/login'
+    name: 'Landing',
+    component: () => import('@/views/Landing.vue'),
+    meta: { title: '首页', requiresAuth: false }
   },
   {
     path: '/auth',
@@ -44,6 +46,18 @@ const routes = [
     ]
   },
   {
+    path: '/reset-password',
+    component: AuthLayout,
+    children: [
+      {
+        path: '',
+        name: 'ResetPasswordStandalone',
+        component: () => import('@/views/auth/ResetPassword.vue'),
+        meta: { title: '重置密码', requiresAuth: false }
+      }
+    ]
+  },
+  {
     path: '/admin',
     component: AdminLayout,
     redirect: '/admin/dashboard',
@@ -68,6 +82,12 @@ const routes = [
         meta: { title: '活动管理', icon: 'Calendar' }
       },
       {
+        path: 'activities/create/:id?',
+        name: 'AdminCreateActivity',
+        component: () => import('@/views/admin/CreateActivity.vue'),
+        meta: { title: '创建活动', icon: 'Plus' }
+      },
+      {
         path: 'statistics',
         name: 'Statistics',
         component: () => import('@/views/admin/Statistics.vue'),
@@ -80,11 +100,53 @@ const routes = [
         meta: { title: '服务记录管理', icon: 'Document' }
       },
       {
-        path: 'roles',
-        name: 'RoleManagement',
-        component: () => import('@/views/admin/RoleManagement.vue'),
-        meta: { title: '角色管理', icon: 'User' }
-      }
+        path: 'points',
+        name: 'AdminPointsManagement',
+        component: () => import('@/views/admin/PointsManagement.vue'),
+        meta: { title: '积分管理', icon: 'Star' }
+      },
+      {
+        path: 'mall/products',
+        name: 'ProductManagement',
+        component: () => import('@/views/admin/ProductManagement.vue'),
+        meta: { title: '商品管理', icon: 'Goods' }
+      },
+      {
+        path: 'mall/categories',
+        name: 'CategoryManagement',
+        component: () => import('@/views/admin/CategoryManagement.vue'),
+        meta: { title: '分类管理', icon: 'Menu' }
+      },
+      {
+        path: 'mall/verify',
+        name: 'RedemptionVerify',
+        component: () => import('@/views/admin/RedemptionVerify.vue'),
+        meta: { title: '兑换核销', icon: 'Finished' }
+      },
+      {
+        path: 'mall/statistics',
+        name: 'RedemptionStatistics',
+        component: () => import('@/views/admin/RedemptionStatistics.vue'),
+        meta: { title: '统计报表', icon: 'DataAnalysis' }
+      },
+      {
+        path: 'activity-approval',
+        name: 'ActivityApproval',
+        component: () => import('@/views/admin/ActivityApproval.vue'),
+        meta: { title: '活动审核', icon: 'CircleCheck' }
+      },
+      {
+        path: 'signups',
+        name: 'AdminSignupManagement',
+        component: () => import('@/views/admin/SignupManagement.vue'),
+        meta: { title: '报名审核', icon: 'UserFilled' }
+      },
+      {
+        path: 'certificate-review',
+        name: 'CertificateReview',
+        component: () => import('@/views/admin/CertificateReview.vue'),
+        meta: { title: '证书审核', icon: 'Medal' }
+      },
     ]
   },
   {
@@ -106,10 +168,16 @@ const routes = [
         meta: { title: '我的活动', icon: 'Calendar' }
       },
       {
-        path: 'activities/create',
+        path: 'activities/create/:id?',
         name: 'CreateActivity',
         component: () => import('@/views/teacher/CreateActivity.vue'),
         meta: { title: '创建活动', icon: 'Plus' }
+      },
+      {
+        path: 'activities/:id/qrcode',
+        name: 'ActivityQrCode',
+        component: () => import('@/views/teacher/ActivityQrCode.vue'),
+        meta: { title: '活动二维码', icon: 'Postcard' }
       },
       {
         path: 'signups',
@@ -124,10 +192,28 @@ const routes = [
         meta: { title: '服务记录', icon: 'Document' }
       },
       {
+        path: 'check',
+        name: 'TeacherCheck',
+        component: () => import('@/views/teacher/TeacherCheckView.vue'),
+        meta: { title: '签到二维码', icon: 'Postcard' }
+      },
+      {
+        path: 'review',
+        name: 'TeacherReview',
+        component: () => import('@/views/teacher/TeacherReviewView.vue'),
+        meta: { title: '签退审核', icon: 'Memo' }
+      },
+      {
         path: 'certificates',
         name: 'CertificateApproval',
         component: () => import('@/views/teacher/CertificateApproval.vue'),
         meta: { title: '证明审核', icon: 'Medal' }
+      },
+      {
+        path: 'points',
+        name: 'TeacherPointsManagement',
+        component: () => import('@/views/admin/PointsManagement.vue'),
+        meta: { title: '积分管理', icon: 'Star' }
       }
     ]
   },
@@ -148,6 +234,12 @@ const routes = [
         name: 'Activities',
         component: () => import('@/views/student/Activities.vue'),
         meta: { title: '活动列表', icon: 'Calendar' }
+      },
+      {
+        path: 'check',
+        name: 'StudentCheck',
+        component: () => import('@/views/student/StudentCheckView.vue'),
+        meta: { title: '扫码签到', icon: 'Aim' }
       },
       {
         path: 'signups',
@@ -172,6 +264,30 @@ const routes = [
         name: 'Certificates',
         component: () => import('@/views/student/Certificates.vue'),
         meta: { title: '证明管理', icon: 'Medal' }
+      },
+      {
+        path: 'mall',
+        name: 'Mall',
+        component: () => import('@/views/student/MallIndex.vue'),
+        meta: { title: '积分商城', icon: 'ShoppingCart' }
+      },
+      {
+        path: 'mall/product/:id',
+        name: 'ProductDetail',
+        component: () => import('@/views/student/ProductDetail.vue'),
+        meta: { title: '商品详情' }
+      },
+      {
+        path: 'mall/my-redemptions',
+        name: 'MyRedemptions',
+        component: () => import('@/views/student/MyRedemptions.vue'),
+        meta: { title: '我的兑换', icon: 'List' }
+      },
+      {
+        path: 'mall/voucher/:id',
+        name: 'VoucherDetail',
+        component: () => import('@/views/student/VoucherDetail.vue'),
+        meta: { title: '兑换凭证' }
       }
     ]
   },
@@ -188,10 +304,22 @@ const routes = [
     meta: { title: '个人资料', requiresAuth: true }
   },
   {
+    path: '/notifications',
+    name: 'NotificationCenter',
+    component: () => import('@/views/common/NotificationCenter.vue'),
+    meta: { title: '通知中心', requiresAuth: true }
+  },
+  {
     path: '/activities/:id',
     name: 'ActivityDetail',
     component: () => import('@/views/common/ActivityDetail.vue'),
     meta: { title: '活动详情', requiresAuth: true }
+  },
+  {
+    path: '/activities/:id/review',
+    name: 'ActivityReview',
+    component: () => import('@/views/teacher/ActivityReview.vue'),
+    meta: { title: '活动审核', requiresAuth: true, roles: ['TEACHER', 'ADMIN'] }
   },
   {
     path: '/:pathMatch(.*)*',
@@ -207,6 +335,6 @@ const router = createRouter({
 })
 
 // 设置路由守卫
-// setupRouterGuards(router)
+setupRouterGuards(router)
 
 export default router

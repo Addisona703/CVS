@@ -12,6 +12,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  */
 @SpringBootApplication
 @MapperScan("com.hngy.cvs.mapper")
+@org.springframework.scheduling.annotation.EnableScheduling
 public class CvsApplication {
 
     public static void main(String[] args) {

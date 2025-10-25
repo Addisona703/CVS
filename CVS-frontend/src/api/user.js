@@ -7,13 +7,13 @@ export const userAPI = {
   },
 
   // 更新用户信息
-  updateUser: (id, data) => {
-    return request.put(`/users/${id}`, data)
+  updateUser: (data) => {
+    return request.put('/users', data)
   },
 
-  // 分页查询用户列表
+  // 分页查询用户列表（管理员端）
   getUserList: (params) => {
-    return request.get('/users', { params })
+    return request.post('/users/search', params)
   },
 
   // 删除用户

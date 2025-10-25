@@ -46,4 +46,7 @@ public class RegisterDTO {
     @NotBlank(message = "验证码不能为空")
     @Size(min = 6, max = 6, message = "验证码必须为6位数字")
     private String verificationCode;
+
+    @Schema(description = "验证令牌", example = "verify_token_123")
+    private String verifyToken;
 }

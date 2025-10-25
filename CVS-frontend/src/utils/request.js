@@ -32,6 +32,11 @@ request.interceptors.request.use(
 // 响应拦截器
 request.interceptors.response.use(
   (response) => {
+    // 如果是blob类型的响应（如PDF文件），直接返回data
+    if (response.config.responseType === 'blob') {
+      return response.data
+    }
+    
     const res = response.data
     
     // 统一处理响应
@@ -43,6 +48,13 @@ request.interceptors.response.use(
     }
   },
   (error) => {
+    // 检查是否是下载管理器（如IDM）拦截的请求
+    // 这种情况下文件已经开始下载，不需要显示错误
+    if (error.code === 'ERR_NETWORK' && error.config?.responseType === 'blob') {
+      console.log('下载请求已被下载管理器接管')
+      return Promise.reject(error)
+    }
+    
     console.error('响应错误:', error)
     const { response } = error
     

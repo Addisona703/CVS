@@ -1,12 +1,12 @@
 package com.hngy.cvs.controller;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.hngy.cvs.dto.response.PageVO;
 import com.hngy.cvs.common.result.Result;
-import com.hngy.cvs.common.util.PageUtil;
 import com.hngy.cvs.common.security.UserPrincipal;
-import com.hngy.cvs.dto.request.ServiceRecordCreateDTO;
+import com.hngy.cvs.dto.request.ServiceRecordSearchDTO;
+import com.hngy.cvs.dto.request.PageDTO;
 import com.hngy.cvs.dto.response.ServiceRecordVO;
+import com.hngy.cvs.dto.response.ServiceStatsVO;
 import com.hngy.cvs.service.RecordService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -17,7 +17,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Min;
 
 /**
  * 记录管理控制器
@@ -32,84 +31,65 @@ public class RecordController {
 
     private final RecordService recordService;
 
-    @PostMapping
-    @PreAuthorize("hasAnyRole('TEACHER', 'ADMIN')")
-    @Operation(summary = "创建服务记录")
-    public Result<ServiceRecordVO> createServiceRecord(@Valid @RequestBody ServiceRecordCreateDTO dto) {
-        ServiceRecordVO serviceRecordVO = recordService.createServiceRecord(dto);
-        return Result.success("创建服务记录成功", serviceRecordVO);
-    }
-
-    @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('TEACHER', 'ADMIN')")
-    @Operation(summary = "更新服务记录")
-    public Result<ServiceRecordVO> updateServiceRecord(
-            @Parameter(description = "服务记录ID") @PathVariable Long id,
-            @Valid @RequestBody ServiceRecordCreateDTO dto) {
-        ServiceRecordVO serviceRecordVO = recordService.updateServiceRecord(id, dto);
-        return Result.success("更新服务记录成功", serviceRecordVO);
-    }
-
-    @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('TEACHER', 'ADMIN')")
-    @Operation(summary = "删除服务记录")
-    public Result<Void> deleteServiceRecord(@Parameter(description = "服务记录ID") @PathVariable Long id) {
-        recordService.deleteServiceRecord(id);
-        return Result.success("删除服务记录成功");
-    }
-
+    // 1. 获取服务记录详情
     @GetMapping("/{id}")
     @Operation(summary = "获取服务记录详情")
-    public Result<ServiceRecordVO> getServiceRecordById(@Parameter(description = "服务记录ID") @PathVariable Long id) {
+    public Result<ServiceRecordVO> getServiceRecordById(
+            @Parameter(description = "服务记录ID") @PathVariable Long id) {
         ServiceRecordVO serviceRecordVO = recordService.getServiceRecordById(id);
         return Result.success(serviceRecordVO);
     }
 
-    @GetMapping("/my")
-    @PreAuthorize("hasAnyRole('STUDENT', 'TEACHER', 'ADMIN')")
+    // 2. 获取我的服务记录（学生端）
+    @PostMapping("/my")
+    @PreAuthorize("hasAnyRole('STUDENT', 'ADMIN')")
     @Operation(summary = "获取我的服务记录")
     public Result<PageVO<ServiceRecordVO>> getMyServiceRecords(
-            @RequestParam(defaultValue = "1") @Min(1) @Parameter(description = "页码") int page,
-            @RequestParam(defaultValue = "10") @Min(1) @Parameter(description = "每页大小") int size,
+            @Valid @RequestBody PageDTO<ServiceRecordSearchDTO> pageRequest,
             @AuthenticationPrincipal UserPrincipal principal) {
-        IPage<ServiceRecordVO> result = recordService.getUserServiceRecords(principal.getUserId(), page, size);
-        return Result.success(PageUtil.convert(result));
+        PageVO<ServiceRecordVO> result = recordService.getMyServiceRecords(pageRequest, principal.getUserId());
+        return Result.success(result);
     }
 
-    @GetMapping("/user/{userId}")
+    // 3. 获取教师管理的所有服务记录
+    @PostMapping("/managed")
     @PreAuthorize("hasAnyRole('TEACHER', 'ADMIN')")
-    @Operation(summary = "获取用户的服务记录")
-    public Result<PageVO<ServiceRecordVO>> getUserServiceRecords(
+    @Operation(summary = "获取教师管理的服务记录")
+    public Result<PageVO<ServiceRecordVO>> getManagedServiceRecords(
+            @Valid @RequestBody PageDTO<ServiceRecordSearchDTO> pageRequest,
+            @AuthenticationPrincipal UserPrincipal principal) {
+        PageVO<ServiceRecordVO> result = recordService.getManagedServiceRecords(pageRequest, principal.getUserId());
+        return Result.success(result);
+    }
+
+    // 4. 获取用户服务统计数据
+    @GetMapping("/stats/{userId}")
+    @PreAuthorize("hasAnyRole('STUDENT', 'TEACHER', 'ADMIN')")
+    @Operation(summary = "获取用户服务统计数据")
+    public Result<ServiceStatsVO> getUserServiceStats(
             @Parameter(description = "用户ID") @PathVariable Long userId,
-            @RequestParam(defaultValue = "1") @Min(1) @Parameter(description = "页码") int page,
-            @RequestParam(defaultValue = "10") @Min(1) @Parameter(description = "每页大小") int size) {
-        IPage<ServiceRecordVO> result = recordService.getUserServiceRecords(userId, page, size);
-        return Result.success(PageUtil.convert(result));
+            @AuthenticationPrincipal UserPrincipal principal) {
+        ServiceStatsVO stats = recordService.getUserServiceStats(userId, principal.getUserId());
+        return Result.success(stats);
     }
 
-    @GetMapping("/activity/{activityId}")
-    @PreAuthorize("hasAnyRole('TEACHER', 'ADMIN')")
-    @Operation(summary = "获取活动的服务记录")
-    public Result<PageVO<ServiceRecordVO>> getActivityServiceRecords(
-            @Parameter(description = "活动ID") @PathVariable Long activityId,
-            @RequestParam(defaultValue = "1") @Min(1) @Parameter(description = "页码") int page,
-            @RequestParam(defaultValue = "10") @Min(1) @Parameter(description = "每页大小") int size) {
-        IPage<ServiceRecordVO> result = recordService.getActivityServiceRecords(activityId, page, size);
-        return Result.success(PageUtil.convert(result));
+    // 5. 获取我的服务统计数据
+    @GetMapping("/stats/my")
+    @PreAuthorize("hasAnyRole('STUDENT', 'ADMIN')")
+    @Operation(summary = "获取我的服务统计数据")
+    public Result<ServiceStatsVO> getMyServiceStats(
+            @AuthenticationPrincipal UserPrincipal principal) {
+        ServiceStatsVO stats = recordService.getUserServiceStats(principal.getUserId(), principal.getUserId());
+        return Result.success(stats);
     }
 
-    @GetMapping("/stats/hours/{userId}")
-    @Operation(summary = "获取用户总服务时长")
-    public Result<Double> getUserTotalServiceHours(@Parameter(description = "用户ID") @PathVariable Long userId) {
-        Double totalHours = recordService.getUserTotalServiceHours(userId);
-        return Result.success(totalHours);
-    }
-
-    @PostMapping("/generate/{signupId}")
-    @PreAuthorize("hasAnyRole('TEACHER', 'ADMIN')")
-    @Operation(summary = "根据报名记录生成服务记录")
-    public Result<Void> generateServiceRecord(@Parameter(description = "报名ID") @PathVariable Long signupId) {
-        recordService.generateServiceRecordFromSignup(signupId);
-        return Result.success("生成服务记录成功");
+    // 6. 获取所有服务记录（管理员端）
+    @PostMapping("/all")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "获取所有服务记录", description = "管理员端获取所有服务记录，支持分页和搜索")
+    public Result<PageVO<ServiceRecordVO>> getAllServiceRecords(
+            @Valid @RequestBody PageDTO<ServiceRecordSearchDTO> pageRequest) {
+        PageVO<ServiceRecordVO> result = recordService.getAllServiceRecords(pageRequest);
+        return Result.success(result);
     }
 }

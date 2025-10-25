@@ -1,0 +1,205 @@
+/**
+ * 字体工具类和 Mixins
+ * 提供一致的字体使用方式
+ */
+
+/**
+ * 字体大小 Mixins
+ * 确保字体大小、行高、字重的一致性
+ */
+
+@mixin text-xs {
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-normal);
+  font-weight: var(--font-weight-normal);
+}
+
+@mixin text-sm {
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal);
+  font-weight: var(--font-weight-normal);
+}
+
+@mixin text-base {
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  font-weight: var(--font-weight-normal);
+}
+
+@mixin text-lg {
+  font-size: var(--font-size-lg);
+  line-height: var(--line-height-snug);
+  font-weight: var(--font-weight-medium);
+}
+
+@mixin text-xl {
+  font-size: var(--font-size-xl);
+  line-height: var(--line-height-snug);
+  font-weight: var(--font-weight-medium);
+}
+
+@mixin text-2xl {
+  font-size: var(--font-size-2xl);
+  line-height: var(--line-height-tight);
+  font-weight: var(--font-weight-semibold);
+}
+
+@mixin text-3xl {
+  font-size: var(--font-size-3xl);
+  line-height: var(--line-height-tight);
+  font-weight: var(--font-weight-bold);
+}
+
+@mixin text-4xl {
+  font-size: var(--font-size-4xl);
+  line-height: var(--line-height-tight);
+  font-weight: var(--font-weight-bold);
+}
+
+/**
+ * 语义化字体 Mixins
+ * 基于内容类型的字体样式
+ */
+
+@mixin heading-primary {
+  @include text-3xl;
+  color: var(--text-color-primary);
+  margin: 0 0 var(--space-4) 0;
+}
+
+@mixin heading-secondary {
+  @include text-2xl;
+  color: var(--text-color-primary);
+  margin: 0 0 var(--space-3) 0;
+}
+
+@mixin heading-tertiary {
+  @include text-xl;
+  color: var(--text-color-primary);
+  margin: 0 0 var(--space-2) 0;
+}
+
+@mixin body-text {
+  @include text-base;
+  color: var(--text-color-regular);
+  line-height: var(--line-height-relaxed);
+}
+
+@mixin caption-text {
+  @include text-sm;
+  color: var(--text-color-secondary);
+}
+
+@mixin label-text {
+  @include text-sm;
+  color: var(--text-color-primary);
+  font-weight: var(--font-weight-medium);
+}
+
+@mixin button-text {
+  @include text-sm;
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--letter-spacing-wider);
+}
+
+@mixin code-text {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal);
+  background-color: var(--bg-color-light);
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+
+/**
+ * 响应式字体 Mixins
+ * 在不同屏幕尺寸下调整字体大小
+ */
+
+@mixin responsive-heading {
+  font-size: clamp(var(--font-size-xl), 4vw, var(--font-size-3xl));
+  line-height: var(--line-height-tight);
+  font-weight: var(--font-weight-bold);
+}
+
+@mixin responsive-body {
+  font-size: clamp(var(--font-size-sm), 2.5vw, var(--font-size-base));
+  line-height: var(--line-height-relaxed);
+}
+
+/**
+ * 字体优化 Mixins
+ * 确保在不同设备上的最佳显示效果
+ */
+
+@mixin font-smoothing {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+@mixin font-fallback {
+  font-synthesis: none;
+  font-variant-ligatures: none;
+}
+
+/**
+ * 工具类
+ * 可直接在 HTML 中使用的字体类
+ */
+
+.text-xs { @include text-xs; }
+.text-sm { @include text-sm; }
+.text-base { @include text-base; }
+.text-lg { @include text-lg; }
+.text-xl { @include text-xl; }
+.text-2xl { @include text-2xl; }
+.text-3xl { @include text-3xl; }
+.text-4xl { @include text-4xl; }
+
+.font-light { font-weight: var(--font-weight-light); }
+.font-normal { font-weight: var(--font-weight-normal); }
+.font-medium { font-weight: var(--font-weight-medium); }
+.font-semibold { font-weight: var(--font-weight-semibold); }
+.font-bold { font-weight: var(--font-weight-bold); }
+
+.text-primary { color: var(--text-color-primary); }
+.text-regular { color: var(--text-color-regular); }
+.text-secondary { color: var(--text-color-secondary); }
+.text-placeholder { color: var(--text-color-placeholder); }
+
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+
+.font-mono { font-family: var(--font-family-mono); }
+
+/**
+ * 特殊用途字体样式
+ */
+
+.text-brand {
+  font-family: var(--font-family-base);
+  font-weight: var(--font-weight-bold);
+  color: var(--primary-color);
+}
+
+.text-error {
+  color: var(--color-danger);
+  font-weight: var(--font-weight-medium);
+}
+
+.text-success {
+  color: var(--color-success);
+  font-weight: var(--font-weight-medium);
+}
+
+.text-warning {
+  color: var(--color-warning);
+  font-weight: var(--font-weight-medium);
+}
+
+.text-info {
+  color: var(--color-info);
+  font-weight: var(--font-weight-medium);
+}

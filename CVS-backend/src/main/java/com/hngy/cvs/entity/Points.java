@@ -15,7 +15,7 @@ public class Points {
     /**
      * 主键ID
      */
-    @TableId(type = IdType.ASSIGN_ID)
+    @TableId(type = IdType.AUTO)
     private Long id;
 
     /**

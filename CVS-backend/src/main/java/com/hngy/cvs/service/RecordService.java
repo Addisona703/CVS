@@ -1,8 +1,10 @@
 package com.hngy.cvs.service;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.hngy.cvs.dto.request.ServiceRecordCreateDTO;
+import com.hngy.cvs.dto.request.ServiceRecordSearchDTO;
+import com.hngy.cvs.dto.request.PageDTO;
 import com.hngy.cvs.dto.response.ServiceRecordVO;
+import com.hngy.cvs.dto.response.ServiceStatsVO;
+import com.hngy.cvs.dto.response.PageVO;
 
 /**
  * 记录服务接口
@@ -12,67 +14,47 @@ import com.hngy.cvs.dto.response.ServiceRecordVO;
 public interface RecordService {
 
     /**
-     * 创建服务记录
-     */
-    ServiceRecordVO createServiceRecord(ServiceRecordCreateDTO request);
-
-    /**
-     * 更新服务记录
-     */
-    ServiceRecordVO updateServiceRecord(Long id, ServiceRecordCreateDTO request);
-
-    /**
-     * 删除服务记录
-     */
-    void deleteServiceRecord(Long id);
-
-    /**
      * 根据ID获取服务记录
      */
     ServiceRecordVO getServiceRecordById(Long id);
 
-    /**
-     * 获取用户的服务记录
+   /**
+     * 获取我的服务记录（支持搜索和分页）
      */
-    IPage<ServiceRecordVO> getUserServiceRecords(Long userId, int page, int size);
+    PageVO<ServiceRecordVO> getMyServiceRecords(PageDTO<ServiceRecordSearchDTO> pageRequest, Long userId);
 
     /**
-     * 获取活动的服务记录
+     * 获取教师管理的所有服务记录（支持搜索和分页）
      */
-    IPage<ServiceRecordVO> getActivityServiceRecords(Long activityId, int page, int size);
+    PageVO<ServiceRecordVO> getManagedServiceRecords(PageDTO<ServiceRecordSearchDTO> pageRequest, Long teacherId);
 
     /**
-     * 统计用户的总服务时长（小时）
+     * 获取用户服务统计数据
      */
-    Double getUserTotalServiceHours(Long userId);
+    ServiceStatsVO getUserServiceStats(Long userId, Long currentUserId);
 
     /**
-     * 统计活动的总服务时长（小时）
+     * 获取所有服务记录（管理员端）
      */
-    Double getActivityTotalServiceHours(Long activityId);
+    PageVO<ServiceRecordVO> getAllServiceRecords(PageDTO<ServiceRecordSearchDTO> pageRequest);
 
     /**
-     * 统计用户的服务记录数
+     * 根据报名记录和评价信息创建服务记录
      */
-    Long countServiceRecordsByUser(Long userId);
+    void createServiceRecordFromSignup(Long signupId, Integer rating, String evaluation, String description);
 
     /**
      * 统计总服务记录数
      */
-    Long countServiceRecords();
-
-    /**
-     * 统计总服务记录数（别名方法）
-     */
     Long countTotal();
 
     /**
-     * 统计用户的总服务时长（小时）- 别名方法
+     * 获取用户总服务时长（小时）
      */
     Double getTotalServiceHoursByUser(Long userId);
 
     /**
-     * 根据签到签退记录自动生成服务记录
+     * 统计用户从服务记录中获得的总积分
      */
-    void generateServiceRecordFromSignup(Long signupId);
+    Long sumPointsByUser(Long userId);
 }

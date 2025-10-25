@@ -5,10 +5,10 @@ import { ElMessage } from 'element-plus'
 
 export const useAuthStore = defineStore('auth', () => {
   // 状态
-  const user = ref(null)
+  const user  = ref(localStorage.getItem('user'))
   const token = ref(localStorage.getItem('token'))
   const loading = ref(false)
-  
+
   // 计算属性
   const isAuthenticated = computed(() => !!token.value && !!user.value)
   const userRole = computed(() => user.value?.role)

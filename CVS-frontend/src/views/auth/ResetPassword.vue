@@ -1,125 +1,87 @@
 <template>
-  <div class="reset-password-page">
+  <div class="reset-password">
+    <div class="form-header">
+      <h2>Set New Password</h2>
+      <p>Please set a secure new password.</p>
+    </div>
+
     <el-form
       ref="resetFormRef"
       :model="resetForm"
       :rules="resetRules"
       label-width="0"
       size="large"
+      class="reset-form"
     >
-      <h2 class="form-title">重置密码</h2>
-      <p class="form-subtitle">请设置您的新密码</p>
-      
-      <!-- 验证信息显示 -->
-      <div class="verify-info">
-        <el-icon size="32" color="#67c23a"><CircleCheck /></el-icon>
-        <p>身份验证成功</p>
-        <p class="contact-info">{{ maskedContact }}</p>
-      </div>
-      
       <el-form-item prop="newPassword">
         <el-input
           v-model="resetForm.newPassword"
           type="password"
-          placeholder="请输入新密码"
-          prefix-icon="Lock"
+          placeholder="New Password"
           show-password
           clearable
         />
-        <div class="password-strength">
-          <div class="strength-bar">
-            <div 
-              class="strength-fill" 
-              :class="passwordStrengthClass"
-              :style="{ width: passwordStrengthWidth }"
-            ></div>
-          </div>
-          <span class="strength-text" :class="passwordStrengthClass">
-            {{ passwordStrengthText }}
-          </span>
-        </div>
       </el-form-item>
-      
+
       <el-form-item prop="confirmPassword">
         <el-input
           v-model="resetForm.confirmPassword"
           type="password"
-          placeholder="请确认新密码"
-          prefix-icon="Lock"
+          placeholder="Confirm New Password"
           show-password
           clearable
-          @keyup.enter="handleResetPassword"
+          @keyup.enter="handleSubmit"
         />
       </el-form-item>
-      
-      <!-- 密码要求提示 -->
-      <div class="password-requirements">
-        <h4>密码要求：</h4>
-        <ul>
-          <li :class="{ valid: hasMinLength }">
-            <el-icon><Check v-if="hasMinLength" /><Close v-else /></el-icon>
-            至少8个字符
-          </li>
-          <li :class="{ valid: hasUpperCase }">
-            <el-icon><Check v-if="hasUpperCase" /><Close v-else /></el-icon>
-            包含大写字母
-          </li>
-          <li :class="{ valid: hasLowerCase }">
-            <el-icon><Check v-if="hasLowerCase" /><Close v-else /></el-icon>
-            包含小写字母
-          </li>
-          <li :class="{ valid: hasNumber }">
-            <el-icon><Check v-if="hasNumber" /><Close v-else /></el-icon>
-            包含数字
-          </li>
-        </ul>
+
+      <div class="password-hints">
+        <span>• At least 6 characters</span>
+        <span>• Must contain letters</span>
       </div>
-      
-      <el-form-item>
-        <el-button
-          type="primary"
-          size="large"
-          style="width: 100%"
-          :loading="loading"
-          @click="handleResetPassword"
-        >
-          重置密码
-        </el-button>
-      </el-form-item>
-      
-      <div class="form-footer">
-        <span>记起密码了？</span>
-        <el-link type="primary" @click="$router.push('/auth/login')">
-          返回登录
-        </el-link>
-      </div>
+
+      <el-button
+        type="primary"
+        size="large"
+        class="primary-btn"
+        :loading="loading"
+        @click="handleSubmit"
+      >
+        Complete Reset
+      </el-button>
+
+      <el-link type="primary" class="back-link" @click="router.push('/auth/login')">
+        Return to Login
+      </el-link>
     </el-form>
   </div>
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { CircleCheck, Check, Close } from '@element-plus/icons-vue'
 import { authAPI } from '@/api'
 
 const router = useRouter()
 const route = useRoute()
-
 const resetFormRef = ref()
 const loading = ref(false)
+const token = ref('')
 
 const resetForm = reactive({
   newPassword: '',
   confirmPassword: ''
 })
 
-const verifyInfo = reactive({
-  token: '',
-  type: '',
-  contact: ''
-})
+const validatePassword = (rule, value, callback) => {
+  if (!value || value.length < 6) {
+    callback(new Error('请输入至少6位密码'))
+  } else if (!/[A-Za-z]/.test(value)) {
+    callback(new Error('密码需包含字母'))
+  } else {
+    callback()
+  }
+}
 
 const validateConfirmPassword = (rule, value, callback) => {
   if (value !== resetForm.newPassword) {
@@ -129,258 +91,139 @@ const validateConfirmPassword = (rule, value, callback) => {
   }
 }
 
-const validatePassword = (rule, value, callback) => {
-  if (!value) {
-    callback(new Error('请输入新密码'))
-  } else if (value.length < 8) {
-    callback(new Error('密码长度不能少于8位'))
-  } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(value)) {
-    callback(new Error('密码必须包含大小写字母和数字'))
-  } else {
-    callback()
-  }
-}
-
 const resetRules = {
-  newPassword: [
-    { validator: validatePassword, trigger: 'blur' }
-  ],
+  newPassword: [{ validator: validatePassword, trigger: 'blur' }],
   confirmPassword: [
     { required: true, message: '请确认新密码', trigger: 'blur' },
     { validator: validateConfirmPassword, trigger: 'blur' }
   ]
 }
 
-// 密码强度检查
-const hasMinLength = computed(() => resetForm.newPassword.length >= 8)
-const hasUpperCase = computed(() => /[A-Z]/.test(resetForm.newPassword))
-const hasLowerCase = computed(() => /[a-z]/.test(resetForm.newPassword))
-const hasNumber = computed(() => /\d/.test(resetForm.newPassword))
-
-const passwordStrength = computed(() => {
-  let strength = 0
-  if (hasMinLength.value) strength++
-  if (hasUpperCase.value) strength++
-  if (hasLowerCase.value) strength++
-  if (hasNumber.value) strength++
-  return strength
-})
-
-const passwordStrengthClass = computed(() => {
-  if (passwordStrength.value <= 1) return 'weak'
-  if (passwordStrength.value <= 2) return 'medium'
-  if (passwordStrength.value <= 3) return 'good'
-  return 'strong'
-})
-
-const passwordStrengthWidth = computed(() => {
-  return `${(passwordStrength.value / 4) * 100}%`
-})
-
-const passwordStrengthText = computed(() => {
-  if (passwordStrength.value <= 1) return '弱'
-  if (passwordStrength.value <= 2) return '中等'
-  if (passwordStrength.value <= 3) return '良好'
-  return '强'
-})
-
-const maskedContact = computed(() => {
-  if (verifyInfo.type === 'email' && verifyInfo.contact) {
-    const [name, domain] = verifyInfo.contact.split('@')
-    return `${name.substring(0, 2)}***@${domain}`
-  } else if (verifyInfo.type === 'phone' && verifyInfo.contact) {
-    return `${verifyInfo.contact.substring(0, 3)}****${verifyInfo.contact.substring(7)}`
+onMounted(() => {
+  const queryToken = route.query.token
+  if (!queryToken || typeof queryToken !== 'string') {
+    ElMessage.error('链接无效或已过期')
+    router.replace('/auth/login')
+    return
   }
-  return ''
+  token.value = queryToken
 })
 
-const handleResetPassword = async () => {
+const handleSubmit = async () => {
+  if (!resetFormRef.value) return
   try {
     await resetFormRef.value.validate()
     loading.value = true
-    
-    const resetData = {
-      token: verifyInfo.token,
+    const payload = {
+      token: token.value,
       newPassword: resetForm.newPassword
     }
-    
-    const response = await authAPI.resetPassword(resetData)
-    if (response.code === 200) {
+    const res = await authAPI.resetPassword(payload)
+    if (res.code === 200) {
       ElMessage.success('密码重置成功，请使用新密码登录')
       router.push('/auth/login')
     }
   } catch (error) {
-    console.error('重置密码失败:', error)
-    ElMessage.error('重置密码失败，请重试')
+    const backendCode = error.response?.data?.code
+    if (backendCode === 1006 || backendCode === 1001) {
+      ElMessage.error('链接无效或已过期')
+      router.replace('/auth/forgot-password')
+    } else if (error.response?.data?.message) {
+      ElMessage.error(error.response.data.message)
+    } else if (!error?.fields) {
+      ElMessage.error('重置密码失败，请稍后重试')
+    }
   } finally {
     loading.value = false
   }
 }
-
-onMounted(() => {
-  // 获取验证信息
-  const { token, type, contact } = route.query
-  
-  if (!token || !type || !contact) {
-    ElMessage.error('验证信息无效，请重新操作')
-    router.push('/auth/forgot-password')
-    return
-  }
-  
-  verifyInfo.token = token
-  verifyInfo.type = type
-  verifyInfo.contact = contact
-})
 </script>
 
-<style lang="scss" scoped>
-.reset-password-page {
-  width: 100%;
+<style scoped lang="scss">
+.reset-password {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
 }
 
-.form-title {
-  text-align: center;
-  margin: 0 0 8px 0;
-  font-size: 24px;
-  font-weight: 600;
-  color: #303133;
-}
+.form-header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 
-.form-subtitle {
-  text-align: center;
-  margin: 0 0 30px 0;
-  color: #606266;
-  font-size: 14px;
-}
-
-.verify-info {
-  text-align: center;
-  margin-bottom: 30px;
-  padding: 20px;
-  background: #f0f9ff;
-  border-radius: 8px;
-  border: 1px solid #e1f5fe;
-  
-  p {
-    margin: 8px 0;
-    color: #606266;
-    
-    &.contact-info {
-      font-weight: 600;
-      color: #303133;
-    }
-  }
-}
-
-.password-strength {
-  margin-top: 8px;
-  
-  .strength-bar {
-    height: 4px;
-    background: #f5f7fa;
-    border-radius: 2px;
-    overflow: hidden;
-    margin-bottom: 4px;
-    
-    .strength-fill {
-      height: 100%;
-      transition: all 0.3s;
-      
-      &.weak {
-        background: #f56c6c;
-      }
-      
-      &.medium {
-        background: #e6a23c;
-      }
-      
-      &.good {
-        background: #409eff;
-      }
-      
-      &.strong {
-        background: #67c23a;
-      }
-    }
-  }
-  
-  .strength-text {
-    font-size: 12px;
-    
-    &.weak {
-      color: #f56c6c;
-    }
-    
-    &.medium {
-      color: #e6a23c;
-    }
-    
-    &.good {
-      color: #409eff;
-    }
-    
-    &.strong {
-      color: #67c23a;
-    }
-  }
-}
-
-.password-requirements {
-  margin-bottom: 24px;
-  padding: 16px;
-  background: #fafafa;
-  border-radius: 8px;
-  
-  h4 {
-    margin: 0 0 12px 0;
-    font-size: 14px;
-    color: #303133;
-  }
-  
-  ul {
+  h2 {
     margin: 0;
-    padding: 0;
-    list-style: none;
-    
-    li {
-      display: flex;
-      align-items: center;
-      margin-bottom: 8px;
-      font-size: 14px;
-      color: #909399;
-      
-      .el-icon {
-        margin-right: 8px;
-        font-size: 16px;
-      }
-      
-      &.valid {
-        color: #67c23a;
-      }
-      
-      &:last-child {
-        margin-bottom: 0;
-      }
-    }
+    font-size: 32px;
+    font-weight: 700;
+    color: #1f2937;
+    letter-spacing: -0.01em;
+  }
+
+  p {
+    margin: 0;
+    font-size: 14px;
+    color: #6b7280;
   }
 }
 
-.form-footer {
-  text-align: center;
-  margin-top: 20px;
-  color: #909399;
+.reset-form {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.password-hints {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13px;
+  color: #9ca3af;
+  margin-top: -12px;
+}
+
+.primary-btn {
+  width: 100%;
+  height: 52px;
+  border-radius: 18px;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.back-link {
+  margin-top: 24px;
   font-size: 14px;
-  
-  span {
-    margin-right: 8px;
-  }
+  align-self: center;
 }
 
 :deep(.el-form-item) {
-  margin-bottom: 20px;
+  margin-bottom: 0;
+}
+
+:deep(.el-form-item__content) {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+:deep(.el-form-item__inner) {
+  padding-bottom: 0;
 }
 
 :deep(.el-input__wrapper) {
-  padding: 12px 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  padding: 14px 18px;
+  background-color: rgba(249, 250, 251, 0.85);
+  box-shadow: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    border-color: rgba(37, 99, 235, 0.55);
+  }
+
+  &.is-focus {
+    border-color: rgba(37, 99, 235, 0.85);
+    box-shadow: 0 12px 24px rgba(37, 99, 235, 0.15);
+  }
 }
 </style>

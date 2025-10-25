@@ -41,8 +41,10 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 // 公开接口 - 无需认证即可访问
                 .requestMatchers("/api/auth/**", "/", "/health", "/swagger-ui/**", "/v3/api-docs/**", "/error", "/actuator/health", "/actuator/info").permitAll()
+                // 静态资源 - 上传的文件允许匿名访问
+                .requestMatchers("/uploads/**").permitAll()
                 // 管理员接口
-                .requestMatchers("/api/admin/**", "/api/statistics/admin-dashboard").hasRole("ADMIN")
+                .requestMatchers("/api/admin/**",  "/api/statistics/admin-dashboard").hasRole("ADMIN")
                 // 教师接口
                 .requestMatchers("/api/teacher/**", "/api/statistics/teacher-dashboard").hasAnyRole("TEACHER", "ADMIN")
                 // 学生接口

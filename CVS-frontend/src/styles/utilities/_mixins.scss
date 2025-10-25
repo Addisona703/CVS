@@ -1,0 +1,328 @@
+/**
+ * 通用 Mixins 和工具类
+ * 基于 design.md 规范
+ */
+
+// 响应式断点 Mixins
+@mixin mobile {
+  @media (max-width: 767px) {
+    @content;
+  }
+}
+
+@mixin tablet {
+  @media (min-width: 768px) and (max-width: 1023px) {
+    @content;
+  }
+}
+
+@mixin desktop {
+  @media (min-width: 1024px) {
+    @content;
+  }
+}
+
+@mixin mobile-and-tablet {
+  @media (max-width: 1023px) {
+    @content;
+  }
+}
+
+// 间距 Mixins
+@mixin spacing($property, $size) {
+  #{$property}: var(--space-#{$size});
+}
+
+// 快捷间距 Mixins
+@mixin margin($size) {
+  margin: var(--space-#{$size});
+}
+
+@mixin margin-top($size) {
+  margin-top: var(--space-#{$size});
+}
+
+@mixin margin-bottom($size) {
+  margin-bottom: var(--space-#{$size});
+}
+
+@mixin margin-left($size) {
+  margin-left: var(--space-#{$size});
+}
+
+@mixin margin-right($size) {
+  margin-right: var(--space-#{$size});
+}
+
+@mixin padding($size) {
+  padding: var(--space-#{$size});
+}
+
+@mixin padding-top($size) {
+  padding-top: var(--space-#{$size});
+}
+
+@mixin padding-bottom($size) {
+  padding-bottom: var(--space-#{$size});
+}
+
+@mixin padding-left($size) {
+  padding-left: var(--space-#{$size});
+}
+
+@mixin padding-right($size) {
+  padding-right: var(--space-#{$size});
+}
+
+@mixin gap($size) {
+  gap: var(--space-#{$size});
+}
+
+@mixin padding-responsive {
+  @include mobile {
+    padding: var(--padding-mobile);
+  }
+  
+  @include tablet {
+    padding: var(--padding-tablet);
+  }
+  
+  @include desktop {
+    padding: var(--padding-desktop);
+  }
+}
+
+// 动画 Mixins
+@mixin smooth-transition($properties: all, $duration: null, $timing: null) {
+  $dur: if($duration, $duration, var(--transition-duration, 0.3s));
+  $tim: if($timing, $timing, var(--transition-timing, ease));
+  transition: #{$properties} #{$dur} #{$tim};
+}
+
+@mixin hover-lift($translate: -2px) {
+  transition: all var(--transition-duration, 0.3s) var(--transition-timing, ease);
+  
+  &:hover {
+    transform: translateY(#{$translate});
+    box-shadow: var(--card-shadow-hover);
+  }
+}
+
+@mixin button-press {
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+// 毛玻璃效果 Mixin (学生主题专用)
+@mixin glass-effect($bg-color: rgba(255, 255, 255, 0.92), $blur: 6px) {
+  background: $bg-color;
+  backdrop-filter: blur($blur);
+  -webkit-backdrop-filter: blur($blur);
+  
+  // 降级策略
+  @supports not (backdrop-filter: blur($blur)) {
+    background: rgba(255, 255, 255, 0.98);
+  }
+  
+  @media (prefers-reduced-motion: reduce) {
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+// 焦点样式 Mixin (可访问性)
+@mixin focus-visible {
+  &:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px rgba(var(--primary-color-rgb, 64, 158, 255), 0.2);
+  }
+}
+
+// 文本截断 Mixins
+@mixin text-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@mixin text-clamp($lines: 2) {
+  display: -webkit-box;
+  -webkit-line-clamp: $lines;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+// 侧边栏相关 Mixins
+@mixin sidebar-base {
+  width: var(--sidebar-width);
+  background: var(--sidebar-bg);
+  transition: all var(--transition-duration, 0.3s) var(--transition-timing, ease);
+  
+  &.collapsed {
+    width: var(--sidebar-collapsed-width);
+  }
+}
+
+@mixin menu-item-base {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--border-radius-menu-item, 4px);
+  transition: all var(--transition-duration, 0.3s) var(--transition-timing, ease);
+  cursor: pointer;
+  
+  &:hover {
+    background: var(--sidebar-hover-bg, rgba(255, 255, 255, 0.1));
+  }
+  
+  &.active {
+    background: var(--primary-color);
+    color: #ffffff;
+  }
+}
+
+// 卡片相关 Mixins
+@mixin card-base {
+  background: var(--bg-color-base);
+  border-radius: var(--border-radius-card);
+  box-shadow: var(--card-shadow);
+  padding: var(--space-6);
+  transition: var(--transition-card);
+}
+
+@mixin card-hover {
+  &:hover {
+    box-shadow: var(--card-shadow-hover);
+    transform: translateY(-4px);
+  }
+}
+
+// 按钮相关 Mixins
+@mixin button-base {
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--border-radius-button);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  border: none;
+  transition: var(--transition-button);
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+@mixin button-primary {
+  background: var(--primary-color);
+  color: #ffffff;
+  
+  &:hover:not(:disabled) {
+    filter: brightness(1.1);
+  }
+  
+  &:active:not(:disabled) {
+    transform: scale(0.95);
+  }
+}
+
+// 表单相关 Mixins
+@mixin form-error-shake {
+  animation: shake 0.5s ease-in-out;
+  border-color: var(--color-error);
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-8px); }
+  75% { transform: translateX(8px); }
+}
+
+// 加载动画 Mixins
+@mixin skeleton-loading {
+  background: linear-gradient(
+    90deg,
+    var(--color-gray-200) 25%,
+    var(--color-gray-100) 50%,
+    var(--color-gray-200) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+}
+
+@keyframes skeleton-loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+// 滚动条样式 Mixin
+@mixin custom-scrollbar($width: 8px, $track-color: transparent, $thumb-color: var(--color-gray-400)) {
+  &::-webkit-scrollbar {
+    width: $width;
+    height: $width;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: $track-color;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: $thumb-color;
+    border-radius: calc($width / 2);
+    
+    &:hover {
+      background: var(--color-gray-500);
+    }
+  }
+}
+
+// 表格滚动提示阴影
+@mixin scroll-shadow($direction: 'both') {
+  @if $direction == 'left' or $direction == 'both' {
+    &.scroll-left::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 10px;
+      box-shadow: var(--scroll-shadow-left);
+      pointer-events: none;
+      z-index: 2;
+    }
+  }
+  
+  @if $direction == 'right' or $direction == 'both' {
+    &.scroll-right::after {
+      content: '';
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      width: 10px;
+      box-shadow: var(--scroll-shadow-right);
+      pointer-events: none;
+      z-index: 2;
+    }
+  }
+}
+
+// 移动端触摸目标尺寸
+@mixin touch-target {
+  min-width: var(--touch-target-min);
+  min-height: var(--touch-target-min);
+}
+
+// 可访问性 - 屏幕阅读器专用文本
+@mixin sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}

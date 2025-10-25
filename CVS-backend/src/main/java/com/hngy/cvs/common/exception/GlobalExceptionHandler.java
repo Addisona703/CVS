@@ -39,6 +39,16 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * 积分商城异常处理
+     */
+    @ExceptionHandler(MallException.class)
+    @ResponseStatus(HttpStatus.OK)
+    public Result<Void> handleMallException(MallException e) {
+        log.warn("积分商城异常: {}", e.getMessage());
+        return Result.error(e.getCode(), e.getMessage());
+    }
+
+    /**
      * 参数校验异常处理 - @Valid
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -109,6 +119,36 @@ public class GlobalExceptionHandler {
     public Result<Void> handleAccessDeniedException(AccessDeniedException e) {
         log.warn("权限不足: {}", e.getMessage());
         return Result.error(ResultCode.FORBIDDEN);
+    }
+
+    /**
+     * 通知不存在异常处理
+     */
+    @ExceptionHandler(NotificationNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Result<Void> handleNotificationNotFoundException(NotificationNotFoundException e) {
+        log.warn("通知不存在: {}", e.getMessage());
+        return Result.error(e.getCode(), e.getMessage());
+    }
+
+    /**
+     * 无权访问通知异常处理
+     */
+    @ExceptionHandler(UnauthorizedNotificationAccessException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public Result<Void> handleUnauthorizedNotificationAccessException(UnauthorizedNotificationAccessException e) {
+        log.warn("无权访问通知: {}", e.getMessage());
+        return Result.error(e.getCode(), e.getMessage());
+    }
+
+    /**
+     * 通知服务异常处理
+     */
+    @ExceptionHandler(NotificationServiceException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public Result<Void> handleNotificationServiceException(NotificationServiceException e) {
+        log.error("通知服务异常: {}", e.getMessage(), e);
+        return Result.error(e.getCode(), e.getMessage());
     }
 
     /**

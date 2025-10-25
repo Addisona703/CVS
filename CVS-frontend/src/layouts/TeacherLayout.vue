@@ -1,189 +1,224 @@
 <template>
   <div class="teacher-layout">
-    <el-container>
-      <!-- 侧边栏 -->
-      <el-aside :width="sidebarWidth" class="sidebar">
-        <div class="logo">
-          <el-icon size="24" color="#67c23a">
-            <School />
-          </el-icon>
-          <span v-if="!sidebarCollapsed" class="logo-text">教师工作台</span>
-        </div>
-        
-        <el-menu
-          :default-active="activeMenu"
-          :collapse="sidebarCollapsed"
-          :unique-opened="true"
-          router
-          class="sidebar-menu"
-        >
-          <el-menu-item index="/teacher/dashboard">
-            <el-icon><Odometer /></el-icon>
-            <template #title>工作台</template>
-          </el-menu-item>
-          
-          <el-sub-menu index="activities">
-            <template #title>
-              <el-icon><Calendar /></el-icon>
-              <span>活动管理</span>
-            </template>
-            <el-menu-item index="/teacher/activities">我的活动</el-menu-item>
-            <el-menu-item index="/teacher/activities/create">创建活动</el-menu-item>
-          </el-sub-menu>
-          
-          <el-menu-item index="/teacher/signups">
-            <el-icon><UserFilled /></el-icon>
-            <template #title>报名管理</template>
-          </el-menu-item>
-          
-          <el-menu-item index="/teacher/records">
-            <el-icon><Document /></el-icon>
-            <template #title>服务记录</template>
-          </el-menu-item>
-          
-          <el-menu-item index="/teacher/certificates">
-            <el-icon><Medal /></el-icon>
-            <template #title>证明审核</template>
-          </el-menu-item>
-        </el-menu>
-      </el-aside>
-      
-      <!-- 主内容区 -->
-      <el-container>
-        <el-header class="header">
-          <AppHeader />
-        </el-header>
-        
-        <el-main class="main-content">
+    <t-layout>
+      <t-header class="header">
+        <AppHeader />
+      </t-header>
+
+      <t-layout style="height: calc(100vh - 60px);">
+        <t-aside width="240px" class="sidebar" style="flex-shrink: 0;">
+          <t-menu :value="activeMenu" theme="light" class="sidebar-menu" @change="handleMenuChange">
+            <t-menu-item value="/teacher/dashboard">
+              <template #icon><t-icon name="dashboard" /></template>
+              工作台
+            </t-menu-item>
+
+            <t-submenu value="activities">
+              <template #icon><t-icon name="calendar" /></template>
+              <template #title>活动管理</template>
+              <t-menu-item value="/teacher/activities">我的活动</t-menu-item>
+              <t-menu-item value="/teacher/activities/create">创建活动</t-menu-item>
+            </t-submenu>
+
+            <t-menu-item value="/teacher/signups">
+              <template #icon><t-icon name="user" /></template>
+              报名管理
+            </t-menu-item>
+
+            <t-menu-item value="/teacher/records">
+              <template #icon><t-icon name="assignment" /></template>
+              服务记录
+            </t-menu-item>
+
+            <t-menu-item value="/teacher/check">
+              <template #icon><t-icon name="qrcode" /></template>
+              签到二维码
+            </t-menu-item>
+
+            <t-menu-item value="/teacher/review">
+              <template #icon><t-icon name="edit" /></template>
+              签退审核
+            </t-menu-item>
+
+            <t-menu-item value="/teacher/points">
+              <template #icon><t-icon name="star" /></template>
+              积分管理
+            </t-menu-item>
+
+            <!-- <t-submenu value="mall">
+              <template #icon><t-icon name="shop" /></template>
+              <template #title>商城管理</template>
+              <t-menu-item value="/teacher/mall/products">商品管理</t-menu-item>
+              <t-menu-item value="/teacher/mall/categories">分类管理</t-menu-item>
+              <t-menu-item value="/teacher/mall/verify">兑换核销</t-menu-item>
+              <t-menu-item value="/teacher/mall/statistics">统计报表</t-menu-item>
+            </t-submenu> -->
+          </t-menu>
+        </t-aside>
+
+        <t-content class="main-content">
           <router-view />
-        </el-main>
-      </el-container>
-    </el-container>
+        </t-content>
+      </t-layout>
+    </t-layout>
   </div>
 </template>
 
 <script setup>
 import { computed } from 'vue'
-import { useRoute } from 'vue-router'
-import { useAppStore } from '@/stores/app'
+import { useRoute, useRouter } from 'vue-router'
 import AppHeader from '@/components/common/AppHeader.vue'
-import {
-  School,
-  Odometer,
-  Calendar,
-  UserFilled,
-  Document,
-  Medal
-} from '@element-plus/icons-vue'
 
 const route = useRoute()
-const appStore = useAppStore()
+const router = useRouter()
 
-const sidebarCollapsed = computed(() => appStore.sidebarCollapsed)
-const sidebarWidth = computed(() => sidebarCollapsed.value ? '64px' : '200px')
 const activeMenu = computed(() => route.path)
+
+const handleMenuChange = (value) => {
+  router.push(value)
+}
 </script>
 
 <style lang="scss" scoped>
 .teacher-layout {
-  height: 100%;
+  height: 100vh;
   overflow: hidden;
-  display: flex
-}
-
-.sidebar {
-  background: #2d5a27;
-  transition: width 0.3s;
-  overflow: hidden;
-  
-  .logo {
-    height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 0 20px;
-    border-bottom: 1px solid #3d6a37;
-    
-    .logo-text {
-      color: #fff;
-      font-size: 16px;
-      font-weight: 600;
-      white-space: nowrap;
-    }
-  }
-  
-  .sidebar-menu {
-    border: none;
-    background: transparent;
-    
-    :deep(.el-menu-item) {
-      color: #b8d4b5;
-      border-bottom: 1px solid #3d6a37;
-      
-      &:hover {
-        background-color: #3d6a37;
-        color: #fff;
-      }
-      
-      &.is-active {
-        background-color: #67c23a;
-        color: #fff;
-        
-        &::before {
-          content: '';
-          position: absolute;
-          left: 0;
-          top: 0;
-          bottom: 0;
-          width: 3px;
-          background: #fff;
-        }
-      }
-    }
-    
-    :deep(.el-sub-menu) {
-      .el-sub-menu__title {
-        color: #b8d4b5;
-        border-bottom: 1px solid #3d6a37;
-        
-        &:hover {
-          background-color: #3d6a37;
-          color: #fff;
-        }
-      }
-      
-      .el-menu {
-        background: #1f4a1a;
-        
-        .el-menu-item {
-          color: #b8d4b5;
-          border-bottom: none;
-          padding-left: 50px !important;
-          
-          &:hover {
-            background-color: #3d6a37;
-            color: #fff;
-          }
-          
-          &.is-active {
-            background-color: #67c23a;
-            color: #fff;
-          }
-        }
-      }
-    }
-  }
 }
 
 .header {
   padding: 0;
   height: 60px;
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  z-index: 10;
+}
+
+.sidebar {
+  background: #f5f7fa;
+  border-right: 1px solid #e5e7eb;
+  overflow-y: auto;
+  width: 240px;
+  min-width: 240px;
+  max-width: 240px;
+  flex-shrink: 0;
+
+  .sidebar-menu {
+    border: none;
+    background: transparent;
+    padding: 8px;
+
+    :deep(.t-menu__item) {
+      height: 48px;
+      line-height: 48px;
+      color: #606266;
+      margin: 4px 0;
+      border-radius: 8px;
+      padding-left: 16px !important;
+      padding-right: 16px !important;
+
+      .t-icon {
+        font-size: 18px;
+        color: #909399;
+      }
+
+      &:hover {
+        background-color: #e8f9f0;
+        color: #97cf7b;
+
+        .t-icon {
+          color: #67c23a;
+        }
+      }
+
+      &.t-is-active {
+        background-color: #67c23a;
+        color: #ffffff;
+        font-weight: 600;
+
+        .t-icon {
+          color: #ffffff;
+        }
+      }
+    }
+
+    :deep(.t-submenu) {
+      margin: 4px 0;
+
+      .t-submenu__title {
+        height: 48px;
+        line-height: 48px;
+        color: #606266;
+        margin: 0;
+        border-radius: 8px;
+        padding-left: 16px !important;
+        padding-right: 16px !important;
+
+        .t-icon {
+          font-size: 18px;
+          color: #909399;
+        }
+
+        &:hover {
+          background-color: #e8f9f0;
+          color: #67c23a;
+
+          .t-icon {
+            color: #67c23a;
+          }
+        }
+      }
+
+      .t-submenu__content {
+        background: transparent;
+        padding: 0 8px;
+
+        .t-menu__item {
+          height: 40px;
+          line-height: 40px;
+          padding-left: 40px !important;
+          padding-right: 16px !important;
+          font-size: 14px;
+          margin: 4px 0;
+          border-radius: 8px;
+
+          &:hover {
+            background-color: #e8f9f0;
+            color: #67c23a;
+          }
+
+          &.t-is-active {
+            background-color: #67c23a;
+            color: #ffffff;
+            font-weight: 600;
+          }
+        }
+      }
+    }
+  }
 }
 
 .main-content {
   background: #f0f2f5;
-  padding: 20px;
   overflow-y: auto;
+  padding: 24px;
+  flex: 1;
+  min-width: 0;
+
+  :deep(.el-card) {
+    background: #ffffff;
+    box-shadow: 0 2px 8px rgba(103, 194, 58, 0.08);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+
+    &:hover {
+      box-shadow: 0 4px 12px rgba(103, 194, 58, 0.12);
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    padding: 16px;
+  }
 }
 </style>

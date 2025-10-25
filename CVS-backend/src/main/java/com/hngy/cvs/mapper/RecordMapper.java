@@ -39,4 +39,16 @@ public interface RecordMapper extends BaseMapper<RecordEntity> {
      */
     @Select("SELECT COALESCE(SUM(points_earned), 0) FROM record_twb WHERE user_id = #{userId}")
     Long sumPointsByUser(@Param("userId") Long userId);
+
+    /**
+     * 统计用户的服务记录数量
+     */
+    @Select("SELECT COUNT(*) FROM record_twb WHERE user_id = #{userId}")
+    Long countByUserId(@Param("userId") Long userId);
+
+    /**
+     * 统计用户的总服务时长（分钟）
+     */
+    @Select("SELECT COALESCE(SUM(duration_minutes), 0) FROM record_twb WHERE user_id = #{userId}")
+    Long sumDurationByUser(@Param("userId") Long userId);
 }

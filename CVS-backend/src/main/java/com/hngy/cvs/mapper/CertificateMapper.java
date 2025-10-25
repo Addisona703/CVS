@@ -26,4 +26,9 @@ public interface CertificateMapper extends BaseMapper<Certificate> {
      */
     IPage<CertificateVO> selectAllCertificates(IPage<CertificateVO> page);
 
+    /**
+     * 查询待审核的证明记录
+     */
+    IPage<CertificateVO> selectPendingCertificates(IPage<CertificateVO> page);
+
 }

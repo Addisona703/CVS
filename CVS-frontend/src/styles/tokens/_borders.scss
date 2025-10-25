@@ -1,0 +1,38 @@
+/**
+ * 边框和圆角系统
+ * 基于 design.md 规范
+ */
+
+:root {
+  // 圆角
+  --border-radius-xs: 2px;
+  --border-radius-sm: 4px;
+  --border-radius-base: 8px;
+  --border-radius-md: 12px;
+  --border-radius-lg: 14px;
+  --border-radius-xl: 18px;
+  --border-radius-2xl: 24px;
+  --border-radius-3xl: 32px;
+  --border-radius-full: 9999px;
+  
+  // 组件特定圆角
+  --border-radius-button: 4px;
+  --border-radius-input: 4px;
+  --border-radius-card: 8px;
+  --border-radius-modal: 12px;
+  --border-radius-menu-item: 4px;
+  --border-radius-content: 8px;
+  
+  // 边框宽度
+  --border-width-thin: 1px;
+  --border-width-base: 2px;
+  --border-width-thick: 3px;
+  --border-width-indicator: 4px;
+  
+  // 边框样式
+  --border-style: solid;
+  
+  // 焦点边框 (可访问性)
+  --focus-border-width: 2px;
+  --focus-border-color: var(--primary-color);
+}

@@ -24,7 +24,7 @@ public class CorsConfig {
         configuration.setAllowedOriginPatterns(Arrays.asList("*"));
         
         // 允许的HTTP方法
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         
         // 允许的请求头
         configuration.setAllowedHeaders(Arrays.asList("*"));

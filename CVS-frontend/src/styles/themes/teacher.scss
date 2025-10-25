@@ -1,0 +1,148 @@
+/**
+ * 教师界面主题 - 友好、温和风格
+ * 基于 design.md 第 3.2 章节规范
+ */
+
+body[data-role="teacher"] {
+  // 主题色彩变量
+  --primary-color: #67c23a;
+  --sidebar-bg: #2d5a27;
+  --sidebar-hover-bg: #1f4a1a;
+  --sidebar-text: #b8d4b5;
+  --indicator-color: #ffffff;
+  --content-bg: #f0f2f5;
+
+  // Element Plus 主题覆盖
+  --el-color-primary: #67c23a;
+  --el-color-primary-light-3: #85ce61;
+  --el-color-primary-light-5: #a4da89;
+  --el-color-primary-light-7: #c2e7b0;
+  --el-color-primary-light-8: #d1edc4;
+  --el-color-primary-light-9: #e1f3d8;
+  --el-color-primary-dark-2: #529b2e;
+
+  // 布局相关变量
+  --sidebar-width: 240px;
+  --sidebar-collapsed-width: 64px;
+  --header-height: 60px;
+
+  // 阴影效果 - 带绿色调
+  --card-shadow: 0 4px 12px rgba(103, 194, 58, 0.12);
+  --card-shadow-hover: 0 8px 24px rgba(103, 194, 58, 0.18);
+
+  // 指示器样式
+  --indicator-width: 4px;
+  --indicator-border-radius: 2px;
+
+  // 过渡动画
+  --transition-duration: 0.3s;
+  --transition-timing: ease;
+
+  // 文字颜色
+  --text-color-primary: #303133;
+  --text-color-regular: #606266;
+  --text-color-secondary: #909399;
+  --text-color-placeholder: #c0c4cc;
+  --text-color-sidebar: var(--sidebar-text);
+
+  // 边框颜色
+  --border-color-base: #dcdfe6;
+  --border-color-light: #e4e7ed;
+  --border-color-lighter: #ebeef5;
+  --border-color-extra-light: #f2f6fc;
+
+  // 背景颜色
+  --bg-color-page: var(--content-bg);
+  --bg-color-base: #ffffff;
+  --bg-color-overlay: #ffffff;
+
+  // 图标尺寸
+  --icon-size-nav: 20px;
+  --icon-size-nav-large: 24px;
+
+  // 间距系统（8px 基准）
+  --space-1: 4px;
+  --space-1-5: 6px;
+  --space-2: 8px;
+  --space-2-5: 10px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-4-5: 18px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 28px;
+  --space-8: 32px;
+  --space-9: 36px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  // 字体大小
+  --font-size-xs: 12px;
+  --font-size-small: 13px;
+  --font-size-base: 14px;
+  --font-size-large: 16px;
+  --font-size-xl: 18px;
+
+  // 图标尺寸
+  --icon-size-small: 18px;
+  --icon-size-medium: 22px;
+
+  // 边框圆角
+  --border-radius-medium: 12px;
+  --border-radius-round: 999px;
+
+  // 过渡时长
+  --transition-duration-fast: 0.2s;
+  --transition-duration-faster: 0.25s;
+
+  // 主题特定的颜色变量 - 绿色调
+  --primary-color-hover: #85ce61;
+  --primary-color-light-bg: rgba(103, 194, 58, 0.06);
+  --primary-color-light-bg-hover: rgba(103, 194, 58, 0.12);
+  --primary-color-border: rgba(103, 194, 58, 0.1);
+  --primary-color-border-hover: rgba(103, 194, 58, 0.2);
+
+  // 通知相关 - 绿色调
+  --notification-unread-bg: #e1f3d8;
+  --notification-unread-bg-hover: #c2e7b0;
+
+  // 悬停背景
+  --bg-color-hover: #f5f7fa;
+
+  // 阴影
+  --header-shadow: 0 2px 8px rgba(103, 194, 58, 0.08);
+  --button-shadow-hover: 0 4px 12px rgba(103, 194, 58, 0.2);
+  --avatar-shadow: 0 4px 12px rgba(103, 194, 58, 0.15);
+  --qr-shadow: 0 8px 24px rgba(103, 194, 58, 0.12);
+
+  // 边框圆角扩展
+  --border-radius-large: 20px;
+
+  // 统计卡片渐变 - 绿色主题
+  --stat-gradient-primary: linear-gradient(135deg, #67c23a 0%, #85ce61 100%);
+  --stat-gradient-success: linear-gradient(135deg, #67c23a 0%, #85ce61 100%);
+  --stat-gradient-warning: linear-gradient(135deg, #e6a23c 0%, #ebb563 100%);
+  --stat-gradient-info: linear-gradient(135deg, #909399 0%, #a6a9ad 100%);
+
+  // 全局卡片样式 - 应用绿色调阴影
+  .el-card {
+    box-shadow: var(--card-shadow);
+    transition: all var(--transition-duration) var(--transition-timing);
+
+    &:hover {
+      box-shadow: var(--card-shadow-hover);
+    }
+  }
+
+  // 侧边栏菜单样式增强
+  .el-menu {
+    &.sidebar-menu {
+
+      .el-menu-item,
+      .el-sub-menu__title {
+        color: var(--sidebar-text);
+        transition: all var(--transition-duration) var(--transition-timing);
+      }
+    }
+  }
+}

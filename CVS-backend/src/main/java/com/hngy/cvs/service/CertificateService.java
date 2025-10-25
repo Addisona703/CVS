@@ -6,13 +6,14 @@ import com.hngy.cvs.dto.request.CertificateApprovalDTO;
 import com.hngy.cvs.dto.request.CertificateCreateDTO;
 import com.hngy.cvs.dto.response.CertificateVO;
 import com.hngy.cvs.entity.Certificate;
+import com.hngy.cvs.entity.enums.UserRole;
 
 /**
  * 志愿证明服务接口
  * 
  * @author CVS Team
  */
-public interface CertificateService {
+public interface  CertificateService {
 
     /**
      * 申请志愿证明
@@ -73,4 +74,14 @@ public interface CertificateService {
      * 按条件统计证明数量
      */
     Long countByCondition(LambdaQueryWrapper<Certificate> wrapper);
+
+    /**
+     * 生成证书PDF
+     *
+     * @param certificateId 证书ID
+     * @param userId 用户ID
+     * @param userRole 用户角色
+     * @return PDF字节数组
+     */
+    byte[] generateCertificatePdf(Long certificateId, Long userId, UserRole userRole);
 }

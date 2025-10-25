@@ -1,5 +1,6 @@
 package com.hngy.cvs.controller;
 
+import com.hngy.cvs.dto.response.ActivityStatisticsVO;
 import com.hngy.cvs.dto.response.PageVO;
 import com.hngy.cvs.common.result.Result;
 import com.hngy.cvs.common.security.UserPrincipal;
@@ -75,7 +76,24 @@ public class ActivityController {
             @PathVariable Long id,
             @AuthenticationPrincipal UserPrincipal principal) {
         activityService.publishActivity(id, principal.getUserId());
-        return Result.success("发布活动成功");
+        
+        // 根据用户角色返回不同的消息
+        boolean isAdmin = "ADMIN".equals(principal.getRole());
+        String message = isAdmin ? "发布成功" : "已提交审核，请等待管理员审核";
+        
+        return Result.success(message);
+    }
+
+    @PostMapping("/{id}/approve")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "审核活动")
+    public Result<Void> approveActivity(
+            @PathVariable Long id,
+            @RequestParam Boolean approved,
+            @RequestParam(required = false) String rejectReason,
+            @AuthenticationPrincipal UserPrincipal principal) {
+        activityService.approveActivity(id, approved, rejectReason, principal.getUserId());
+        return Result.success(approved ? "审核通过" : "已拒绝");
     }
 
     @PostMapping("/{id}/cancel")
@@ -88,20 +106,29 @@ public class ActivityController {
         return Result.success("取消活动成功");
     }
 
-    @GetMapping
+    @PostMapping("/search")
     @Operation(summary = "分页查询活动列表", description = "支持按标题、创建者名字模糊查询，按活动状态筛选")
-    public Result<PageVO<ActivityVO>> getActivityList(@Valid PageDTO<ActivitySearchDTO> pageRequest) {
+    public Result<PageVO<ActivityVO>> getActivityList(@Valid @RequestBody PageDTO<ActivitySearchDTO> pageRequest) {
         PageVO<ActivityVO> result = activityService.getActivityList(pageRequest);
         return Result.success(result);
     }
 
-    @GetMapping("/my")
+    @PostMapping("/my/search")
     @PreAuthorize("hasAnyRole('TEACHER', 'ADMIN')")
     @Operation(summary = "获取我创建的活动列表")
     public Result<PageVO<ActivityVO>> getMyActivities(
-            @Valid PageDTO<ActivitySearchDTO> pageRequest,
+            @Valid @RequestBody PageDTO<ActivitySearchDTO> pageRequest,
             @AuthenticationPrincipal UserPrincipal principal) {
         PageVO<ActivityVO> result = activityService.getMyActivitiesList(pageRequest, principal.getUserId());
         return Result.success(result);
+    }
+
+    @GetMapping("/statistics")
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    @Operation(summary = "获取活动统计数据", description = "获取指定天数内的每日活动数和参与人数统计")
+    public Result<ActivityStatisticsVO> getActivityStatistics(
+            @RequestParam(name = "days", defaultValue = "7") Integer days) {
+        ActivityStatisticsVO statistics = activityService.getActivityStatistics(days);
+        return Result.success(statistics);
     }
 }

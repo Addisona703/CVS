@@ -2,12 +2,14 @@ package com.hngy.cvs.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.hngy.cvs.dto.request.SignupSearchDTO;
+import com.hngy.cvs.dto.response.PendingSignStudentVO;
 import com.hngy.cvs.dto.response.SignupVO;
 import com.hngy.cvs.entity.Signup;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+
+import java.util.List;
 
 /**
  * 报名数据访问层
@@ -18,37 +20,43 @@ import org.apache.ibatis.annotations.Select;
 public interface SignupMapper extends BaseMapper<Signup> {
 
     /**
-     * 查询用户的报名记录
+     * 查询未签到的报名学生
      */
-    IPage<SignupVO> selectMySignups(IPage<SignupVO> page, @Param("userId") Long userId);
+    @Select("""
+            SELECT u.name AS name,
+                   u.username AS username
+            FROM signup_twb s
+                     INNER JOIN user_twb u ON s.user_id = u.id
+            WHERE s.activity_id = #{activityId}
+              AND s.status = 'APPROVED'
+              AND (s.signed_in IS NULL OR s.signed_in = 0)
+            """)
+    List<PendingSignStudentVO> selectPendingCheckInStudents(@Param("activityId") Long activityId);
 
     /**
-     * 查询活动的报名记录
+     * 查询未签退的报名学生（已签到但未签退）
      */
-    IPage<SignupVO> selectActivitySignups(IPage<SignupVO> page, @Param("activityId") Long activityId);
+    @Select("""
+            SELECT u.name AS name,
+                   u.username AS username
+            FROM signup_twb s
+                     INNER JOIN user_twb u ON s.user_id = u.id
+            WHERE s.activity_id = #{activityId}
+              AND s.status = 'APPROVED'
+              AND s.signed_in = 1
+              AND (s.signed_out IS NULL OR s.signed_out = 0)
+            """)
+    List<PendingSignStudentVO> selectPendingCheckOutStudents(@Param("activityId") Long activityId);
 
     /**
-     * 分页查询报名列表（带搜索条件）
+     * 分页查询指定活动的报名列表
      */
-    IPage<SignupVO> selectSignupPage(IPage<SignupVO> page, @Param("searchDTO") SignupSearchDTO searchDTO);
-
-    /**
-     * 统计教师待审核的报名数
-     */
-    @Select("SELECT COUNT(*) FROM signup_twb asu " +
-            "JOIN activity_twb va ON asu.activity_id = va.id " +
-            "WHERE va.organizer_id = #{organizerId} AND asu.status = 'PENDING' AND va.deleted = 0")
-    Long countPendingByOrganizer(@Param("organizerId") Long organizerId);
-
-    /**
-     * 统计学生的报名数
-     */
-    @Select("SELECT COUNT(*) FROM signup_twb WHERE user_id = #{userId}")
-    Long countByUser(@Param("userId") Long userId);
-
-    /**
-     * 统计活动的已通过报名数
-     */
-    @Select("SELECT COUNT(*) FROM signup_twb WHERE activity_id = #{activityId} AND status = 'APPROVED'")
-    Long countApprovedByActivity(@Param("activityId") Long activityId);
+    IPage<SignupVO> selectSignupPage(
+            com.baomidou.mybatisplus.extension.plugins.pagination.Page<Signup> page,
+            @Param("activityId") Long activityId,
+            @Param("status") com.hngy.cvs.entity.enums.SignupStatus status,
+            @Param("userName") String userName,
+            @Param("signedIn") Boolean signedIn,
+            @Param("signedOut") Boolean signedOut
+    );
 }

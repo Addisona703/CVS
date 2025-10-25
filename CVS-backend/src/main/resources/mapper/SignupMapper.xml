@@ -8,7 +8,8 @@
         <result column="activity_id" property="activityId"/>
         <result column="activity_title" property="activityTitle"/>
         <result column="user_id" property="userId"/>
-        <result column="user_name" property="userName"/>
+        <result column="name" property="name"/>
+        <result column="username" property="username"/>
         <result column="status" property="status"/>
         <result column="reason" property="reason"/>
         <result column="reject_reason" property="rejectReason"/>
@@ -48,27 +49,35 @@
     <!-- 分页查询报名列表 -->
     <select id="selectSignupPage" resultMap="SignupVOMap">
         SELECT 
-            s.*,
+            s.id,
+            s.activity_id,
+            s.user_id,
+            s.status,
+            s.reason,
+            s.reject_reason,
+            s.signed_in,
+            s.signed_out,
+            s.sign_in_time,
+            s.sign_out_time,
+            s.created_at,
             a.title as activity_title,
-            u.name as user_name
+            u.name as name,
+            u.username as username
         FROM signup_twb s
         LEFT JOIN activity_twb a ON s.activity_id = a.id AND a.deleted = 0
         LEFT JOIN user_twb u ON s.user_id = u.id AND u.deleted = 0
-        WHERE true
-        <if test="searchDTO.activityTitle != null and searchDTO.activityTitle != ''">
-            AND a.title LIKE CONCAT('%', #{searchDTO.activityTitle}, '%')
+        WHERE s.activity_id = #{activityId}
+        <if test="status != null">
+            AND s.status = #{status}
         </if>
-        <if test="searchDTO.userName != null and searchDTO.userName != ''">
-            AND u.name LIKE CONCAT('%', #{searchDTO.userName}, '%')
+        <if test="userName != null and userName != ''">
+            AND u.name LIKE CONCAT('%', #{userName}, '%')
         </if>
-        <if test="searchDTO.status != null and searchDTO.status != ''">
-            AND s.status = #{searchDTO.status}
+        <if test="signedIn != null">
+            AND s.signed_in = #{signedIn}
         </if>
-        <if test="searchDTO.activityId != null">
-            AND s.activity_id = #{searchDTO.activityId}
-        </if>
-        <if test="searchDTO.userId != null">
-            AND s.user_id = #{searchDTO.userId}
+        <if test="signedOut != null">
+            AND s.signed_out = #{signedOut}
         </if>
         ORDER BY s.created_at DESC
     </select>

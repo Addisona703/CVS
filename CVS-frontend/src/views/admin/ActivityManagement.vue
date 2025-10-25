@@ -2,7 +2,7 @@
   <div class="activity-management">
     <div class="page-header">
       <h1>活动管理</h1>
-      <el-button type="primary" @click="$router.push('/teacher/activities/create')">
+      <el-button type="primary" @click="$router.push('/admin/activities/create')">
         <el-icon><Plus /></el-icon>
         创建活动
       </el-button>
@@ -17,12 +17,14 @@
         <el-form-item label="状态">
           <el-select v-model="searchForm.status" placeholder="请选择状态" clearable>
             <el-option label="草稿" value="DRAFT" />
+            <el-option label="待审核" value="PENDING_APPROVAL" />
             <el-option label="已发布" value="PUBLISHED" />
             <el-option label="已取消" value="CANCELLED" />
+            <el-option label="审核拒绝" value="REJECTED" />
           </el-select>
         </el-form-item>
         <el-form-item label="创建者">
-          <el-input v-model="searchForm.creatorName" placeholder="请输入创建者姓名" clearable />
+          <el-input v-model="searchForm.organizerName" placeholder="请输入创建者姓名" clearable />
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="handleSearch">搜索</el-button>
@@ -35,10 +37,10 @@
     <el-card>
       <el-table :data="activityList" :loading="loading" stripe>
         <el-table-column prop="id" label="ID" width="80" />
-        <el-table-column prop="title" label="活动标题" min-width="200" />
-        <el-table-column prop="creatorName" label="创建者" width="120" />
-        <el-table-column prop="maxParticipants" label="最大人数" width="100" />
-        <el-table-column prop="currentParticipants" label="当前人数" width="100" />
+        <el-table-column prop="title" label="活动标题" min-width="150" />
+        <el-table-column prop="organizerName" label="创建者" width="120" />
+        <el-table-column prop="maxParticipants" label="最大人数" width="80" />
+        <el-table-column prop="currentParticipants" label="当前人数" width="80" />
         <el-table-column prop="status" label="状态" width="100">
           <template #default="{ row }">
             <el-tag :type="getStatusType(row.status)">
@@ -56,7 +58,7 @@
             {{ formatDateTime(row.createdAt) }}
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="200" fixed="right">
+        <el-table-column label="操作" width="250" fixed="right">
           <template #default="{ row }">
             <el-button type="primary" size="small" @click="viewActivity(row.id)">
               查看
@@ -68,6 +70,14 @@
               @click="publishActivity(row)"
             >
               发布
+            </el-button>
+            <el-button 
+              v-if="row.status === 'PENDING_APPROVAL'" 
+              type="success" 
+              size="small" 
+              @click="approveActivity(row)"
+            >
+              审核
             </el-button>
             <el-button 
               v-if="row.status === 'PUBLISHED'" 
@@ -118,7 +128,7 @@ const activityList = ref([])
 const searchForm = reactive({
   title: '',
   status: '',
-  creatorName: ''
+  organizerName: ''
 })
 
 const getStatusLabel = (status) => {
@@ -139,9 +149,11 @@ const fetchActivityList = async () => {
   loading.value = true
   try {
     const params = {
-      current: pagination.current,
-      size: pagination.size,
-      ...searchForm
+      pageNum: pagination.current,
+      pageSize: pagination.size,
+      params: { 
+        ...searchForm
+      }
     }
     const response = await activityAPI.getActivityList(params)
     if (response.code === 200) {
@@ -164,7 +176,7 @@ const handleReset = () => {
   Object.assign(searchForm, {
     title: '',
     status: '',
-    creatorName: ''
+    organizerName: ''
   })
   handleSearch()
 }
@@ -215,6 +227,11 @@ const cancelActivity = async (row) => {
       console.error('取消活动失败:', error)
     }
   }
+}
+
+const approveActivity = (row) => {
+  // 跳转到活动审核页面，并传递活动ID
+  router.push(`/admin/activity-approval?activityId=${row.id}`)
 }
 
 const deleteActivity = async (row) => {

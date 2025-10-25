@@ -1,0 +1,126 @@
+/**
+ * 管理员界面主题 - 专业、严谨风格
+ * 基于 design.md 第 3.1 章节规范
+ */
+
+body[data-role="admin"] {
+  // 主题色彩变量
+  --primary-color: #409eff;
+  --sidebar-bg: #304156;
+  --sidebar-hover-bg: #434a5a;
+  --content-bg: #f0f2f5;
+  --text-primary: #e5eaf3;
+  
+  // Element Plus 主题覆盖
+  --el-color-primary: #409eff;
+  --el-color-primary-light-3: #79bbff;
+  --el-color-primary-light-5: #a0cfff;
+  --el-color-primary-light-7: #c6e2ff;
+  --el-color-primary-light-8: #d9ecff;
+  --el-color-primary-light-9: #ecf5ff;
+  --el-color-primary-dark-2: #337ecc;
+  
+  // 布局相关变量
+  --sidebar-width: 240px;
+  --sidebar-collapsed-width: 64px;
+  --header-height: 60px;
+  
+  // 阴影效果
+  --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --card-shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.12);
+  
+  // 过渡动画
+  --transition-duration: 0.3s;
+  --transition-timing: ease;
+  
+  // 文字颜色
+  --text-color-primary: #303133;
+  --text-color-regular: #606266;
+  --text-color-secondary: #909399;
+  --text-color-placeholder: #c0c4cc;
+  
+  // 边框颜色
+  --border-color-base: #dcdfe6;
+  --border-color-light: #e4e7ed;
+  --border-color-lighter: #ebeef5;
+  --border-color-extra-light: #f2f6fc;
+  
+  // 背景颜色
+  --bg-color-page: var(--content-bg);
+  --bg-color-base: #ffffff;
+  --bg-color-overlay: #ffffff;
+  
+  // 图标尺寸
+  --icon-size-nav: 20px;
+  --icon-size-nav-large: 24px;
+  
+  // 边框圆角
+  --border-radius-content: 8px;
+  --el-border-radius-base: 6px;
+  --el-border-radius-small: 4px;
+  --el-border-radius-large: 8px;
+  
+  // 间距系统（8px 基准）
+  --space-1: 4px;
+  --space-1-5: 6px;
+  --space-2: 8px;
+  --space-2-5: 10px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-4-5: 18px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 28px;
+  --space-8: 32px;
+  --space-9: 36px;
+  --space-10: 40px;
+  --space-12: 48px;
+  
+  // 字体大小
+  --font-size-xs: 12px;
+  --font-size-small: 13px;
+  --font-size-base: 14px;
+  --font-size-large: 16px;
+  --font-size-xl: 18px;
+  
+  // 图标尺寸
+  --icon-size-small: 18px;
+  --icon-size-medium: 22px;
+  
+  // 边框圆角
+  --border-radius-medium: 12px;
+  --border-radius-round: 999px;
+  
+  // 过渡时长
+  --transition-duration-fast: 0.2s;
+  --transition-duration-faster: 0.25s;
+  
+  // 主题特定的颜色变量
+  --primary-color-hover: #66b1ff;
+  --primary-color-light-bg: rgba(64, 158, 255, 0.06);
+  --primary-color-light-bg-hover: rgba(64, 158, 255, 0.12);
+  --primary-color-border: rgba(64, 158, 255, 0.1);
+  --primary-color-border-hover: rgba(64, 158, 255, 0.2);
+  
+  // 通知相关
+  --notification-unread-bg: #ecf5ff;
+  --notification-unread-bg-hover: #d9ecff;
+  
+  // 悬停背景
+  --bg-color-hover: #f5f7fa;
+  
+  // 阴影
+  --header-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --button-shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --avatar-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --qr-shadow: 0 8px 24px rgba(64, 158, 255, 0.12);
+  
+  // 边框圆角扩展
+  --border-radius-large: 20px;
+  
+  // 统计卡片渐变
+  --stat-gradient-primary: linear-gradient(135deg, #409eff 0%, #66b1ff 100%);
+  --stat-gradient-success: linear-gradient(135deg, #67c23a 0%, #85ce61 100%);
+  --stat-gradient-warning: linear-gradient(135deg, #e6a23c 0%, #ebb563 100%);
+  --stat-gradient-info: linear-gradient(135deg, #909399 0%, #a6a9ad 100%);
+}

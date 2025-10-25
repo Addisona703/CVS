@@ -1,0 +1,89 @@
+/**
+ * 主题系统入口文件
+ * 导入所有角色主题和基础 tokens
+ */
+
+// 基础 tokens
+@use '../tokens/breakpoints';
+@use '../tokens/colors';
+@use '../tokens/spacing';
+@use '../tokens/typography';
+@use '../tokens/shadows';
+@use '../tokens/borders';
+@use '../tokens/transitions';
+
+// 工具类和 mixins
+@use '../utilities/mixins';
+@use '../utilities/animations';
+@use '../utilities/helpers';
+
+// 角色主题
+@use './admin.scss';
+@use './teacher.scss';
+@use './student.scss';
+
+// Element Plus 组件主题覆盖
+@use '../element-plus-override.scss';
+
+// 公共组件样式 (使用 CSS 变量)
+@use '../components/common';
+@use '../components/layouts';
+
+/**
+ * 全局基础样式
+ * 确保所有主题都有一致的基础样式
+ */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  color: var(--text-color-primary);
+  background-color: var(--bg-color-page);
+  margin: 0;
+  padding: 0;
+  transition: background-color var(--transition-duration, 0.3s) var(--transition-timing, ease);
+}
+
+// 确保主题切换时的平滑过渡
+body[data-role] {
+  transition: all var(--transition-duration, 0.3s) var(--transition-timing, ease);
+}
+
+// 通用组件样式基础
+.app-button {
+  background: var(--primary-color);
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all var(--transition-duration, 0.3s) var(--transition-timing, ease);
+  
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--card-shadow-hover);
+  }
+  
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+.app-card {
+  background: var(--bg-color-base);
+  border-radius: var(--border-radius-content, 8px);
+  box-shadow: var(--card-shadow);
+  padding: var(--space-6);
+  transition: all var(--transition-duration, 0.3s) var(--transition-timing, ease);
+  
+  &:hover {
+    box-shadow: var(--card-shadow-hover);
+    transform: translateY(-2px);
+  }
+}

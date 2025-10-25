@@ -18,7 +18,7 @@ public class Activity {
     /**
      * 主键ID
      */
-    @TableId(type = IdType.ASSIGN_ID)
+    @TableId(type = IdType.AUTO)
     private Long id;
 
     /**
@@ -80,6 +80,21 @@ public class Activity {
      * 奖励积分
      */
     private Integer points;
+
+    /**
+     * 审核人ID
+     */
+    private Long approverId;
+
+    /**
+     * 审核时间
+     */
+    private LocalDateTime approvedAt;
+
+    /**
+     * 拒绝原因
+     */
+    private String rejectReason;
 
     /**
      * 创建时间

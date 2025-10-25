@@ -1,0 +1,351 @@
+/**
+ * 布局容器组件样式
+ * 使用 CSS 变量确保主题切换时样式同步更新
+ * 基于 design.md 规范
+ */
+
+// 通用布局容器
+.layout-container {
+  min-height: 100vh;
+  background-color: var(--bg-color-page, #f0f2f5);
+  transition: background-color var(--transition-duration, 0.3s) var(--transition-timing, ease);
+}
+
+// 侧边栏容器
+.sidebar-container {
+  width: var(--sidebar-width, 240px);
+  background: var(--sidebar-bg, #304156);
+  transition: width var(--transition-duration, 0.3s) var(--transition-timing, ease),
+              background var(--transition-duration, 0.3s) var(--transition-timing, ease);
+  overflow: hidden;
+  box-shadow: var(--sidebar-shadow, 2px 0 8px rgba(0, 0, 0, 0.1));
+  
+  &.collapsed {
+    width: var(--sidebar-collapsed-width, 64px);
+  }
+  
+  // 学生界面的毛玻璃效果
+  body[data-role="student"] & {
+    background: var(--sidebar-bg, rgba(255, 255, 255, 0.92));
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    
+    // 降级策略
+    @supports not (backdrop-filter: blur(6px)) {
+      background: rgba(255, 255, 255, 0.98);
+    }
+    
+    @media (prefers-reduced-motion: reduce) {
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+  }
+}
+
+// Logo 区域
+.logo-container {
+  height: var(--header-height, 60px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2, 8px);
+  padding: 0 var(--space-5, 20px);
+  border-bottom: 1px solid var(--sidebar-divider, rgba(255, 255, 255, 0.08));
+  background: var(--logo-bg, rgba(0, 0, 0, 0.1));
+  transition: all var(--transition-duration, 0.3s) var(--transition-timing, ease);
+  
+  .logo-icon {
+    color: var(--primary-color, #409eff);
+    font-size: var(--icon-size-nav-large, 24px);
+    transition: color var(--transition-duration, 0.3s) var(--transition-timing, ease);
+  }
+  
+  .logo-text {
+    color: var(--text-primary, #e5eaf3);
+    font-size: var(--font-size-large, 16px);
+    font-weight: 600;
+    white-space: nowrap;
+    letter-spacing: 0.5px;
+    transition: color var(--transition-duration, 0.3s) var(--transition-timing, ease);
+  }
+  
+  // 学生界面的 Logo 样式
+  body[data-role="student"] & {
+    background: transparent;
+    border-bottom-color: var(--border-color-lighter, #ebeef5);
+    
+    .logo-text {
+      color: var(--text-color-primary, #303133);
+    }
+  }
+}
+
+// 主内容区域
+.main-content-container {
+  background: var(--content-bg, #f0f2f5);
+  padding: var(--space-9, 36px);
+  overflow-y: auto;
+  min-height: calc(100vh - var(--header-height, 60px));
+  transition: background var(--transition-duration, 0.3s) var(--transition-timing, ease),
+              padding var(--transition-duration, 0.3s) var(--transition-timing, ease);
+  
+  // 响应式 padding
+  @media (max-width: 1024px) {
+    padding: var(--space-6, 24px);
+  }
+  
+  @media (max-width: 768px) {
+    padding: var(--space-4, 16px);
+  }
+}
+
+// 页面头部容器
+.page-header-container {
+  background: var(--bg-color-base, #ffffff);
+  padding: var(--space-5, 20px) var(--space-6, 24px);
+  margin-bottom: var(--space-6, 24px);
+  border-radius: var(--border-radius-content, 8px);
+  box-shadow: var(--card-shadow, 0 4px 12px rgba(0, 0, 0, 0.08));
+  transition: all var(--transition-duration, 0.3s) var(--transition-timing, ease);
+  
+  .page-title {
+    font-size: var(--font-size-xl, 18px);
+    font-weight: 600;
+    color: var(--text-color-primary, #303133);
+    margin: 0;
+  }
+  
+  .page-description {
+    font-size: var(--font-size-base, 14px);
+    color: var(--text-color-secondary, #909399);
+    margin-top: var(--space-2, 8px);
+  }
+}
+
+// 内容卡片容器
+.content-card-container {
+  background: var(--bg-color-base, #ffffff);
+  border-radius: var(--border-radius-content, 8px);
+  box-shadow: var(--card-shadow, 0 4px 12px rgba(0, 0, 0, 0.08));
+  padding: var(--space-6, 24px);
+  margin-bottom: var(--space-6, 24px);
+  transition: all var(--transition-duration, 0.3s) var(--transition-timing, ease);
+  
+  &:hover {
+    box-shadow: var(--card-shadow-hover, 0 8px 24px rgba(0, 0, 0, 0.12));
+  }
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+// 统计卡片容器
+.stat-card-container {
+  background: var(--bg-color-base, #ffffff);
+  border-radius: var(--border-radius-content, 8px);
+  box-shadow: var(--card-shadow, 0 4px 12px rgba(0, 0, 0, 0.08));
+  padding: var(--space-6, 24px);
+  transition: all var(--transition-duration, 0.3s) var(--transition-timing, ease);
+  
+  &:hover {
+    box-shadow: var(--card-shadow-hover, 0 8px 24px rgba(0, 0, 0, 0.12));
+    transform: translateY(-4px);
+  }
+  
+  .stat-icon {
+    width: var(--space-12, 48px);
+    height: var(--space-12, 48px);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--icon-size-medium, 22px);
+    margin-bottom: var(--space-3, 12px);
+    transition: all var(--transition-duration, 0.3s) var(--transition-timing, ease);
+    
+    &.primary {
+      background: var(--primary-color-light-bg, rgba(64, 158, 255, 0.1));
+      color: var(--primary-color, #409eff);
+    }
+    
+    &.success {
+      background: rgba(103, 194, 58, 0.1);
+      color: var(--color-success, #67c23a);
+    }
+    
+    &.warning {
+      background: rgba(230, 162, 60, 0.1);
+      color: var(--color-warning, #e6a23c);
+    }
+    
+    &.danger {
+      background: rgba(245, 108, 108, 0.1);
+      color: var(--color-error, #f56c6c);
+    }
+  }
+  
+  .stat-value {
+    font-size: var(--font-size-xxl, 24px);
+    font-weight: 700;
+    color: var(--text-color-primary, #303133);
+    margin-bottom: var(--space-1, 4px);
+  }
+  
+  .stat-label {
+    font-size: var(--font-size-base, 14px);
+    color: var(--text-color-secondary, #909399);
+  }
+}
+
+// 表格容器
+.table-container {
+  background: var(--bg-color-base, #ffffff);
+  border-radius: var(--border-radius-content, 8px);
+  box-shadow: var(--card-shadow, 0 4px 12px rgba(0, 0, 0, 0.08));
+  padding: var(--space-6, 24px);
+  overflow: hidden;
+  transition: all var(--transition-duration, 0.3s) var(--transition-timing, ease);
+  
+  .table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-5, 20px);
+    
+    .table-title {
+      font-size: var(--font-size-large, 16px);
+      font-weight: 600;
+      color: var(--text-color-primary, #303133);
+    }
+  }
+  
+  // 移动端表格横向滚动
+  @media (max-width: 768px) {
+    padding: var(--space-4, 16px);
+    
+    .el-table {
+      overflow-x: auto;
+    }
+  }
+}
+
+// 表单容器
+.form-container {
+  background: var(--bg-color-base, #ffffff);
+  border-radius: var(--border-radius-content, 8px);
+  box-shadow: var(--card-shadow, 0 4px 12px rgba(0, 0, 0, 0.08));
+  padding: var(--space-6, 24px);
+  transition: all var(--transition-duration, 0.3s) var(--transition-timing, ease);
+  
+  .form-header {
+    margin-bottom: var(--space-6, 24px);
+    padding-bottom: var(--space-4, 16px);
+    border-bottom: 1px solid var(--border-color-lighter, #ebeef5);
+    
+    .form-title {
+      font-size: var(--font-size-large, 16px);
+      font-weight: 600;
+      color: var(--text-color-primary, #303133);
+    }
+    
+    .form-description {
+      font-size: var(--font-size-small, 13px);
+      color: var(--text-color-secondary, #909399);
+      margin-top: var(--space-2, 8px);
+    }
+  }
+  
+  .form-footer {
+    margin-top: var(--space-6, 24px);
+    padding-top: var(--space-4, 16px);
+    border-top: 1px solid var(--border-color-lighter, #ebeef5);
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-3, 12px);
+  }
+}
+
+// 空状态容器
+.empty-state-container {
+  padding: var(--space-12, 48px) var(--space-6, 24px);
+  text-align: center;
+  
+  .empty-icon {
+    font-size: var(--icon-size-xxl, 64px);
+    color: var(--text-color-placeholder, #c0c4cc);
+    margin-bottom: var(--space-4, 16px);
+  }
+  
+  .empty-text {
+    font-size: var(--font-size-base, 14px);
+    color: var(--text-color-secondary, #909399);
+  }
+}
+
+// 响应式布局工具类
+.responsive-grid {
+  display: grid;
+  gap: var(--space-5, 20px);
+  
+  &.cols-2 {
+    grid-template-columns: repeat(2, 1fr);
+    
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  &.cols-3 {
+    grid-template-columns: repeat(3, 1fr);
+    
+    @media (max-width: 1024px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  &.cols-4 {
+    grid-template-columns: repeat(4, 1fr);
+    
+    @media (max-width: 1024px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
+  }
+}
+
+// Flex 布局工具类
+.flex-container {
+  display: flex;
+  gap: var(--space-4, 16px);
+  
+  &.justify-between {
+    justify-content: space-between;
+  }
+  
+  &.justify-center {
+    justify-content: center;
+  }
+  
+  &.align-center {
+    align-items: center;
+  }
+  
+  &.wrap {
+    flex-wrap: wrap;
+  }
+  
+  @media (max-width: 768px) {
+    &.mobile-column {
+      flex-direction: column;
+    }
+  }
+}

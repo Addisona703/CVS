@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hngy.cvs.mapper.RedemptionMapper">
+
+    <!-- 根据凭证编号查询兑换记录 -->
+    <select id="selectByVoucherCode" resultType="com.hngy.cvs.entity.Redemption">
+        SELECT 
+            id,
+            user_id,
+            product_id,
+            points_spent,
+            voucher_code,
+            status,
+            verified_by,
+            verified_at,
+            created_at,
+            updated_at
+        FROM redemption_twb
+        WHERE voucher_code = #{voucherCode}
+        LIMIT 1
+    </select>
+
+    <!-- 统计指定时间范围内的兑换次数 -->
+    <select id="countRedemptionsByDateRange" resultType="java.lang.Long">
+        SELECT COUNT(*)
+        FROM redemption_twb
+        <where>
+            <if test="startDate != null">
+                AND created_at >= #{startDate}
+            </if>
+            <if test="endDate != null">
+                AND created_at &lt;= #{endDate}
+            </if>
+        </where>
+    </select>
+
+    <!-- 统计指定时间范围内的总消耗积分 -->
+    <select id="sumPointsSpentByDateRange" resultType="java.lang.Long">
+        SELECT COALESCE(SUM(points_spent), 0)
+        FROM redemption_twb
+        <where>
+            <if test="startDate != null">
+                AND created_at >= #{startDate}
+            </if>
+            <if test="endDate != null">
+                AND created_at &lt;= #{endDate}
+            </if>
+        </where>
+    </select>
+
+    <!-- 统计指定状态的兑换次数 -->
+    <select id="countRedemptionsByStatus" resultType="java.lang.Long">
+        SELECT COUNT(*)
+        FROM redemption_twb
+        WHERE status = #{status}
+    </select>
+
+    <!-- 获取商品兑换排行 -->
+    <select id="selectProductRanking" resultType="com.hngy.cvs.dto.response.ProductRankingVO">
+        SELECT 
+            p.id as productId,
+            p.name as productName,
+            p.image_url as productImageUrl,
+            c.name as categoryName,
+            COUNT(r.id) as redemptionCount,
+            SUM(r.points_spent) as totalPointsSpent,
+            p.stock as currentStock
+        FROM redemption_twb r
+        INNER JOIN product_twb p ON r.product_id = p.id
+        LEFT JOIN category_twb c ON p.category_id = c.id
+        WHERE p.deleted = 0
+        GROUP BY p.id, p.name, p.image_url, c.name, p.stock
+        ORDER BY redemptionCount DESC, totalPointsSpent DESC
+        LIMIT #{limit}
+    </select>
+
+    <!-- 导出兑换记录 -->
+    <select id="selectRedemptionsForExport" resultType="com.hngy.cvs.dto.response.RedemptionVO">
+        SELECT 
+            r.id,
+            r.user_id as userId,
+            u.name as userName,
+            u.username as userUsername,
+            r.product_id as productId,
+            p.name as productName,
+            r.points_spent as pointsSpent,
+            r.voucher_code as voucherCode,
+            r.status,
+            CASE r.status
+                WHEN 0 THEN '待领取'
+                WHEN 1 THEN '已领取'
+                WHEN 2 THEN '已取消'
+                ELSE '未知'
+            END as statusText,
+            r.verified_by as verifiedBy,
+            v.name as verifiedByName,
+            r.verified_at as verifiedAt,
+            r.created_at as createdAt
+        FROM redemption_twb r
+        INNER JOIN user_twb u ON r.user_id = u.id
+        INNER JOIN product_twb p ON r.product_id = p.id
+        LEFT JOIN user_twb v ON r.verified_by = v.id
+        <where>
+            <if test="startDate != null">
+                AND r.created_at >= #{startDate}
+            </if>
+            <if test="endDate != null">
+                AND r.created_at &lt;= #{endDate}
+            </if>
+        </where>
+        ORDER BY r.created_at DESC
+    </select>
+
+</mapper>

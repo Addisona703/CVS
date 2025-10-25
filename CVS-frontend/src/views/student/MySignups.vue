@@ -3,7 +3,7 @@
     <div class="page-header">
       <h1>我的报名</h1>
     </div>
-    
+
     <!-- 状态筛选 -->
     <el-card class="filter-card">
       <el-radio-group v-model="statusFilter" @change="handleFilterChange">
@@ -13,109 +13,102 @@
         <el-radio-button label="REJECTED">已拒绝</el-radio-button>
       </el-radio-group>
     </el-card>
-    
+
     <!-- 报名列表 -->
     <div class="signup-list">
-      <el-card 
-        v-for="signup in signupList" 
-        :key="signup.id" 
-        class="signup-card"
-        shadow="hover"
-      >
-        <div class="signup-header">
-          <h3 class="activity-title">{{ signup.activityTitle }}</h3>
-          <el-tag :type="getStatusType(signup.status)">
-            {{ getStatusLabel(signup.status) }}
-          </el-tag>
-        </div>
-        
-        <div class="signup-content">
-          <div class="activity-info">
+      <el-card v-for="signup in signupList" :key="signup.id" class="signup-card" shadow="hover">
+        <template #header>
+          <div class="card-header">
+            <div class="header-left">
+              <h3 class="activity-title">{{ signup.activityTitle }}</h3>
+              <span class="activity-subtitle">{{ signup.location }}</span>
+            </div>
+            <el-tag :type="getStatusType(signup.status)" size="large">
+              {{ getStatusLabel(signup.status) }}
+            </el-tag>
+          </div>
+        </template>
+
+        <div class="card-content">
+          <div class="info-row">
             <div class="info-item">
-              <el-icon><Location /></el-icon>
-              <span>{{ signup.location }}</span>
+              <el-icon>
+                <Clock />
+              </el-icon>
+              <span>活动时间：{{ formatDateTime(signup.startTime) }}</span>
             </div>
             <div class="info-item">
-              <el-icon><Clock /></el-icon>
-              <span>{{ formatDateTime(signup.startTime) }}</span>
-            </div>
-            <div class="info-item">
-              <el-icon><Calendar /></el-icon>
-              <span>报名时间：{{ formatDateTime(signup.signupTime) }}</span>
+              <el-icon>
+                <Calendar />
+              </el-icon>
+              <span>报名时间：{{ formatDateTime(signup.createdAt) }}</span>
             </div>
             <div class="info-item" v-if="signup.points">
-              <el-icon><Star /></el-icon>
-              <span>{{ signup.points }}积分</span>
+              <el-icon>
+                <Star />
+              </el-icon>
+              <span>上限积分：{{ signup.points }}</span>
             </div>
           </div>
-          
+
           <div class="signup-progress" v-if="signup.status === 'APPROVED'">
-            <div class="progress-item" :class="{ active: signup.checkedIn }">
-              <el-icon><Check /></el-icon>
+            <div class="progress-item" :class="{ active: signup.signedIn }">
+              <el-icon>
+                <Check />
+              </el-icon>
               <span>已签到</span>
             </div>
-            <div class="progress-item" :class="{ active: signup.checkedOut }">
-              <el-icon><Check /></el-icon>
+            <div class="progress-item" :class="{ active: signup.signedOut }">
+              <el-icon>
+                <Check />
+              </el-icon>
               <span>已签退</span>
             </div>
             <div class="progress-item" :class="{ active: signup.recordCreated }">
-              <el-icon><Check /></el-icon>
+              <el-icon>
+                <Check />
+              </el-icon>
               <span>记录已生成</span>
             </div>
           </div>
-          
-          <div class="rejection-reason" v-if="signup.status === 'REJECTED' && signup.rejectionReason">
-            <el-alert
-              :title="signup.rejectionReason"
-              type="error"
-              :closable="false"
-              show-icon
-            />
+
+          <div class="rejection-reason" v-if="signup.status === 'REJECTED' && signup.rejectReason">
+            <el-alert :title="signup.rejectReason" type="error" :closable="false" show-icon />
           </div>
         </div>
-        
-        <div class="signup-actions">
-          <el-button type="primary" @click="viewActivity(signup.activityId)">
-            查看活动
-          </el-button>
-          <el-button 
-            v-if="canCancel(signup)"
-            type="danger" 
-            @click="cancelSignup(signup)"
-          >
-            取消报名
-          </el-button>
-          <el-button 
-            v-if="signup.status === 'APPROVED' && signup.recordCreated"
-            type="success" 
-            @click="viewRecord(signup.recordId)"
-          >
-            查看记录
-          </el-button>
-        </div>
+
+        <template #footer>
+          <div class="card-actions">
+            <a href="javascript:void(0)" @click="viewActivity(signup.activityId)">查看活动</a>
+            <a href="javascript:void(0)" @click="viewSignupDetail(signup)">查看详情</a>
+            <a v-if="canCancel(signup)" href="javascript:void(0)" class="danger" @click="cancelSignup(signup)">
+              取消报名
+            </a>
+            <a v-if="signup.status === 'APPROVED' && signup.recordCreated" href="javascript:void(0)" class="success"
+              @click="viewRecord(signup.recordId)">
+              查看记录
+            </a>
+          </div>
+        </template>
       </el-card>
     </div>
-    
+
     <!-- 分页 -->
     <div class="pagination" v-if="signupList.length > 0">
-      <el-pagination
-        v-model:current-page="pagination.current"
-        v-model:page-size="pagination.size"
-        :total="pagination.total"
-        :page-sizes="[10, 20, 50]"
-        layout="total, sizes, prev, pager, next, jumper"
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-      />
+      <el-pagination v-model:current-page="pagination.current" v-model:page-size="pagination.size"
+        :total="pagination.total" :page-sizes="[10, 20, 50]" layout="total, sizes, prev, pager, next, jumper"
+        @size-change="handleSizeChange" @current-change="handleCurrentChange" />
     </div>
-    
+
     <!-- 空状态 -->
     <el-empty v-if="!loading && signupList.length === 0" description="暂无报名记录" />
+
+    <SignupDetailDialog v-model="detailDialogVisible" :signup="selectedSignup" />
   </div>
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Location, Clock, Calendar, Star, Check } from '@element-plus/icons-vue'
@@ -123,12 +116,15 @@ import { signupAPI } from '@/api'
 import { formatDateTime } from '@/utils/format'
 import { STATUS_LABELS, STATUS_COLORS } from '@/utils/constants'
 import { usePagination } from '@/composables/usePagination'
+import SignupDetailDialog from './components/SignupDetailDialog.vue'
 
 const router = useRouter()
 const { loading, pagination, handleSizeChange, handleCurrentChange, updatePagination } = usePagination()
 
 const signupList = ref([])
 const statusFilter = ref('')
+const detailDialogVisible = ref(false)
+const selectedSignup = ref(null)
 
 const getStatusLabel = (status) => {
   return STATUS_LABELS[status] || status
@@ -147,66 +143,34 @@ const getStatusType = (status) => {
 const fetchSignupList = async () => {
   loading.value = true
   try {
-    const params = {
-      current: pagination.current,
-      size: pagination.size,
-      status: statusFilter.value || undefined
-    }
-    // 这里应该调用获取用户报名列表的API
-    // const response = await signupAPI.getUserSignups(userId, params)
-    
-    // 使用模拟数据
-    signupList.value = [
-      {
-        id: 1,
-        activityId: 1,
-        activityTitle: '社区环保志愿活动',
-        location: '市中心公园',
-        startTime: '2024-01-20T09:00:00',
-        signupTime: '2024-01-15T10:30:00',
-        status: 'APPROVED',
-        points: 15,
-        checkedIn: true,
-        checkedOut: true,
-        recordCreated: true,
-        recordId: 1
-      },
-      {
-        id: 2,
-        activityId: 2,
-        activityTitle: '敬老院志愿服务',
-        location: '阳光敬老院',
-        startTime: '2024-01-25T14:00:00',
-        signupTime: '2024-01-18T15:20:00',
-        status: 'PENDING',
-        points: 20,
-        checkedIn: false,
-        checkedOut: false,
-        recordCreated: false
-      },
-      {
-        id: 3,
-        activityId: 3,
-        activityTitle: '图书馆志愿服务',
-        location: '市图书馆',
-        startTime: '2024-01-15T09:00:00',
-        signupTime: '2024-01-10T14:00:00',
-        status: 'REJECTED',
-        rejectionReason: '报名人数已满，感谢您的参与热情',
-        checkedIn: false,
-        checkedOut: false,
-        recordCreated: false
+    // 使用POST请求和分页DTO结构
+    const pageRequest = {
+      pageNum: pagination.current,
+      pageSize: pagination.size,
+      params: {
+        // 添加筛选条件
+        status: statusFilter.value || undefined
       }
-    ]
-    
-    updatePagination({
-      current: 1,
-      size: 10,
-      total: 3,
-      pages: 1
-    })
+    }
+
+    const response = await signupAPI.getMySignups(pageRequest)
+    if (response.code === 200) {
+      signupList.value = response.data.records || []
+      updatePagination(response.data)
+    } else {
+      ElMessage.error(response.message || '获取报名列表失败')
+      signupList.value = []
+    }
   } catch (error) {
     console.error('获取报名列表失败:', error)
+    ElMessage.error('网络错误，请稍后重试')
+    signupList.value = []
+    updatePagination({
+      current: 1,
+      size: pagination.size,
+      total: 0,
+      pages: 0
+    })
   } finally {
     loading.value = false
   }
@@ -226,8 +190,13 @@ const viewRecord = (recordId) => {
 }
 
 const canCancel = (signup) => {
-  // 只有待审核状态的报名可以取消
+  // 只有待审核的报名可以取消，已通过的报名不允许取消
   return signup.status === 'PENDING'
+}
+
+const viewSignupDetail = (signup) => {
+  selectedSignup.value = { ...signup }
+  detailDialogVisible.value = true
 }
 
 const cancelSignup = async (signup) => {
@@ -241,13 +210,14 @@ const cancelSignup = async (signup) => {
         type: 'warning'
       }
     )
-    
-    await signupAPI.cancelSignup(signup.activityId)
+
+    await signupAPI.cancelSignup(signup.id)
     ElMessage.success('取消报名成功')
     fetchSignupList()
   } catch (error) {
     if (error !== 'cancel') {
       console.error('取消报名失败:', error)
+      ElMessage.error(error.response?.data?.message || '取消报名失败，请稍后重试')
     }
   }
 }
@@ -261,115 +231,186 @@ onMounted(() => {
 .my-signups {
   .page-header {
     margin-bottom: 20px;
-    
+
     h1 {
       margin: 0;
       font-size: 24px;
       color: #303133;
     }
   }
-  
+
   .filter-card {
     margin-bottom: 20px;
   }
-  
+
   .signup-list {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: 20px;
     margin-bottom: 20px;
-    
+
     .signup-card {
-      .signup-header {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+
+      :deep(.el-card__header) {
+        padding: 20px;
+        border-bottom: 1px solid #f0f0f0;
+      }
+
+      :deep(.el-card__body) {
+        flex: 1;
+        display: flex;
+        padding: 20px;
+      }
+
+      :deep(.el-card__footer) {
+        padding: 16px 20px;
+        border-top: 1px solid #f0f0f0;
+        background-color: #fafafa;
+      }
+
+      .card-header {
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
-        margin-bottom: 16px;
-        
-        .activity-title {
-          margin: 0;
-          font-size: 18px;
-          font-weight: 600;
-          color: #303133;
+
+        .header-left {
           flex: 1;
-          margin-right: 12px;
+          margin-right: 16px;
+
+          .activity-title {
+            margin: 0 0 8px 0;
+            font-size: 18px;
+            font-weight: 600;
+            color: #303133;
+            line-height: 1.4;
+          }
+
+          .activity-subtitle {
+            font-size: 14px;
+            color: #909399;
+          }
         }
       }
-      
-      .signup-content {
-        .activity-info {
-          margin-bottom: 16px;
-          
+
+      .card-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+
+        .info-row {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+
           .info-item {
             display: flex;
             align-items: center;
             gap: 8px;
-            margin-bottom: 8px;
             font-size: 14px;
             color: #606266;
-            
+
             .el-icon {
               color: #909399;
+              font-size: 16px;
             }
           }
         }
-        
+
         .signup-progress {
           display: flex;
           gap: 24px;
-          margin-bottom: 16px;
-          
+          padding: 16px;
+          background-color: #f5f7fa;
+          border-radius: 4px;
+
           .progress-item {
             display: flex;
             align-items: center;
             gap: 6px;
             font-size: 14px;
             color: #c0c4cc;
-            
+
             &.active {
               color: #67c23a;
+              font-weight: 500;
             }
-            
+
             .el-icon {
               font-size: 16px;
             }
           }
         }
-        
+
         .rejection-reason {
-          margin-bottom: 16px;
+          margin-top: 0;
         }
       }
-      
-      .signup-actions {
+
+      .card-actions {
         display: flex;
-        gap: 12px;
-        
-        .el-button {
-          flex: 1;
+        gap: 16px;
+        align-items: center;
+
+        a {
+          color: #409eff;
+          text-decoration: none;
+          font-size: 14px;
+          transition: color 0.3s;
+
+          &:hover {
+            color: #66b1ff;
+          }
+
+          &.danger {
+            color: #f56c6c;
+
+            &:hover {
+              color: #f78989;
+            }
+          }
+
+          &.success {
+            color: #67c23a;
+
+            &:hover {
+              color: #85ce61;
+            }
+          }
         }
       }
     }
   }
-  
+
   .pagination {
     text-align: center;
     margin-top: 20px;
   }
 }
 
+@media (max-width: 1200px) {
+  .my-signups .signup-list {
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  }
+}
+
 @media (max-width: 768px) {
   .my-signups {
-    .signup-progress {
-      flex-direction: column;
-      gap: 12px !important;
-    }
-    
-    .signup-actions {
-      flex-direction: column;
-      
-      .el-button {
-        width: 100%;
+    .signup-list {
+      grid-template-columns: 1fr;
+
+      .signup-card {
+        .signup-progress {
+          flex-direction: column;
+          gap: 12px;
+        }
+
+        .card-actions {
+          flex-wrap: wrap;
+        }
       }
     }
   }

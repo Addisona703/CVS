@@ -1,0 +1,60 @@
+/**
+ * 过渡和动画系统
+ * 基于 design.md 第 6 章节规范
+ */
+
+:root {
+  // 过渡时长
+  --transition-duration-fast: 0.12s;
+  --transition-duration-base: 0.3s;
+  --transition-duration-slow: 0.5s;
+  --transition-duration: 0.3s; // 默认值
+  
+  // 过渡时间函数
+  --transition-timing-linear: linear;
+  --transition-timing-ease: ease;
+  --transition-timing-ease-in: ease-in;
+  --transition-timing-ease-out: ease-out;
+  --transition-timing-ease-in-out: ease-in-out;
+  --transition-timing: ease; // 默认值
+  
+  // 组件特定过渡
+  --transition-button: all 0.12s ease;
+  --transition-hover: all 0.3s ease;
+  --transition-page: opacity 0.3s ease;
+  --transition-menu: all 0.3s ease;
+  --transition-card: all 0.3s ease;
+  --transition-modal: all 0.3s ease;
+  
+  // 动画时长
+  --animation-duration-shake: 0.5s;
+  --animation-duration-fade: 0.3s;
+  --animation-duration-slide: 0.25s;
+  
+  // Z-index 层级
+  --z-index-dropdown: 1000;
+  --z-index-sticky: 1020;
+  --z-index-fixed: 1030;
+  --z-index-modal-backdrop: 1040;
+  --z-index-modal: 1050;
+  --z-index-popover: 1060;
+  --z-index-tooltip: 1070;
+}
+
+// 动效降级支持
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --transition-duration-fast: 0.01s;
+    --transition-duration-base: 0.01s;
+    --transition-duration-slow: 0.01s;
+    --transition-duration: 0.01s;
+  }
+  
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01s !important;
+  }
+}

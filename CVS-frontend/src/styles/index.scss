@@ -1,0 +1,34 @@
+/**
+ * CVS 样式系统主入口
+ * 基于 design.md 规范构建的完整设计系统
+ * 
+ * 目录结构:
+ * - tokens/    设计 tokens (颜色、间距、字体等)
+ * - themes/    角色主题 (管理员、教师、学生)
+ * - utilities/ 工具类和 mixins
+ */
+
+// 导入所有主题和工具
+@use './themes/index.scss';
+@use './utilities/index.scss';
+
+/**
+ * 使用说明:
+ * 
+ * 1. 在 main.js 中导入此文件:
+ *    import './styles/index.scss'
+ * 
+ * 2. 使用 CSS 变量:
+ *    color: var(--primary-color);
+ *    padding: var(--space-4);
+ * 
+ * 3. 使用 mixins (在 .vue 文件的 <style lang="scss"> 中):
+ *    @use '@/styles/utilities/mixins' as *;
+ *    .my-component {
+ *      @include card-base;
+ *      @include card-hover;
+ *    }
+ * 
+ * 4. 使用工具类 (在模板中):
+ *    <div class="d-flex justify-between align-center p-4">
+ */

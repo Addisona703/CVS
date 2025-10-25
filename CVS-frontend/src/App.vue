@@ -5,22 +5,20 @@
 </template>
 
 <script setup>
+import { onMounted } from 'vue'
+import { useTheme } from '@/composables/useTheme'
+
 // 应用入口组件
+const { initTheme } = useTheme()
+
+// 初始化主题系统
+onMounted(() => {
+  initTheme()
+})
 </script>
 
 <style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-html, body {
-  height: 100%;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  background-color: #f0f2f5;
-}
-
+/* 基础样式已移至主题系统，这里只保留应用特定样式 */
 #app {
   height: 100%;
 }
@@ -32,34 +30,53 @@ html, body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: var(--border-color-lighter, #f1f1f1);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
+  background: var(--border-color-base, #c1c1c1);
   border-radius: 3px;
+  transition: background var(--transition-duration, 0.3s) var(--transition-timing, ease);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
+  background: var(--text-color-secondary, #a8a8a8);
 }
 
-/* Element Plus 样式覆盖 */
+/* Element Plus 样式覆盖 - 使用主题变量 */
 .el-card {
-  border-radius: 8px;
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  border-radius: var(--border-radius-content, 8px);
+  box-shadow: var(--card-shadow);
+  transition: box-shadow var(--transition-duration, 0.3s) var(--transition-timing, ease);
+}
+
+.el-card:hover {
+  box-shadow: var(--card-shadow-hover);
 }
 
 .el-button {
   border-radius: 6px;
+  transition: all var(--transition-duration, 0.3s) var(--transition-timing, ease);
+}
+
+.el-button:active {
+  transform: scale(0.95);
 }
 
 .el-input__wrapper {
   border-radius: 6px;
+  transition: all var(--transition-duration, 0.3s) var(--transition-timing, ease);
 }
 
 .el-select .el-input__wrapper {
   border-radius: 6px;
+}
+
+/* 确保主题切换时的平滑过渡 */
+* {
+  transition-property: background-color, border-color, color, box-shadow;
+  transition-duration: var(--transition-duration, 0.3s);
+  transition-timing-function: var(--transition-timing, ease);
 }
 </style>

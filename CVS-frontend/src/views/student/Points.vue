@@ -13,7 +13,7 @@
               <el-icon size="48" color="#e6a23c"><Star /></el-icon>
             </div>
             <div class="points-info">
-              <div class="points-number">{{ userPoints.totalPoints }}</div>
+              <div class="points-number">{{ userPoints.totalPoints || 0 }}</div>
               <div class="points-label">总积分</div>
             </div>
           </div>
@@ -27,7 +27,7 @@
               <el-icon size="48" color="#f56c6c"><Trophy /></el-icon>
             </div>
             <div class="rank-info">
-              <div class="rank-number">{{ userPoints.ranking }}</div>
+              <div class="rank-number">{{ userPoints.ranking || '-' }}</div>
               <div class="rank-label">当前排名</div>
             </div>
           </div>
@@ -41,7 +41,7 @@
               <el-icon size="48" color="#67c23a"><Medal /></el-icon>
             </div>
             <div class="level-info">
-              <div class="level-name">{{ userPoints.level }}</div>
+              <div class="level-name">{{ userPoints.level || '新手志愿者' }}</div>
               <div class="level-label">当前等级</div>
             </div>
           </div>
@@ -56,8 +56,8 @@
       </template>
       <div class="level-progress">
         <div class="current-level">
-          <span class="level-name">{{ userPoints.level }}</span>
-          <span class="level-points">{{ userPoints.totalPoints }}分</span>
+          <span class="level-name">{{ userPoints.level || '新手志愿者' }}</span>
+          <span class="level-points">{{ userPoints.totalPoints || 0 }}分</span>
         </div>
         <div class="progress-bar">
           <el-progress 
@@ -67,12 +67,15 @@
           />
         </div>
         <div class="next-level">
-          <span class="level-name">{{ nextLevel.name }}</span>
-          <span class="level-points">{{ nextLevel.requiredPoints }}分</span>
+          <span class="level-name">{{ nextLevel.name || '志愿达人' }}</span>
+          <span class="level-points">{{ nextLevel.requiredPoints || 1000 }}分</span>
         </div>
       </div>
-      <div class="progress-text">
-        还需 {{ nextLevel.requiredPoints - userPoints.totalPoints }} 分升级到 {{ nextLevel.name }}
+      <div class="progress-text" v-if="(nextLevel.requiredPoints || 1000) > (userPoints.totalPoints || 0)">
+        还需 {{ (nextLevel.requiredPoints || 1000) - (userPoints.totalPoints || 0) }} 分升级到 {{ nextLevel.name || '志愿达人' }}
+      </div>
+      <div class="progress-text" v-else>
+        已达到最高等级
       </div>
     </el-card>
     
@@ -105,16 +108,24 @@
           </el-form>
           
           <el-table :data="pointsRecords" :loading="loading" stripe>
-            <el-table-column prop="activityTitle" label="活动名称" min-width="150" />
-            <el-table-column prop="points" label="积分" width="80">
+            <el-table-column prop="activityTitle" label="活动名称" min-width="150">
               <template #default="{ row }">
-                <span class="points-change positive">+{{ row.points }}</span>
+                {{ row.activityTitle || '志愿服务' }}
               </template>
             </el-table-column>
-            <el-table-column prop="reason" label="获得原因" min-width="120" />
+            <el-table-column prop="points" label="积分" width="80">
+              <template #default="{ row }">
+                <span class="points-change positive">+{{ row.points || 0 }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column prop="reason" label="获得原因" min-width="120">
+              <template #default="{ row }">
+                {{ row.reason || '完成志愿服务' }}
+              </template>
+            </el-table-column>
             <el-table-column prop="recordTime" label="获得时间" width="180">
               <template #default="{ row }">
-                {{ formatDateTime(row.recordTime) }}
+                {{ row.recordTime ? formatDateTime(row.recordTime) : '-' }}
               </template>
             </el-table-column>
           </el-table>
@@ -148,12 +159,12 @@
               </div>
               <div class="user-info">
                 <div class="user-name" :class="{ 'current-user': item.isCurrentUser }">
-                  {{ item.userName }}
+                  {{ item.name || '未知用户' }}
                   <el-tag v-if="item.isCurrentUser" type="primary" size="small">我</el-tag>
                 </div>
-                <div class="user-level">{{ item.level }}</div>
+                <div class="user-level">{{ item.level || '新手志愿者' }}</div>
               </div>
-              <div class="user-points">{{ item.totalPoints }}分</div>
+              <div class="user-points">{{ item.totalPoints || 0 }}分</div>
               <div class="rank-badge" v-if="index < 3">
                 <el-icon v-if="index === 0" color="#ffd700"><Trophy /></el-icon>
                 <el-icon v-else-if="index === 1" color="#c0c0c0"><Trophy /></el-icon>
@@ -170,7 +181,7 @@
 <script setup>
 import { ref, reactive, onMounted, computed } from 'vue'
 import { Star, Trophy, Medal } from '@element-plus/icons-vue'
-import { pointsAPI } from '@/api'
+import { pointsAPI, serviceRecordAPI } from '@/api'
 import { formatDateTime } from '@/utils/format'
 import { usePagination } from '@/composables/usePagination'
 
@@ -199,6 +210,12 @@ const levels = [
   { name: '志愿达人', requiredPoints: 1000, color: '#eb2f96' }
 ]
 
+// 根据积分获取等级
+const getLevelByPoints = (points) => {
+  const levelInfo = levels.slice().reverse().find(level => points >= level.requiredPoints)
+  return levelInfo ? levelInfo.name : '新手志愿者'
+}
+
 const nextLevel = computed(() => {
   const currentPoints = userPoints.value.totalPoints
   const nextLevelInfo = levels.find(level => level.requiredPoints > currentPoints)
@@ -222,17 +239,24 @@ const levelProgress = computed(() => {
 
 const fetchUserPoints = async () => {
   try {
-    // 这里应该调用获取用户积分的API
-    // const response = await pointsAPI.getUserPoints(userId)
-    
-    // 使用模拟数据
+    // 调用积分统计接口
+    const response = await pointsAPI.getCurrentUserPointsStats()
+    if (response.code === 200) {
+      const stats = response.data
+      userPoints.value = {
+        totalPoints: stats.totalPoints || 0,
+        ranking: stats.currentRanking || 0,
+        level: getLevelByPoints(stats.totalPoints || 0)
+      }
+    }
+  } catch (error) {
+    console.error('获取用户积分失败:', error)
+    // 使用模拟数据作为备用
     userPoints.value = {
       totalPoints: 180,
       ranking: 5,
       level: '中级志愿者'
     }
-  } catch (error) {
-    console.error('获取用户积分失败:', error)
   }
 }
 
@@ -240,14 +264,31 @@ const fetchPointsRecords = async () => {
   loading.value = true
   try {
     const params = {
-      current: pagination.current,
-      size: pagination.size,
-      ...searchForm
+      pageNum: pagination.current,
+      pageSize: pagination.size,
+      params: {
+        // 可以添加搜索条件
+        startDate: searchForm.dateRange?.[0],
+        endDate: searchForm.dateRange?.[1]
+      }
     }
-    // 这里应该调用获取积分记录的API
-    // const response = await pointsAPI.getUserPointsRecords(userId, params)
     
-    // 使用模拟数据
+    // 调用获取我的服务记录API来获取积分记录
+    const response = await serviceRecordAPI.getMyRecords(params)
+    if (response.code === 200) {
+      pointsRecords.value = (response.data.records || []).map(record => ({
+        ...record,
+        activityTitle: record.activityTitle || '志愿服务',
+        points: record.pointsEarned || 0,
+        reason: '完成志愿服务',
+        recordTime: record.createdAt
+      }))
+      
+      updatePagination(response.data)
+    }
+  } catch (error) {
+    console.error('获取积分记录失败:', error)
+    // 使用模拟数据作为备用
     pointsRecords.value = [
       {
         id: 1,
@@ -278,8 +319,6 @@ const fetchPointsRecords = async () => {
       total: 3,
       pages: 1
     })
-  } catch (error) {
-    console.error('获取积分记录失败:', error)
   } finally {
     loading.value = false
   }
@@ -287,10 +326,18 @@ const fetchPointsRecords = async () => {
 
 const fetchPointsRanking = async () => {
   try {
-    // 这里应该调用获取积分排行榜的API
-    // const response = await pointsAPI.getPointsRanking()
-    
-    // 使用模拟数据
+    // 调用分页排行榜接口，只获取前10名
+    const response = await pointsAPI.getPointsRankingPage({ page: 1, size: 10 })
+    if (response.code === 200) {
+      pointsRanking.value = (response.data.records || []).map(item => ({
+        ...item,
+        level: getLevelByPoints(item.totalPoints),
+        isCurrentUser: item.isCurrentUser || false
+      }))
+    }
+  } catch (error) {
+    console.error('获取积分排行榜失败:', error)
+    // 使用模拟数据作为备用
     pointsRanking.value = [
       { userId: 1, userName: '张三', totalPoints: 280, level: '高级志愿者', isCurrentUser: false },
       { userId: 2, userName: '李四', totalPoints: 260, level: '高级志愿者', isCurrentUser: false },
@@ -299,8 +346,6 @@ const fetchPointsRanking = async () => {
       { userId: 5, userName: '当前用户', totalPoints: 180, level: '中级志愿者', isCurrentUser: true },
       { userId: 6, userName: '钱七', totalPoints: 160, level: '中级志愿者', isCurrentUser: false }
     ]
-  } catch (error) {
-    console.error('获取积分排行榜失败:', error)
   }
 }
 

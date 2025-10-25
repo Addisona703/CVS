@@ -60,22 +60,27 @@
     <el-card>
       <el-table :data="recordList" :loading="loading" stripe>
         <el-table-column prop="activityTitle" label="活动名称" min-width="200" />
-        <el-table-column prop="serviceDate" label="服务日期" width="120">
+        <el-table-column prop="createdAt" label="记录日期" width="120">
           <template #default="{ row }">
-            {{ formatDate(row.serviceDate) }}
+            {{ formatDate(row.createdAt) }}
           </template>
         </el-table-column>
-        <el-table-column prop="serviceHours" label="服务时长" width="100">
+        <el-table-column label="服务时长" width="100">
           <template #default="{ row }">
-            {{ row.serviceHours }}小时
+            {{ Math.round((row.durationMinutes || 0) / 60 * 10) / 10 }}小时
           </template>
         </el-table-column>
-        <el-table-column prop="points" label="获得积分" width="100" />
-        <el-table-column prop="description" label="服务内容" min-width="200" />
-        <el-table-column prop="evaluator" label="评价人" width="120" />
-        <el-table-column prop="recordTime" label="记录时间" width="180">
+        <el-table-column prop="pointsEarned" label="获得积分" width="100" />
+        <el-table-column prop="description" label="服务内容" min-width="200" show-overflow-tooltip />
+        <el-table-column prop="rating" label="评分" width="80">
           <template #default="{ row }">
-            {{ formatDateTime(row.recordTime) }}
+            <span v-if="row.rating">{{ row.rating }}分</span>
+            <span v-else class="text-muted">未评分</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="createdAt" label="记录时间" width="180">
+          <template #default="{ row }">
+            {{ formatDateTime(row.createdAt) }}
           </template>
         </el-table-column>
         <el-table-column label="操作" width="120" fixed="right">
@@ -112,23 +117,24 @@
           <el-descriptions-item label="活动名称">
             {{ selectedRecord.activityTitle }}
           </el-descriptions-item>
-          <el-descriptions-item label="服务日期">
-            {{ formatDate(selectedRecord.serviceDate) }}
+          <el-descriptions-item label="记录日期">
+            {{ formatDate(selectedRecord.createdAt) }}
           </el-descriptions-item>
           <el-descriptions-item label="服务时长">
-            {{ selectedRecord.serviceHours }}小时
+            {{ Math.round((selectedRecord.durationMinutes || 0) / 60 * 10) / 10 }}小时
           </el-descriptions-item>
           <el-descriptions-item label="获得积分">
-            {{ selectedRecord.points }}分
+            {{ selectedRecord.pointsEarned || 0 }}分
           </el-descriptions-item>
-          <el-descriptions-item label="评价人">
-            {{ selectedRecord.evaluator }}
+          <el-descriptions-item label="评分">
+            <span v-if="selectedRecord.rating">{{ selectedRecord.rating }}分</span>
+            <span v-else class="text-muted">未评分</span>
           </el-descriptions-item>
           <el-descriptions-item label="记录时间">
-            {{ formatDateTime(selectedRecord.recordTime) }}
+            {{ formatTime(selectedRecord.createdAt) }}
           </el-descriptions-item>
           <el-descriptions-item label="服务内容" :span="2">
-            {{ selectedRecord.description }}
+            {{ selectedRecord.description || '无' }}
           </el-descriptions-item>
           <el-descriptions-item label="评价" :span="2" v-if="selectedRecord.evaluation">
             {{ selectedRecord.evaluation }}
@@ -146,7 +152,7 @@
 <script setup>
 import { ref, reactive, onMounted, computed } from 'vue'
 import { serviceRecordAPI } from '@/api'
-import { formatDate, formatDateTime } from '@/utils/format'
+import { formatDate, formatDateTime, formatTime } from '@/utils/format'
 import { usePagination } from '@/composables/usePagination'
 
 const { loading, pagination, handleSizeChange, handleCurrentChange, updatePagination } = usePagination()
@@ -162,31 +168,57 @@ const searchForm = reactive({
 })
 
 // 计算统计数据
-const totalRecords = computed(() => myStats.value?.totalActivities ?? recordList.value.length)
-const totalHours = computed(() => myStats.value?.totalHours ?? recordList.value.reduce((sum, record) => sum + (record.durationHours || record.serviceHours || 0), 0))
-const totalPoints = computed(() => myStats.value?.totalPoints ?? 0)
+const totalRecords = computed(() => myStats.value?.totalRecords ?? 0)
+const totalHours = computed(() => {
+  const hours = myStats.value?.totalServiceHours ?? 0
+  return Math.round(hours * 10) / 10
+})
+const totalPoints = computed(() => myStats.value?.totalPointsEarned ?? 0)
 
 const fetchRecordList = async () => {
   loading.value = true
   try {
-    const params = {
-      current: pagination.current,
-      size: pagination.size
+    // 构建分页参数
+    const pageRequest = {
+      pageNum: pagination.current,
+      pageSize: pagination.size,
+      params: {
+        activityTitle: searchForm.activityTitle || undefined,
+        // 日期范围处理（如需要）
+        startDate: searchForm.dateRange?.[0] || undefined,
+        endDate: searchForm.dateRange?.[1] || undefined
+      }
     }
 
-    // 获取我的服务记录
-    const resp = await serviceRecordAPI.getMyRecords(params)
-    recordList.value = resp.data?.records || []
-    updatePagination(resp.data || { current: 1, size: params.size, total: 0, pages: 0 })
+    // 调用新的API接口
+    const resp = await serviceRecordAPI.getMyRecords(pageRequest)
+    if (resp.code === 200 && resp.data) {
+      recordList.value = resp.data.records || []
+      updatePagination({
+        current: resp.data.current || 1,
+        size: resp.data.size || pagination.size,
+        total: resp.data.total || 0,
+        pages: resp.data.pages || 0
+      })
+    } else {
+      recordList.value = []
+      updatePagination({ current: 1, size: pagination.size, total: 0, pages: 0 })
+    }
 
-    // 获取我的服务统计（可选）
+    // 获取统计数据
     try {
       const statsResp = await serviceRecordAPI.getMyStats()
-      myStats.value = statsResp.data || null
-    } catch {}
+      if (statsResp.code === 200) {
+        myStats.value = statsResp.data
+      }
+    } catch (error) {
+      console.warn('获取统计数据失败:', error)
+    }
 
   } catch (error) {
     console.error('获取服务记录失败:', error)
+    recordList.value = []
+    updatePagination({ current: 1, size: pagination.size, total: 0, pages: 0 })
   } finally {
     loading.value = false
   }
@@ -262,6 +294,10 @@ onMounted(() => {
     :deep(.el-descriptions__body) {
       background: #fafafa;
     }
+  }
+  
+  .text-muted {
+    color: #909399;
   }
 }
 </style>

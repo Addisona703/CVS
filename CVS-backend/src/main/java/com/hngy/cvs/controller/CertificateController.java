@@ -8,6 +8,7 @@ import com.hngy.cvs.common.security.UserPrincipal;
 import com.hngy.cvs.dto.request.CertificateApprovalDTO;
 import com.hngy.cvs.dto.request.CertificateCreateDTO;
 import com.hngy.cvs.dto.response.CertificateVO;
+import com.hngy.cvs.entity.enums.UserRole;
 import com.hngy.cvs.service.CertificateService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -19,6 +20,11 @@ import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+
+import java.nio.charset.StandardCharsets;
 
 /**
  * 志愿证明管理控制器
@@ -114,5 +120,56 @@ public class CertificateController {
     public Result<Long> countCertificatesByUser(@Parameter(description = "用户ID") @PathVariable Long userId) {
         Long count = certificateService.countCertificatesByUser(userId);
         return Result.success(count);
+    }
+
+    @GetMapping("/{id}/preview")
+    @PreAuthorize("hasAnyRole('STUDENT', 'ADMIN')")
+    @Operation(summary = "预览志愿证书")
+    public ResponseEntity<byte[]> previewCertificate(
+            @Parameter(description = "证书ID") @PathVariable Long id,
+            @AuthenticationPrincipal UserPrincipal principal) {
+        // 生成PDF字节数组
+        byte[] pdfBytes = certificateService.generateCertificatePdf(
+                id, 
+                principal.getUserId(), 
+                UserRole.fromCode(principal.getRole())
+        );
+        
+        // 设置响应头
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(pdfBytes);
+    }
+
+    @GetMapping("/{id}/download")
+    @PreAuthorize("hasAnyRole('STUDENT', 'ADMIN')")
+    @Operation(summary = "下载志愿证书")
+    public ResponseEntity<byte[]> downloadCertificate(
+            @Parameter(description = "证书ID") @PathVariable Long id,
+            @AuthenticationPrincipal UserPrincipal principal) {
+        // 生成PDF字节数组
+        byte[] pdfBytes = certificateService.generateCertificatePdf(
+                id, 
+                principal.getUserId(), 
+                UserRole.fromCode(principal.getRole())
+        );
+        
+        // 获取证书信息以获取学号
+        CertificateVO certificate = certificateService.getCertificateById(id);
+        String filename = "志愿服务证书-" + certificate.getUsername() + ".pdf";
+        
+        // 设置响应头
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDispositionFormData("attachment", 
+                new String(filename.getBytes(StandardCharsets.UTF_8), 
+                          StandardCharsets.ISO_8859_1));
+        
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(pdfBytes);
     }
 }

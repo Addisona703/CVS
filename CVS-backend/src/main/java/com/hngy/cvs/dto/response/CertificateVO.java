@@ -22,8 +22,11 @@ public class CertificateVO {
     @Schema(description = "用户ID", example = "4")
     private Long userId;
 
-    @Schema(description = "用户姓名", example = "张三")
-    private String userName;
+    @Schema(description = "用户名", example = "student001")
+    private String username;
+
+    @Schema(description = "姓名", example = "张三")
+    private String name;
 
     @Schema(description = "申请目的", example = "申请奖学金需要")
     private String purpose;
@@ -54,4 +57,20 @@ public class CertificateVO {
 
     @Schema(description = "创建时间", example = "2024-01-01T10:00:00")
     private LocalDateTime createdAt;
+
+    @Schema(description = "服务统计信息")
+    private ServiceStatistics statistics;
+
+    /**
+     * 服务统计信息内部类
+     */
+    @Data
+    @Schema(description = "服务统计信息")
+    public static class ServiceStatistics {
+        @Schema(description = "完成的活动数量", example = "5")
+        private Integer completedActivityCount;
+
+        @Schema(description = "总服务时长（小时）", example = "20.5")
+        private Double totalServiceHours;
+    }
 }

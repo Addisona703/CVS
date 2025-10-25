@@ -64,8 +64,23 @@ public class ActivityVO {
     @Schema(description = "当前报名人数", example = "25")
     private Integer currentParticipants;
 
+    @Schema(description = "已签到人数", example = "20")
+    private Integer checkinCount;
+
+    @Schema(description = "已签退人数", example = "18")
+    private Integer checkoutCount;
+
     @Schema(description = "是否可以报名", example = "true")
     private Boolean canSignup;
+
+    @Schema(description = "审核人ID", example = "1")
+    private Long approverId;
+
+    @Schema(description = "审核时间", example = "2024-01-01T12:00:00")
+    private LocalDateTime approvedAt;
+
+    @Schema(description = "拒绝原因", example = "活动内容不符合要求")
+    private String rejectReason;
 
     @Schema(description = "创建时间", example = "2024-01-01T10:00:00")
     private LocalDateTime createdAt;

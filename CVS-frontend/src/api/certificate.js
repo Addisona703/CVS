@@ -3,7 +3,7 @@ import request from '@/utils/request'
 export const certificateAPI = {
   // 申请志愿证明
   applyCertificate: (data) => {
-    return request.post('/certificates/apply', data)
+    return request.post('/certificates', data)
   },
 
   // 获取证明详情
@@ -11,29 +11,52 @@ export const certificateAPI = {
     return request.get(`/certificates/${id}`)
   },
 
-  // 获取用户的证明列表（按文档路径）
-  getUserCertificates: (userId, params) => {
-    return request.get(`/certificates/user/${userId}`, { params })
+  // 根据证明编号查询证明
+  getCertificateByNumber: (certificateNumber) => {
+    return request.get(`/certificates/number/${certificateNumber}`)
   },
+
   // 获取当前用户的证明列表
   getMyCertificates: (params) => {
     return request.get('/certificates/my', { params })
   },
 
-  // 审核证明（通过）— 不带请求体
-  approveCertificate: (id) => {
-    return request.put(`/certificates/${id}/approve`)
-  },
-  // 审核证明（拒绝）— 可选传拒绝原因（若后端不支持将自动回退）
-  rejectCertificate: (id, reason) => {
-    if (reason) {
-      return request.put(`/certificates/${id}/reject`, { reason })
-    }
-    return request.put(`/certificates/${id}/reject`)
+  // 获取所有证明列表（管理员）
+  getAllCertificates: (params) => {
+    return request.get('/certificates/all', { params })
   },
 
-  // 获取所有证明列表
-  getAllCertificates: (params) => {
-    return request.get('/certificates', { params })
+  // 获取待审核的证明列表（管理员）
+  getPendingCertificates: (params) => {
+    return request.get('/certificates/pending', { params })
+  },
+
+  // 审批证明申请（管理员）
+  approveCertificate: (data) => {
+    return request.post('/certificates/approve', data)
+  },
+
+  // 删除证明申请
+  deleteCertificate: (id) => {
+    return request.delete(`/certificates/${id}`)
+  },
+
+  // 统计用户的证明数量
+  countCertificatesByUser: (userId) => {
+    return request.get(`/certificates/count/${userId}`)
+  },
+
+  // 预览证书PDF
+  previewCertificate: (id) => {
+    return request.get(`/certificates/${id}/preview`, {
+      responseType: 'blob'
+    })
+  },
+
+  // 下载证书PDF
+  downloadCertificate: (id) => {
+    return request.get(`/certificates/${id}/download`, {
+      responseType: 'blob'
+    })
   }
 }
