@@ -21,17 +21,17 @@ export const certificateAPI = {
     return request.get('/certificates/my', { params })
   },
 
-  // 获取所有证明列表（管理员）
+  // 获取所有证明列表（学工处）
   getAllCertificates: (params) => {
     return request.get('/certificates/all', { params })
   },
 
-  // 获取待审核的证明列表（管理员）
+  // 获取待审核的证明列表（学工处）
   getPendingCertificates: (params) => {
     return request.get('/certificates/pending', { params })
   },
 
-  // 审批证明申请（管理员）
+  // 审批证明申请（学工处）
   approveCertificate: (data) => {
     return request.post('/certificates/approve', data)
   },

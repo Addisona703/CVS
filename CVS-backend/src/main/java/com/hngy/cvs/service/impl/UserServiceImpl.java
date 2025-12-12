@@ -144,7 +144,7 @@ public class UserServiceImpl implements UserService {
         // 构建查询条件
         LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
         
-        // 排除管理员账户
+        // 排除学工处账户
         wrapper.ne(User::getRole, UserRole.ADMIN);
         
         if (searchDTO != null) {
@@ -188,7 +188,7 @@ public class UserServiceImpl implements UserService {
         User user = userMapper.selectById(request.getId());
         AssertUtils.notNull(user, ResultCode.USER_NOT_FOUND);
         
-        // 权限检查：只有管理员或用户本人可以修改
+        // 权限检查：只有学工处或用户本人可以修改
         User currentUser = userMapper.selectById(currentUserId);
         boolean isAdmin = currentUser != null && currentUser.getRole() == UserRole.ADMIN;
         boolean isSelf = user.getId().equals(currentUserId);
@@ -225,10 +225,10 @@ public class UserServiceImpl implements UserService {
         User user = userMapper.selectById(id);
         AssertUtils.notNull(user, ResultCode.USER_NOT_FOUND);
         
-        // 防止删除管理员账户
+        // 防止删除学工处账户
         AssertUtils.isFalse(user.getRole() == UserRole.ADMIN, ResultCode.INSUFFICIENT_PERMISSIONS);
         
-        // 防止管理员删除自己
+        // 防止学工处删除自己
         AssertUtils.isFalse(user.getId().equals(currentUserId), ResultCode.INSUFFICIENT_PERMISSIONS);
 
         userMapper.deleteById(id);

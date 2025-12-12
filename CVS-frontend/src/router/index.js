@@ -67,7 +67,7 @@ const routes = [
         path: 'dashboard',
         name: 'adminDashboard',
         component: () => import('@/views/admin/Dashboard.vue'),
-        meta: { title: '管理员仪表板', icon: 'Dashboard' }
+        meta: { title: '学工处仪表板', icon: 'Dashboard' }
       },
       {
         path: 'users',
@@ -234,12 +234,6 @@ const routes = [
         name: 'Activities',
         component: () => import('@/views/student/Activities.vue'),
         meta: { title: '活动列表', icon: 'Calendar' }
-      },
-      {
-        path: 'check',
-        name: 'StudentCheck',
-        component: () => import('@/views/student/StudentCheckView.vue'),
-        meta: { title: '扫码签到', icon: 'Aim' }
       },
       {
         path: 'signups',

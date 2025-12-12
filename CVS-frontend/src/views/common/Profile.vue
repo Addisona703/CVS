@@ -191,7 +191,7 @@ const getRoleType = (role) => {
 
 const getRoleThemeColor = (role) => {
   const colorMap = {
-    ADMIN: '#409eff',    // 蓝色 - 管理员
+    ADMIN: '#409eff',    // 蓝色 - 学工处
     TEACHER: '#67c23a',  // 绿色 - 教师
     STUDENT: '#1f6bff'   // 深蓝色 - 学生
   }

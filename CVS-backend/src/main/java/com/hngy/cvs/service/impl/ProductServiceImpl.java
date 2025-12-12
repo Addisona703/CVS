@@ -141,15 +141,15 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
     }
 
     @Override
-    public PageVO<ProductVO> getProductList(ProductQueryRequest request, Long userId) {
+    public PageVO<ProductVO> getProductList(ProductQueryRequest request, Long userId, String userRole) {
         // 参数校验
         AssertUtils.notNull(request, "查询请求不能为空");
         AssertUtils.isTrue(request.getPageNum() > 0, "页码必须大于0");
         AssertUtils.isTrue(request.getPageSize() > 0, "每页大小必须大于0");
         AssertUtils.isTrue(request.getPageSize() <= 100, "每页大小不能超过100");
         
-        log.debug("获取商品列表，页码: {}, 每页大小: {}, 查询条件: {}", 
-                request.getPageNum(), request.getPageSize(), request);
+        log.debug("获取商品列表，页码: {}, 每页大小: {}, 查询条件: {}, 用户角色: {}", 
+                request.getPageNum(), request.getPageSize(), request, userRole);
         
         // 构建查询条件
         LambdaQueryWrapper<Product> wrapper = new LambdaQueryWrapper<>();
@@ -157,15 +157,27 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
                .eq(request.getCategoryId() != null, Product::getCategoryId, request.getCategoryId())
                .ge(request.getMinPoints() != null, Product::getPointsRequired, request.getMinPoints())
                .le(request.getMaxPoints() != null, Product::getPointsRequired, request.getMaxPoints());
-        
+        log.info("当前用户角色{}", userRole);
         // 状态过滤逻辑：
-        // 1. 如果请求中指定了状态，使用指定的状态（管理员端筛选）
-        // 2. 如果没有指定状态，默认只显示上架商品（学生端）
+        // 1. 如果请求中明确指定了状态，使用指定的状态（管理员端筛选）
+        // 2. 如果没有指定状态：
+        //    - 管理员：显示所有状态的商品
+        //    - 学生：只显示已上架的商品
         if (request.getStatus() != null) {
+            // 明确指定了状态，使用指定的状态
             wrapper.eq(Product::getStatus, request.getStatus());
+            log.debug("使用指定状态筛选: {}", request.getStatus());
         } else {
-            // 默认只显示上架商品
-            wrapper.eq(Product::getStatus, ProductStatus.ONLINE.getCode());
+            // 没有指定状态，根据用户角色决定
+            boolean isAdmin = "ADMIN".equals(userRole);
+            if (!isAdmin) {
+                // 学生用户，只显示已上架的商品
+                wrapper.eq(Product::getStatus, ProductStatus.ONLINE.getCode());
+                log.debug("学生用户，只显示已上架商品");
+            } else {
+                // 管理员用户，显示所有状态的商品
+                log.debug("管理员用户，显示所有状态商品");
+            }
         }
         
         wrapper.orderByDesc(Product::getCreatedAt);
@@ -181,6 +193,9 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
         // 构造分页结果
         Page<ProductVO> resultPage = new Page<>(request.getPageNum(), request.getPageSize(), productPage.getTotal());
         resultPage.setRecords(productVOs);
+        
+        log.info("获取商品列表成功，总数: {}, 当前页: {}, 每页大小: {}", 
+                productPage.getTotal(), request.getPageNum(), request.getPageSize());
         
         return PageUtil.convert(resultPage);
     }

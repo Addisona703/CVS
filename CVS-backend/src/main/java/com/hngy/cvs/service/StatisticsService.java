@@ -65,6 +65,13 @@ public interface StatisticsService {
     List<ProductVO> getLowStockProducts();
 
     /**
+     * 获取核销统计数据
+     *
+     * @return 核销统计数据
+     */
+    com.hngy.cvs.dto.response.VerifyStatisticsVO getVerifyStatistics();
+
+    /**
      * 导出兑换记录Excel
      *
      * @param startDate 开始日期

@@ -4,97 +4,108 @@
       <h1>兑换核销</h1>
     </div>
     
-    <el-row :gutter="20">
-      <!-- 扫码核销区域 -->
-      <el-col :span="12">
-        <el-card class="scan-card">
-          <template #header>
-            <div class="card-header">
-              <span>扫码核销</span>
+    <!-- 选项卡 -->
+    <el-tabs v-model="activeTab" class="verify-tabs">
+      <!-- 凭证核销选项卡 -->
+      <el-tab-pane label="凭证核销" name="verify">
+        <el-card class="verify-card">
+          <el-form :model="manualForm" @submit.prevent="handleManualVerify">
+            <el-form-item label="凭证编号">
+              <el-input 
+                v-model="manualForm.voucherCode" 
+                placeholder="请输入凭证编号，例如：MALL202511090921305783186"
+                clearable
+                size="large"
+                @keyup.enter="handleManualVerify"
+              >
+                <template #prefix>
+                  <el-icon><Ticket /></el-icon>
+                </template>
+              </el-input>
+            </el-form-item>
+            
+            <el-form-item>
               <el-button 
                 type="primary" 
-                size="small" 
-                @click="toggleCamera"
+                size="large"
+                @click="handleManualVerify"
+                :loading="verifying"
+                class="verify-button"
               >
-                {{ cameraActive ? '关闭摄像头' : '开启摄像头' }}
+                <el-icon v-if="!verifying"><Search /></el-icon>
+                查询并核销
               </el-button>
-            </div>
-          </template>
-          
-          <div class="scan-area">
-            <div v-if="!cameraActive" class="camera-placeholder">
-              <el-icon size="60"><Camera /></el-icon>
-              <p>点击上方按钮开启摄像头进行扫码</p>
-            </div>
-            
-            <div v-else class="camera-container">
-              <qrcode-stream
-                @decode="onDecode"
-                @init="onInit"
-                @error="onError"
-              >
-                <div class="scan-overlay">
-                  <div class="scan-frame"></div>
-                  <p class="scan-tip">请将二维码对准扫描框</p>
-                </div>
-              </qrcode-stream>
-            </div>
-          </div>
+            </el-form-item>
+          </el-form>
         </el-card>
-      </el-col>
-      
-      <!-- 手动输入区域 -->
-      <el-col :span="12">
-        <el-card class="manual-card">
-          <template #header>
-            <span>手动输入凭证</span>
-          </template>
-          
-          <div class="manual-input">
-            <el-form :model="manualForm" @submit.prevent="handleManualVerify">
-              <el-form-item label="凭证编号">
-                <el-input 
-                  v-model="manualForm.voucherCode" 
-                  placeholder="请输入凭证编号"
-                  clearable
-                  @keyup.enter="handleManualVerify"
-                >
-                  <template #append>
-                    <el-button 
-                      type="primary" 
-                      @click="handleManualVerify"
-                      :loading="verifying"
-                    >
-                      查询
-                    </el-button>
-                  </template>
-                </el-input>
-              </el-form-item>
-            </el-form>
+        
+        <!-- 核销流程说明 -->
+        <div class="verify-tips">
+          <el-icon><InfoFilled /></el-icon>
+          <div class="tips-content">
+            <p><strong>核销流程：</strong></p>
+            <p>1. 请学生出示兑换凭证编号</p>
+            <p>2. 在上方输入框中输入完整的凭证编号</p>
+            <p>3. 点击"查询并核销"按钮，确认信息后完成核销</p>
           </div>
-        </el-card>
-      </el-col>
-    </el-row>
-    
-    <!-- 核销记录 -->
-    <el-card class="history-card">
-      <template #header>
-        <span>最近核销记录</span>
-      </template>
+        </div>
+      </el-tab-pane>
       
-      <el-table :data="recentVerifications" :loading="historyLoading" stripe>
-        <el-table-column prop="voucherCode" label="凭证编号" width="150" />
-        <el-table-column prop="userName" label="学生姓名" width="120" />
-        <el-table-column prop="productName" label="商品名称" min-width="150" />
-        <el-table-column prop="pointsSpent" label="消耗积分" width="100" />
-        <el-table-column prop="verifiedAt" label="核销时间" width="180">
-          <template #default="{ row }">
-            {{ formatDateTime(row.verifiedAt) }}
-          </template>
-        </el-table-column>
-        <el-table-column prop="verifiedByName" label="核销人员" width="120" />
-      </el-table>
-    </el-card>
+      <!-- 核销记录选项卡 -->
+      <el-tab-pane label="核销记录" name="history">
+        <el-card class="history-card">
+          <div class="history-header">
+            <el-radio-group v-model="statusType" @change="fetchVerifications">
+              <el-radio-button label="TODAY">今日核销</el-radio-button>
+              <el-radio-button label="VERIFIED">累计核销</el-radio-button>
+              <el-radio-button label="PENDING">待核销</el-radio-button>
+            </el-radio-group>
+          </div>
+          
+          <el-table :data="verifications" :loading="historyLoading" stripe>
+            <el-table-column prop="voucherCode" label="凭证编号" width="200" />
+            <el-table-column prop="userName" label="学生姓名" width="120" />
+            <el-table-column prop="productName" label="商品名称" min-width="180" />
+            <el-table-column prop="pointsSpent" label="消耗积分" width="100" align="center">
+              <template #default="{ row }">
+                <el-tag type="warning">{{ row.pointsSpent }}</el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column prop="status" label="状态" width="100" align="center">
+              <template #default="{ row }">
+                <el-tag :type="getStatusType(row.status)">
+                  {{ getStatusText(row.status) }}
+                </el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column prop="verifiedAt" label="核销时间" width="180">
+              <template #default="{ row }">
+                {{ row.verifiedAt ? formatDateTime(row.verifiedAt) : '-' }}
+              </template>
+            </el-table-column>
+            <el-table-column prop="verifiedByName" label="核销人员" width="120">
+              <template #default="{ row }">
+                {{ row.verifiedByName || '-' }}
+              </template>
+            </el-table-column>
+          </el-table>
+          
+          <el-pagination
+            v-if="pagination.total > 0"
+            v-model:current-page="pagination.pageNum"
+            v-model:page-size="pagination.pageSize"
+            :total="pagination.total"
+            :page-sizes="[10, 20, 50, 100]"
+            layout="total, sizes, prev, pager, next, jumper"
+            @size-change="fetchVerifications"
+            @current-change="fetchVerifications"
+            class="pagination"
+          />
+          
+          <el-empty v-if="!verifications.length && !historyLoading" description="暂无核销记录" />
+        </el-card>
+      </el-tab-pane>
+    </el-tabs>
 
     <!-- 核销确认对话框 -->
     <el-dialog 
@@ -155,82 +166,49 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, onUnmounted } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
-import { Camera } from '@element-plus/icons-vue'
-import { QrcodeStream } from 'vue-qrcode-reader'
+import { Tickets, Ticket, Search, InfoFilled } from '@element-plus/icons-vue'
 import { mallAPI } from '@/api'
 import { formatDateTime } from '@/utils/format'
 
-const cameraActive = ref(false)
+const activeTab = ref('verify')
+const statusType = ref('VERIFIED')
 const verifying = ref(false)
 const confirming = ref(false)
 const historyLoading = ref(false)
 const confirmDialogVisible = ref(false)
 const redemptionInfo = ref(null)
-const recentVerifications = ref([])
+const verifications = ref([])
+
+const pagination = reactive({
+  pageNum: 1,
+  pageSize: 10,
+  total: 0
+})
 
 const manualForm = reactive({
   voucherCode: ''
 })
 
-// 切换摄像头
-const toggleCamera = () => {
-  cameraActive.value = !cameraActive.value
-}
-
-// 二维码解码
-const onDecode = (decodedString) => {
-  console.log('扫码结果:', decodedString)
-  handleVerifyVoucher(decodedString)
-}
-
-// 摄像头初始化
-const onInit = async (promise) => {
-  try {
-    await promise
-    console.log('摄像头初始化成功')
-  } catch (error) {
-    console.error('摄像头初始化失败:', error)
-    ElMessage.error('摄像头初始化失败，请检查设备权限')
-    cameraActive.value = false
-  }
-}
-
-// 摄像头错误处理
-const onError = (error) => {
-  console.error('摄像头错误:', error)
-  ElMessage.error('摄像头访问失败')
-  cameraActive.value = false
-}
-
 // 手动输入核销
-const handleManualVerify = () => {
+const handleManualVerify = async () => {
   if (!manualForm.voucherCode.trim()) {
     ElMessage.warning('请输入凭证编号')
     return
   }
-  handleVerifyVoucher(manualForm.voucherCode.trim())
-}
-
-// 处理凭证核销
-const handleVerifyVoucher = async (voucherCode) => {
+  
   if (verifying.value) return
   
   verifying.value = true
   try {
-    // 先查询兑换记录信息
-    const response = await mallAPI.getRedemptionByVoucher(voucherCode)
+    // 查询兑换记录信息
+    const response = await mallAPI.getRedemptionByVoucher(manualForm.voucherCode.trim())
     if (response.code === 200) {
       redemptionInfo.value = response.data
       confirmDialogVisible.value = true
       
-      // 关闭摄像头
-      if (cameraActive.value) {
-        cameraActive.value = false
-      }
-      
-      // 清空手动输入
+      // 清空输入
       manualForm.voucherCode = ''
     }
   } catch (error) {
@@ -260,7 +238,7 @@ const confirmVerify = async () => {
     redemptionInfo.value = null
     
     // 刷新核销记录
-    fetchRecentVerifications()
+    fetchVerifications()
   } catch (error) {
     console.error('核销失败:', error)
     if (error.response?.data?.message) {
@@ -273,20 +251,23 @@ const confirmVerify = async () => {
   }
 }
 
-// 获取最近核销记录
-const fetchRecentVerifications = async () => {
+// 获取核销记录
+const fetchVerifications = async () => {
   historyLoading.value = true
   try {
-    const response = await mallAPI.getAllRedemptions({
-      status: 1, // 已核销
-      pageSize: 10,
-      pageNum: 1
-    })
+    const response = await mallAPI.getRedemptionsByStatus({
+      pageNum: pagination.pageNum,
+      pageSize: pagination.pageSize,
+      params: {}
+    }, statusType.value)
+    
     if (response.code === 200) {
-      recentVerifications.value = response.data.records
+      verifications.value = response.data.records || []
+      pagination.total = response.data.total || 0
     }
   } catch (error) {
     console.error('获取核销记录失败:', error)
+    ElMessage.error('获取核销记录失败')
   } finally {
     historyLoading.value = false
   }
@@ -313,14 +294,7 @@ const getStatusText = (status) => {
 }
 
 onMounted(() => {
-  fetchRecentVerifications()
-})
-
-onUnmounted(() => {
-  // 组件销毁时关闭摄像头
-  if (cameraActive.value) {
-    cameraActive.value = false
-  }
+  fetchVerifications()
 })
 </script>
 
@@ -332,101 +306,172 @@ onUnmounted(() => {
     h1 {
       margin: 0;
       font-size: 24px;
+      font-weight: 600;
       color: #303133;
     }
   }
   
-  .scan-card, .manual-card {
-    height: 400px;
+  .verify-tabs {
+    :deep(.el-tabs__header) {
+      margin-bottom: 20px;
+    }
     
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+    :deep(.el-tabs__item) {
+      font-size: 15px;
+      font-weight: 500;
+      padding: 0 20px;
+      height: 44px;
+      line-height: 44px;
+    }
+    
+    :deep(.el-tabs__active-bar) {
+      height: 3px;
     }
   }
   
-  .scan-area {
-    height: 320px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  .verify-card {
+    max-width: 700px;
+    margin: 0 auto;
+    border: none;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
     
-    .camera-placeholder {
-      text-align: center;
-      color: #909399;
+    :deep(.el-card__body) {
+      padding: 32px;
+    }
+    
+    :deep(.el-form-item__label) {
+      font-size: 15px;
+      font-weight: 500;
+      color: #303133;
+      margin-bottom: 8px;
+    }
+    
+    :deep(.el-input) {
+      .el-input__wrapper {
+        padding: 12px 16px;
+        box-shadow: 0 0 0 1px #dcdfe6 inset;
+        transition: all 0.3s;
+        
+        &:hover {
+          box-shadow: 0 0 0 1px #c0c4cc inset;
+        }
+        
+        &.is-focus {
+          box-shadow: 0 0 0 1px #409eff inset;
+        }
+      }
+      
+      .el-input__prefix {
+        .el-icon {
+          color: #909399;
+          font-size: 18px;
+        }
+      }
+    }
+    
+    .verify-button {
+      width: 100%;
+      height: 48px;
+      font-size: 16px;
+      font-weight: 600;
+      background: linear-gradient(135deg, #409eff 0%, #66b1ff 100%);
+      border: none;
+      box-shadow: 0 4px 12px rgba(64, 158, 255, 0.3);
+      
+      .el-icon {
+        margin-right: 8px;
+      }
+      
+      &:hover {
+        background: linear-gradient(135deg, #66b1ff 0%, #409eff 100%);
+        box-shadow: 0 6px 16px rgba(64, 158, 255, 0.4);
+        transform: translateY(-2px);
+      }
+      
+      &:active {
+        transform: translateY(0);
+      }
+    }
+  }
+  
+  .verify-tips {
+    max-width: 700px;
+    margin: 20px auto 0;
+    padding: 16px 20px;
+    background: #f4f4f5;
+    border-radius: 8px;
+    display: flex;
+    gap: 12px;
+    
+    > .el-icon {
+      flex-shrink: 0;
+      font-size: 20px;
+      color: #409eff;
+      margin-top: 2px;
+    }
+    
+    .tips-content {
+      flex: 1;
       
       p {
-        margin-top: 10px;
-        font-size: 14px;
-      }
-    }
-    
-    .camera-container {
-      width: 100%;
-      height: 100%;
-      position: relative;
-      
-      .scan-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
+        margin: 0 0 6px 0;
+        font-size: 13px;
+        line-height: 1.6;
+        color: #606266;
         
-        .scan-frame {
-          width: 200px;
-          height: 200px;
-          border: 2px solid #409eff;
-          border-radius: 8px;
-          position: relative;
-          
-          &::before,
-          &::after {
-            content: '';
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            border: 3px solid #409eff;
-          }
-          
-          &::before {
-            top: -3px;
-            left: -3px;
-            border-right: none;
-            border-bottom: none;
-          }
-          
-          &::after {
-            bottom: -3px;
-            right: -3px;
-            border-left: none;
-            border-top: none;
-          }
+        &:last-child {
+          margin-bottom: 0;
         }
         
-        .scan-tip {
-          margin-top: 20px;
-          color: #409eff;
-          font-size: 14px;
-          background: rgba(0, 0, 0, 0.7);
-          padding: 5px 10px;
-          border-radius: 4px;
+        strong {
+          color: #303133;
+          font-weight: 600;
         }
       }
     }
-  }
-  
-  .manual-input {
-    padding: 20px 0;
   }
   
   .history-card {
-    margin-top: 20px;
+    border: none;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    
+    :deep(.el-card__body) {
+      padding: 24px;
+    }
+    
+    .history-header {
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      
+      :deep(.el-radio-group) {
+        .el-radio-button__inner {
+          padding: 10px 20px;
+          font-weight: 500;
+        }
+      }
+    }
+    
+    :deep(.el-table) {
+      font-size: 14px;
+      
+      th {
+        background-color: #fafafa;
+        color: #606266;
+        font-weight: 600;
+      }
+      
+      .el-table__empty-block {
+        padding: 60px 0;
+      }
+    }
+    
+    .pagination {
+      margin-top: 20px;
+      display: flex;
+      justify-content: flex-end;
+    }
   }
   
   .confirm-content {

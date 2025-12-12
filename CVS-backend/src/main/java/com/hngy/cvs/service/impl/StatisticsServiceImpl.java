@@ -177,6 +177,27 @@ public class StatisticsServiceImpl implements StatisticsService {
     }
 
     @Override
+    public com.hngy.cvs.dto.response.VerifyStatisticsVO getVerifyStatistics() {
+        LocalDateTime todayStart = LocalDate.now().atStartOfDay();
+        LocalDateTime todayEnd = LocalDate.now().atTime(23, 59, 59);
+        
+        // 今日核销数量
+        Long todayCount = redemptionMapper.countVerifiedRedemptions(todayStart, todayEnd);
+        
+        // 累计核销数量
+        Long totalCount = redemptionMapper.countVerifiedRedemptions(null, null);
+        
+        // 待核销数量
+        Long pendingCount = redemptionMapper.countPendingRedemptions();
+        
+        return com.hngy.cvs.dto.response.VerifyStatisticsVO.builder()
+                .todayCount(todayCount)
+                .totalCount(totalCount)
+                .pendingCount(pendingCount)
+                .build();
+    }
+
+    @Override
     public byte[] exportRedemptions(LocalDate startDate, LocalDate endDate) {
         LocalDateTime startDateTime = startDate != null ? startDate.atStartOfDay() : null;
         LocalDateTime endDateTime = endDate != null ? endDate.atTime(23, 59, 59) : null;

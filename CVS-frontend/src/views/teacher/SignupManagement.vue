@@ -380,7 +380,7 @@ onMounted(() => {
     cursor: help;
 
     &:hover {
-      color: #409eff;
+      color: #67c23a;
     }
   }
 }

@@ -1,17 +1,21 @@
 <template>
-  <t-head-menu class="app-header" :theme="headerTheme" :value="activeMenu" @change="handleMenuChange">
-    <template #logo>
+  <div class="app-header">
+    <div class="header-left">
       <div class="logo">
         <span class="logo-icon" v-html="logoInfo.svg"></span>
         <span class="logo-text">{{ logoInfo.text }}</span>
       </div>
-    </template>
+      
+      <el-divider direction="vertical" style="height: 24px; margin: 0 20px;" />
+      
+      <el-breadcrumb separator="/">
+        <el-breadcrumb-item v-for="item in breadcrumbs" :key="item.path" :to="item.path">
+          {{ item.label }}
+        </el-breadcrumb-item>
+      </el-breadcrumb>
+    </div>
 
-    <t-menu-item v-for="item in menuItems" :key="item.value" :value="item.value">
-      {{ item.label }}
-    </t-menu-item>
-
-    <template #operations>
+    <div class="header-operations">
       <t-button variant="text" shape="square" @click="handleSearch">
         <template #icon><t-icon name="search" /></template>
       </t-button>
@@ -36,8 +40,8 @@
       </t-dropdown>
 
       <ProfileDialog v-model="profileVisible" />
-    </template>
-  </t-head-menu>
+    </div>
+  </div>
 </template>
 
 <script setup>
@@ -51,9 +55,6 @@ import NotificationBell from '@/components/NotificationBell.vue'
 const router = useRouter()
 const route = useRoute()
 const authStore = useAuthStore()
-
-const userName = computed(() => authStore.userName)
-const headerTheme = computed(() => 'light')
 
 const logoInfo = computed(() => {
   switch (authStore.userRole) {
@@ -80,53 +81,104 @@ const logoInfo = computed(() => {
   }
 })
 
-const menuItems = computed(() => {
-  const role = authStore.userRole
-
-  if (role === 'ADMIN') {
-    return [
-      { value: '/admin/dashboard', label: '仪表板' },
-      { value: '/admin/users', label: '用户管理' },
-      { value: '/admin/activities', label: '活动管理' },
-      { value: '/admin/records', label: '服务记录' }
-    ]
-  } else if (role === 'TEACHER') {
-    return [
-      { value: '/teacher/dashboard', label: '工作台' },
-      { value: '/teacher/activities', label: '我的活动' },
-      { value: '/teacher/signups', label: '报名管理' },
-      { value: '/teacher/records', label: '服务记录' }
-    ]
-  } else if (role === 'STUDENT') {
-    return [
-      { value: '/student/dashboard', label: '个人中心' },
-      { value: '/student/activities', label: '活动列表' },
-      { value: '/student/signups', label: '我的报名' },
-      { value: '/student/records', label: '服务记录' }
-    ]
-  }
-
-  return []
-})
-
-const activeMenu = computed(() => route.path)
-
-const userAvatar = computed(() => {
-  switch (authStore.userRole) {
-    case 'ADMIN':
-      return new URL('@/assets/images/admin.png', import.meta.url).href
-    case 'TEACHER':
-      return new URL('@/assets/images/teacher.png', import.meta.url).href
-    case 'STUDENT':
-      return new URL('@/assets/images/student.png', import.meta.url).href
-    default:
-      return new URL('@/assets/images/duke.jpg', import.meta.url).href
-  }
-})
-
-const handleMenuChange = (value) => {
-  router.push(value)
+// 路由标题映射
+const routeTitleMap = {
+  // Admin
+  '/admin/dashboard': '仪表板',
+  '/admin/users': '用户管理',
+  '/admin/activities': '活动管理',
+  '/admin/activities/create': '创建活动',
+  '/admin/statistics': '统计分析',
+  '/admin/records': '服务记录管理',
+  '/admin/points': '积分管理',
+  '/admin/mall/products': '商品管理',
+  '/admin/mall/categories': '分类管理',
+  '/admin/mall/verify': '兑换核销',
+  '/admin/mall/statistics': '统计报表',
+  '/admin/activity-approval': '活动审核',
+  '/admin/signups': '报名审核',
+  '/admin/certificate-review': '证书审核',
+  
+  // Teacher
+  '/teacher/dashboard': '仪表板',
+  '/teacher/activities': '我的活动',
+  '/teacher/activities/create': '创建活动',
+  '/teacher/signups': '报名管理',
+  '/teacher/records': '服务记录',
+  '/teacher/check': '签到二维码',
+  '/teacher/review': '签退审核',
+  '/teacher/certificates': '证明审核',
+  '/teacher/points': '积分管理',
+  
+  // Student
+  '/student/dashboard': '个人中心',
+  '/student/activities': '活动列表',
+  '/student/signups': '我的报名',
+  '/student/records': '我的记录',
+  '/student/points': '积分中心',
+  '/student/certificates': '证明管理',
+  '/student/mall': '积分商城',
+  '/student/mall/my-redemptions': '我的兑换',
+  '/student/mall/product': '商品详情',
+  '/student/mall/voucher': '兑换凭证',
+  
+  // Common
+  '/profile': '个人资料',
+  '/notifications': '通知中心',
+  '/activities': '活动详情'
 }
+
+const breadcrumbs = computed(() => {
+  const path = route.path
+  const role = authStore.userRole
+  const crumbs = []
+  
+  // 添加首页
+  if (role === 'ADMIN') {
+    crumbs.push({ label: '学工处', path: '/admin/dashboard' })
+  } else if (role === 'TEACHER') {
+    crumbs.push({ label: '教师工作台', path: '/teacher/dashboard' })
+  } else if (role === 'STUDENT') {
+    crumbs.push({ label: '学生中心', path: '/student/dashboard' })
+  }
+  
+  // 解析当前路径
+  const pathSegments = path.split('/').filter(Boolean)
+  let currentPath = ''
+  
+  for (let i = 0; i < pathSegments.length; i++) {
+    currentPath += '/' + pathSegments[i]
+    
+    // 跳过首页路径
+    if (currentPath === '/admin/dashboard' || 
+        currentPath === '/teacher/dashboard' || 
+        currentPath === '/student/dashboard') {
+      continue
+    }
+    
+    // 获取标题
+    let title = routeTitleMap[currentPath]
+    
+    // 处理动态路由
+    if (!title && pathSegments[i].match(/^\d+$/)) {
+      // 如果是数字ID，使用上一级的标题
+      const parentPath = currentPath.substring(0, currentPath.lastIndexOf('/'))
+      if (parentPath.includes('product')) {
+        title = '商品详情'
+      } else if (parentPath.includes('voucher')) {
+        title = '兑换凭证'
+      } else if (parentPath.includes('activities')) {
+        title = '活动详情'
+      }
+    }
+    
+    if (title) {
+      crumbs.push({ label: title, path: currentPath })
+    }
+  }
+  
+  return crumbs
+})
 
 const goToProfile = () => {
   profileVisible.value = true
@@ -166,12 +218,25 @@ const profileVisible = ref(false)
 <style lang="scss" scoped>
 .app-header {
   height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  background: #ffffff;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 
-  :deep(.t-menu__operations) {
-    .t-button {
-      margin-left: 8px;
-    }
+  .header-left {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .header-operations {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
   }
 }
 
@@ -179,7 +244,7 @@ const profileVisible = ref(false)
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 0 20px;
+  flex-shrink: 0;
 
   .logo-icon {
     display: inline-flex;
@@ -201,21 +266,54 @@ const profileVisible = ref(false)
   }
 }
 
-@media (max-width: 768px) {
-  .logo {
-    padding: 0 12px;
+:deep(.el-breadcrumb) {
+  font-size: 14px;
+  
+  .el-breadcrumb__item {
+    .el-breadcrumb__inner {
+      color: #606266;
+      font-weight: 400;
+      
+      &:hover {
+        color: var(--primary-color, #409eff);
+      }
+    }
+    
+    &:last-child {
+      .el-breadcrumb__inner {
+        color: var(--primary-color, #303133);
+        font-weight: 500;
+      }
+    }
+  }
+  
+  .el-breadcrumb__separator {
+    color: #c0c4cc;
+    margin: 0 8px;
+  }
+}
 
+@media (max-width: 768px) {
+  .app-header {
+    padding: 0 16px;
+  }
+
+  .logo {
     .logo-text {
       display: none;
     }
   }
-
-  .app-header {
-    :deep(.t-menu__operations) {
-      .t-button {
-        margin-left: 4px;
-      }
+  
+  :deep(.el-breadcrumb) {
+    font-size: 13px;
+    
+    .el-breadcrumb__separator {
+      margin: 0 6px;
     }
+  }
+  
+  :deep(.el-divider) {
+    margin: 0 12px !important;
   }
 }
 </style>

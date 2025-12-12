@@ -1,7 +1,7 @@
 <template>
   <div class="admin-dashboard">
     <div class="dashboard-header">
-      <h1>管理员仪表板</h1>
+      <h1>学工处仪表板</h1>
       <p>欢迎回来，{{ userName }}！</p>
     </div>
 

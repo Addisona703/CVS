@@ -2,96 +2,131 @@
   <div class="student-check-page">
     <el-card class="check-card">
       <header class="card-header">
-        <div class="title">
-          <el-icon><Aim /></el-icon>
-          <div>
-            <h2>志愿活动签到 / 签退</h2>
-            <p>扫描二维码后粘贴口令完成签到签退流程</p>
-          </div>
-        </div>
-        <el-tag v-if="checkoutSuccess" type="success" effect="dark">等待教师审核中</el-tag>
+        <h2>志愿活动签到签退</h2>
+        <p>扫描二维码后粘贴口令完成签到或签退流程</p>
       </header>
 
-      <section class="token-section">
-        <el-form label-position="top" :model="{ token }">
+      <!-- 选项卡 -->
+      <el-tabs v-model="activeTab" class="check-tabs" @tab-change="handleTabChange">
+        <el-tab-pane label="活动签到" name="checkin">
+          <div class="tab-icon">📝</div>
+        </el-tab-pane>
+        <el-tab-pane label="活动签退" name="checkout">
+          <div class="tab-icon">✅</div>
+        </el-tab-pane>
+      </el-tabs>
+
+      <!-- 签到表单 -->
+      <section v-if="activeTab === 'checkin'" class="form-section">
+        <el-form label-position="top">
           <el-form-item label="签到口令">
             <el-input
               v-model="token"
               placeholder="在此粘贴二维码口令"
-              :disabled="checkinSuccess && checkoutSuccess"
+              :disabled="checkinSuccess"
               clearable
+              size="large"
             >
-              <template #append>
-                <el-button text type="primary" @click="pasteFromClipboard">粘贴</el-button>
+              <template #suffix>
+                <el-button 
+                  :icon="DocumentCopy" 
+                  link 
+                  @click="pasteFromClipboard"
+                  title="从剪贴板粘贴"
+                />
               </template>
             </el-input>
           </el-form-item>
         </el-form>
-        <div class="action-group">
-          <el-button
-            type="primary"
-            :loading="checkinLoading"
-            :disabled="checkinSuccess || !token"
-            @click="handleCheckin"
-          >
-            {{ checkinSuccess ? '已完成签到' : '立即签到' }}
-          </el-button>
-          <el-button
-            type="success"
-            :loading="checkoutLoading"
-            :disabled="checkoutSuccess || !token"
-            @click="openCheckout"
-          >
-            {{ checkoutSuccess ? '已完成签退' : '提交签退' }}
-          </el-button>
-        </div>
+
+        <el-button
+          type="primary"
+          size="large"
+          class="submit-button"
+          :loading="checkinLoading"
+          :disabled="checkinSuccess || !token"
+          @click="handleCheckin"
+        >
+          <span v-if="checkinSuccess">✓ 已完成签到</span>
+          <span v-else>确认签到</span>
+        </el-button>
+
+        <el-alert
+          v-if="checkinSuccess"
+          type="success"
+          show-icon
+          class="tip-alert"
+          title="签到成功！完成服务后请切换到-活动签退-提交自评"
+          :closable="false"
+        />
       </section>
 
-      <el-collapse-transition>
-        <section v-if="checkoutVisible" class="checkout-section">
-          <h3>签退自评</h3>
-          <el-form :model="checkoutForm" label-position="top">
-            <el-form-item label="自我评分 (1-5分)">
-              <el-rate
-                v-model="checkoutForm.studentRating"
-                :colors="['#99ccff', '#409EFF', '#1f6bff']"
-                :allow-half="false"
-              />
-            </el-form-item>
-            <el-form-item label="服务心得">
-              <el-input
-                v-model="checkoutForm.studentEvaluation"
-                type="textarea"
-                :autosize="{ minRows: 4, maxRows: 6 }"
-                maxlength="400"
-                show-word-limit
-                placeholder="请描述本次服务的主要内容、收获或建议..."
-              />
-            </el-form-item>
-            <div class="checkout-actions">
-              <el-button @click="cancelCheckout" :disabled="checkoutLoading">取消</el-button>
-              <el-button type="primary" :loading="checkoutLoading" @click="handleCheckout">
-                提交签退
-              </el-button>
-            </div>
-          </el-form>
-        </section>
-      </el-collapse-transition>
+      <!-- 签退表单 -->
+      <section v-if="activeTab === 'checkout'" class="form-section">
+        <el-form label-position="top">
+          <el-form-item label="签退口令">
+            <el-input
+              v-model="token"
+              placeholder="在此粘贴二维码口令"
+              :disabled="checkoutSuccess"
+              clearable
+              size="large"
+            >
+              <template #suffix>
+                <el-button 
+                  :icon="DocumentCopy" 
+                  link 
+                  @click="pasteFromClipboard"
+                  title="从剪贴板粘贴"
+                />
+              </template>
+            </el-input>
+          </el-form-item>
 
-      <el-alert
-        v-if="checkinSuccess && !checkoutSuccess"
-        type="info"
-        show-icon
-        class="tip-alert"
-        title="已完成签到，完成服务后请及时提交签退自评"
-      />
-      <el-alert
-        v-if="checkoutSuccess"
-        type="success"
-        show-icon
-        class="tip-alert"
-        title="签退已提交，结果将在教师审核后同步至个人记录"
-      />
+          <el-form-item label="自我评分 (1-5分)" class="rating-item">
+            <el-rate
+              v-model="checkoutForm.studentRating"
+              :colors="['#99ccff', '#409EFF', '#1f6bff']"
+              :allow-half="false"
+              :disabled="checkoutSuccess"
+              size="large"
+            />
+          </el-form-item>
+
+          <el-form-item label="服务心得">
+            <el-input
+              v-model="checkoutForm.studentEvaluation"
+              type="textarea"
+              :autosize="{ minRows: 4, maxRows: 6 }"
+              maxlength="400"
+              show-word-limit
+              placeholder="请描述本次服务的主要内容、收获或建议..."
+              :disabled="checkoutSuccess"
+            />
+          </el-form-item>
+        </el-form>
+
+        <el-button
+          type="primary"
+          size="large"
+          class="submit-button"
+          :loading="checkoutLoading"
+          :disabled="checkoutSuccess || !token"
+          @click="handleCheckout"
+        >
+          <span v-if="checkoutSuccess">✓ 已完成签退</span>
+          <span v-else>确认签退</span>
+        </el-button>
+
+        <el-alert
+          v-if="checkoutSuccess"
+          type="success"
+          show-icon
+          class="tip-alert"
+          title="签退已提交，结果将在教师审核后同步至个人记录"
+          :closable="false"
+        />
+      </section>
     </el-card>
   </div>
 </template>
@@ -100,15 +135,15 @@
 import { ref, reactive, watch, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { Aim } from '@element-plus/icons-vue'
+import { DocumentCopy } from '@element-plus/icons-vue'
 import { checkAPI } from '@/api/check'
 
 const route = useRoute()
 
+const activeTab = ref('checkin')
 const token = ref('')
 const checkinSuccess = ref(false)
 const checkoutSuccess = ref(false)
-const checkoutVisible = ref(false)
 const checkinLoading = ref(false)
 const checkoutLoading = ref(false)
 
@@ -116,6 +151,11 @@ const checkoutForm = reactive({
   studentRating: 0,
   studentEvaluation: ''
 })
+
+const handleTabChange = (tabName) => {
+  // 切换选项卡时可以做一些额外处理
+  console.log('切换到:', tabName)
+}
 
 const applyTokenFromRoute = () => {
   const incoming = route.query.token
@@ -157,21 +197,6 @@ const handleCheckin = async () => {
   }
 }
 
-const openCheckout = () => {
-  // 直接打开签退自评表单，不检查签到状态
-  // 后端会验证token是否有效
-  if (!token.value.trim()) {
-    ElMessage.warning('请先输入签退口令')
-    return
-  }
-  checkoutVisible.value = true
-}
-
-const cancelCheckout = () => {
-  if (checkoutLoading.value) return
-  checkoutVisible.value = false
-}
-
 const handleCheckout = async () => {
   const value = validateToken()
   if (!value) return
@@ -194,7 +219,6 @@ const handleCheckout = async () => {
       studentEvaluation: checkoutForm.studentEvaluation.trim()
     })
     checkoutSuccess.value = true
-    checkoutVisible.value = false
     ElMessage.success('签退信息已提交，请等待教师审核')
   } catch (error) {
     console.error('签退失败', error)
@@ -220,102 +244,272 @@ const pasteFromClipboard = async () => {
 
 <style lang="scss" scoped>
 .student-check-page {
-  min-height: calc(100vh - 120px);
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding: clamp(24px, 4vw, 48px) 16px;
-  background: linear-gradient(180deg, rgba(233, 242, 255, 0.6), rgba(255, 255, 255, 0.9));
+  min-height: 100vh;
+  padding:20px 24px 80px;
+  background: 
+    radial-gradient(circle at 15% 20%, rgba(64, 158, 255, 0.06) 0%, transparent 40%),
+    radial-gradient(circle at 85% 80%, rgba(103, 194, 58, 0.05) 0%, transparent 40%),
+    linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
+  background-attachment: fixed;
+  position: relative;
+
+  // 添加微妙的背景图案
+  &::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+      repeating-linear-gradient(90deg, transparent, transparent 40px, rgba(64, 158, 255, 0.015) 40px, rgba(64, 158, 255, 0.015) 80px),
+      repeating-linear-gradient(0deg, transparent, transparent 40px, rgba(64, 158, 255, 0.015) 40px, rgba(64, 158, 255, 0.015) 80px);
+    pointer-events: none;
+    z-index: 0;
+  }
 
   .check-card {
-    width: min(640px, 100%);
-    border-radius: 26px;
-    box-shadow: 0 24px 80px -30px rgba(31, 107, 255, 0.35);
-    border: none;
-    padding: 0 6px 24px;
+    max-width: 520px;
+    margin: 0 auto;
+    border-radius: 20px;
+    box-shadow: 
+      0 8px 32px -8px rgba(31, 107, 255, 0.15),
+      0 2px 8px rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(64, 158, 255, 0.08);
+    background: #ffffff;
+    position: relative;
+    z-index: 1;
 
     :deep(.el-card__body) {
-      padding: clamp(22px, 4vw, 36px);
+      padding: 36px 32px;
     }
 
     .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      text-align: center;
+      margin-bottom: 28px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid rgba(64, 158, 255, 0.08);
+
+      h2 {
+        margin: 0 0 6px 0;
+        font-size: 24px;
+        font-weight: 700;
+        color: #1f2937;
+        letter-spacing: -0.5px;
+      }
+
+      p {
+        margin: 0;
+        color: #606266;
+        font-size: 13px;
+        line-height: 1.5;
+      }
+    }
+
+    .check-tabs {
       margin-bottom: 24px;
 
-      .title {
+      :deep(.el-tabs__header) {
+        margin-bottom: 0;
+      }
+
+      :deep(.el-tabs__nav-wrap) {
+        &::after {
+          display: none;
+        }
+      }
+
+      :deep(.el-tabs__nav) {
         display: flex;
-        gap: 14px;
-        align-items: flex-start;
+        width: 100%;
+        border: 1.5px solid #e4e7ed;
+        border-radius: 12px;
+        padding: 3px;
+        background: #f5f7fa;
+      }
+
+      :deep(.el-tabs__item) {
+        flex: 1;
+        text-align: center;
+        padding: 12px 16px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #606266;
+        border-radius: 9px;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        border: none;
+        height: auto;
+        line-height: 1.4;
+
+        &:hover {
+          color: #409eff;
+          background: rgba(64, 158, 255, 0.06);
+        }
+
+        &.is-active {
+          color: #ffffff;
+          background: linear-gradient(135deg, #409eff 0%, #1f6bff 100%);
+          box-shadow: 0 2px 8px rgba(64, 158, 255, 0.25);
+        }
+      }
+
+      :deep(.el-tabs__active-bar) {
+        display: none;
+      }
+
+      .tab-icon {
+        display: none;
+      }
+    }
+
+    .form-section {
+      animation: fadeIn 0.25s ease;
+
+      :deep(.el-form-item) {
+        margin-bottom: 20px;
+      }
+
+      :deep(.el-form-item__label) {
+        font-weight: 600;
+        color: #303133;
+        font-size: 14px;
+        margin-bottom: 8px;
+        padding-bottom: 0;
+      }
+
+      :deep(.el-input__wrapper) {
+        padding: 12px 15px;
+        border-radius: 10px;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+        transition: all 0.25s ease;
+        border: 1px solid transparent;
+
+        &:hover {
+          box-shadow: 0 2px 8px rgba(64, 158, 255, 0.12);
+          border-color: rgba(64, 158, 255, 0.2);
+        }
+
+        &.is-focus {
+          box-shadow: 0 2px 12px rgba(64, 158, 255, 0.2);
+          border-color: #409eff;
+        }
+      }
+
+      :deep(.el-textarea__inner) {
+        padding: 12px 15px;
+        border-radius: 10px;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+        transition: all 0.25s ease;
+        border: 1px solid #dcdfe6;
+
+        &:hover {
+          box-shadow: 0 2px 8px rgba(64, 158, 255, 0.12);
+          border-color: rgba(64, 158, 255, 0.3);
+        }
+
+        &:focus {
+          box-shadow: 0 2px 12px rgba(64, 158, 255, 0.2);
+          border-color: #409eff;
+        }
+      }
+
+      .rating-item {
+        :deep(.el-rate) {
+          height: 32px;
+          display: flex;
+          align-items: center;
+        }
+
+        :deep(.el-rate__icon) {
+          font-size: 26px;
+          margin-right: 6px;
+        }
+      }
+
+      .submit-button {
+        width: 100%;
+        height: 44px;
+        font-size: 15px;
+        font-weight: 600;
+        border-radius: 10px;
+        margin-top: 4px;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+        &:hover:not(:disabled) {
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(64, 158, 255, 0.3);
+        }
+
+        &:active:not(:disabled) {
+          transform: translateY(0);
+        }
+      }
+
+      .tip-alert {
+        margin-top: 16px;
+        border-radius: 10px;
+        border: none;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+
+        :deep(.el-alert__content) {
+          line-height: 1.6;
+        }
+      }
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .student-check-page {
+    padding: 30px 16px 50px;
+
+    .check-card {
+      border-radius: 16px;
+
+      :deep(.el-card__body) {
+        padding: 28px 24px;
+      }
+
+      .card-header {
+        margin-bottom: 24px;
+        padding-bottom: 16px;
 
         h2 {
-          margin: 0;
-          font-size: 24px;
-          font-weight: 700;
-          color: #1f2937;
+          font-size: 20px;
         }
 
         p {
-          margin: 6px 0 0;
-          color: rgba(31, 41, 55, 0.6);
+          font-size: 12px;
+        }
+      }
+
+      .check-tabs {
+        margin-bottom: 20px;
+
+        :deep(.el-tabs__item) {
+          padding: 10px 12px;
+          font-size: 13px;
+        }
+      }
+
+      .form-section {
+        .submit-button {
+          height: 42px;
           font-size: 14px;
         }
-
-        :deep(svg) {
-          font-size: 34px;
-          color: #1f6bff;
-          padding: 12px;
-          border-radius: 16px;
-          background: linear-gradient(135deg, rgba(31, 107, 255, 0.15), rgba(31, 107, 255, 0.05));
-          box-shadow: inset 0 0 0 1px rgba(31, 107, 255, 0.15);
-        }
       }
     }
-
-    .token-section {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-
-      .action-group {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 12px;
-      }
-    }
-
-    .checkout-section {
-      margin-top: 28px;
-      padding: 20px 24px;
-      background: rgba(31, 107, 255, 0.06);
-      border-radius: 20px;
-
-      h3 {
-        margin: 0 0 18px;
-        font-size: 18px;
-        font-weight: 600;
-        color: #1f2937;
-      }
-
-      .checkout-actions {
-        display: flex;
-        justify-content: flex-end;
-        gap: 12px;
-        margin-top: 10px;
-      }
-    }
-
-    .tip-alert {
-      margin-top: 20px;
-    }
-  }
-}
-
-@media (max-width: 720px) {
-  .student-check-page {
-    padding: 18px 12px;
   }
 }
 </style>
-

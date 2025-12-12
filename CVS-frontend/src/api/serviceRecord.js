@@ -26,7 +26,7 @@ export const serviceRecordAPI = {
     return request.get('/service-records/stats/my')
   },
 
-  // 获取所有服务记录（管理员端）
+  // 获取所有服务记录（学工处）
   getAllRecords: (data) => {
     return request.post('/service-records/all', data)
   },

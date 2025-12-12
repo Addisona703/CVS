@@ -1,0 +1,298 @@
+/**
+ * 全局样式变量
+ * 这里定义的变量可以在整个项目中使用
+ */
+
+/* 引入 uview-plus 样式变量 */
+@import 'uview-plus/theme.scss';
+
+/* 颜色变量 - 温暖友好的志愿者主题 */
+$uni-color-primary: #FF8C42; /* 柔和橙色 - 主色调 */
+$uni-color-secondary: #7BC96F; /* 清新绿色 - 辅助色 */
+$uni-color-success: #7BC96F;
+$uni-color-warning: #FFB84D;
+$uni-color-error: #FF6B6B;
+
+/* 扩展色板 */
+$uni-color-primary-light: #FFB380; /* 浅橙色 */
+$uni-color-primary-lighter: #FFE5D9; /* 极浅橙色 */
+$uni-color-secondary-light: #A8D99C; /* 浅绿色 */
+$uni-color-secondary-lighter: #E8F5E6; /* 极浅绿色 */
+
+$uni-text-color: #2D3748; /* 深灰色文字 */
+$uni-text-color-secondary: #718096;
+$uni-text-color-placeholder: #A0AEC0;
+$uni-text-color-disabled: #CBD5E0;
+
+$uni-bg-color: #FFFFFF;
+$uni-bg-color-grey: #F7FAFC; /* 更柔和的背景灰 */
+$uni-bg-color-hover: #EDF2F7;
+$uni-bg-color-mask: rgba(0, 0, 0, 0.4);
+
+$uni-border-color: #E2E8F0;
+
+/* 字体大小 */
+$uni-font-size-xs: 20rpx;
+$uni-font-size-sm: 24rpx;
+$uni-font-size-base: 28rpx;
+$uni-font-size-lg: 32rpx;
+$uni-font-size-xl: 36rpx;
+
+/* 间距 */
+$uni-spacing-xs: 8rpx;
+$uni-spacing-sm: 16rpx;
+$uni-spacing-md: 24rpx;
+$uni-spacing-lg: 32rpx;
+$uni-spacing-xl: 48rpx;
+
+/* 圆角 - 更圆润友好 */
+$uni-border-radius-sm: 8rpx;
+$uni-border-radius-base: 16rpx;
+$uni-border-radius-lg: 24rpx;
+$uni-border-radius-xl: 32rpx;
+$uni-border-radius-circle: 50%;
+
+/* 阴影 - 柔和自然 */
+$uni-shadow-sm: 0 2rpx 12rpx rgba(255, 140, 66, 0.08);
+$uni-shadow-base: 0 4rpx 20rpx rgba(255, 140, 66, 0.12);
+$uni-shadow-lg: 0 8rpx 32rpx rgba(255, 140, 66, 0.16);
+$uni-shadow-card: 0 2rpx 16rpx rgba(0, 0, 0, 0.06);
+
+/* 动画时长 */
+$uni-animation-duration-fast: 0.2s;
+$uni-animation-duration-base: 0.3s;
+$uni-animation-duration-slow: 0.5s;
+
+/* uView-plus 主题色覆盖 - 温暖橙色系 */
+$u-primary: $uni-color-primary;
+$u-success: $uni-color-success;
+$u-warning: $uni-color-warning;
+$u-error: $uni-color-error;
+$u-info: $uni-text-color-secondary;
+
+/* 页面基础样式 */
+page {
+  background-color: $uni-bg-color-grey;
+  font-size: $uni-font-size-base;
+  color: $uni-text-color;
+  line-height: 1.6;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+}
+
+/* 通用样式类 */
+.container {
+  padding: $uni-spacing-md;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.text-primary {
+  color: $uni-color-primary;
+}
+
+.text-secondary-color {
+  color: $uni-color-secondary;
+}
+
+.text-success {
+  color: $uni-color-success;
+}
+
+.text-warning {
+  color: $uni-color-warning;
+}
+
+.text-error {
+  color: $uni-color-error;
+}
+
+.text-secondary {
+  color: $uni-text-color-secondary;
+}
+
+.text-disabled {
+  color: $uni-text-color-disabled;
+}
+
+.bg-white {
+  background-color: $uni-bg-color;
+}
+
+.bg-grey {
+  background-color: $uni-bg-color-grey;
+}
+
+.mt-xs { margin-top: $uni-spacing-xs; }
+.mt-sm { margin-top: $uni-spacing-sm; }
+.mt-md { margin-top: $uni-spacing-md; }
+.mt-lg { margin-top: $uni-spacing-lg; }
+.mt-xl { margin-top: $uni-spacing-xl; }
+
+.mb-xs { margin-bottom: $uni-spacing-xs; }
+.mb-sm { margin-bottom: $uni-spacing-sm; }
+.mb-md { margin-bottom: $uni-spacing-md; }
+.mb-lg { margin-bottom: $uni-spacing-lg; }
+.mb-xl { margin-bottom: $uni-spacing-xl; }
+
+.ml-xs { margin-left: $uni-spacing-xs; }
+.ml-sm { margin-left: $uni-spacing-sm; }
+.ml-md { margin-left: $uni-spacing-md; }
+.ml-lg { margin-left: $uni-spacing-lg; }
+.ml-xl { margin-left: $uni-spacing-xl; }
+
+.mr-xs { margin-right: $uni-spacing-xs; }
+.mr-sm { margin-right: $uni-spacing-sm; }
+.mr-md { margin-right: $uni-spacing-md; }
+.mr-lg { margin-right: $uni-spacing-lg; }
+.mr-xl { margin-right: $uni-spacing-xl; }
+
+.pt-xs { padding-top: $uni-spacing-xs; }
+.pt-sm { padding-top: $uni-spacing-sm; }
+.pt-md { padding-top: $uni-spacing-md; }
+.pt-lg { padding-top: $uni-spacing-lg; }
+.pt-xl { padding-top: $uni-spacing-xl; }
+
+.pb-xs { padding-bottom: $uni-spacing-xs; }
+.pb-sm { padding-bottom: $uni-spacing-sm; }
+.pb-md { padding-bottom: $uni-spacing-md; }
+.pb-lg { padding-bottom: $uni-spacing-lg; }
+.pb-xl { padding-bottom: $uni-spacing-xl; }
+
+.pl-xs { padding-left: $uni-spacing-xs; }
+.pl-sm { padding-left: $uni-spacing-sm; }
+.pl-md { padding-left: $uni-spacing-md; }
+.pl-lg { padding-left: $uni-spacing-lg; }
+.pl-xl { padding-left: $uni-spacing-xl; }
+
+.pr-xs { padding-right: $uni-spacing-xs; }
+.pr-sm { padding-right: $uni-spacing-sm; }
+.pr-md { padding-right: $uni-spacing-md; }
+.pr-lg { padding-right: $uni-spacing-lg; }
+.pr-xl { padding-right: $uni-spacing-xl; }
+
+.p-xs { padding: $uni-spacing-xs; }
+.p-sm { padding: $uni-spacing-sm; }
+.p-md { padding: $uni-spacing-md; }
+.p-lg { padding: $uni-spacing-lg; }
+.p-xl { padding: $uni-spacing-xl; }
+
+.m-xs { margin: $uni-spacing-xs; }
+.m-sm { margin: $uni-spacing-sm; }
+.m-md { margin: $uni-spacing-md; }
+.m-lg { margin: $uni-spacing-lg; }
+.m-xl { margin: $uni-spacing-xl; }
+
+/* 温暖友好的卡片样式 */
+.card {
+  background: $uni-bg-color;
+  border-radius: $uni-border-radius-lg;
+  padding: $uni-spacing-lg;
+  box-shadow: $uni-shadow-card;
+}
+
+.card-warm {
+  background: linear-gradient(135deg, $uni-color-primary-lighter 0%, $uni-color-secondary-lighter 100%);
+  border-radius: $uni-border-radius-lg;
+  padding: $uni-spacing-lg;
+}
+
+/* 渐变背景 */
+.bg-gradient-warm {
+  background: linear-gradient(135deg, $uni-color-primary 0%, $uni-color-primary-light 100%);
+}
+
+.bg-gradient-fresh {
+  background: linear-gradient(135deg, $uni-color-secondary 0%, $uni-color-secondary-light 100%);
+}
+
+.bg-gradient-sunset {
+  background: linear-gradient(135deg, #FF8C42 0%, #FFB84D 50%, #7BC96F 100%);
+}
+
+/* 友好的按钮样式 */
+.btn-warm {
+  background: linear-gradient(135deg, $uni-color-primary 0%, $uni-color-primary-light 100%);
+  color: #fff;
+  border-radius: $uni-border-radius-base;
+  padding: $uni-spacing-md $uni-spacing-lg;
+  box-shadow: $uni-shadow-base;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn-fresh {
+  background: linear-gradient(135deg, $uni-color-secondary 0%, $uni-color-secondary-light 100%);
+  color: #fff;
+  border-radius: $uni-border-radius-base;
+  padding: $uni-spacing-md $uni-spacing-lg;
+  box-shadow: $uni-shadow-base;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+/* 标签样式 */
+.tag-warm {
+  display: inline-block;
+  padding: 8rpx 16rpx;
+  background: $uni-color-primary-lighter;
+  color: $uni-color-primary;
+  border-radius: $uni-border-radius-sm;
+  font-size: $uni-font-size-sm;
+  font-weight: 500;
+}
+
+.tag-fresh {
+  display: inline-block;
+  padding: 8rpx 16rpx;
+  background: $uni-color-secondary-lighter;
+  color: $uni-color-secondary;
+  border-radius: $uni-border-radius-sm;
+  font-size: $uni-font-size-sm;
+  font-weight: 500;
+}
+
+/* 图标容器 - 友好圆润 */
+.icon-container {
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: $uni-border-radius-circle;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48rpx;
+}
+
+.icon-container-warm {
+  background: linear-gradient(135deg, $uni-color-primary-lighter 0%, $uni-color-primary-light 100%);
+}
+
+.icon-container-fresh {
+  background: linear-gradient(135deg, $uni-color-secondary-lighter 0%, $uni-color-secondary-light 100%);
+}

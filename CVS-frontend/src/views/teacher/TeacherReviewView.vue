@@ -56,7 +56,7 @@
         <el-table-column label="学生自评" min-width="180">
           <template #default="{ row }">
             <div class="rating-block">
-              <el-rate :model-value="row.studentRating" disabled :colors="['#99ccff', '#409EFF', '#1f6bff']"
+              <el-rate :model-value="row.studentRating" disabled :colors="['#b3e19d', '#67c23a', '#5daf34']"
                 size="small" />
               <p class="summary">{{ row.studentEvaluation || '—' }}</p>
             </div>
@@ -65,7 +65,7 @@
         <el-table-column label="教师评语" min-width="180">
           <template #default="{ row }">
             <div class="rating-block">
-              <el-rate :model-value="row.teacherRating" disabled :colors="['#99ccff', '#409EFF', '#1f6bff']"
+              <el-rate :model-value="row.teacherRating" disabled :colors="['#b3e19d', '#67c23a', '#5daf34']"
                 size="small" />
               <p class="summary">{{ row.teacherEvaluation || '—' }}</p>
             </div>
@@ -244,7 +244,7 @@ onMounted(() => {
 
       :deep(svg) {
         font-size: 32px;
-        color: #1f6bff;
+        color: #67c23a;
         padding: 12px;
         border-radius: 16px;
         background: linear-gradient(135deg, rgba(31, 107, 255, 0.18), rgba(31, 107, 255, 0.06));

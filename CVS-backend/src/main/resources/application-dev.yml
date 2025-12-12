@@ -78,7 +78,8 @@ app:
 
 logging:
   level:
-    com.hngy.cvs: DEBUG
-    org.springframework.security: DEBUG
+    com.hngy.cvs: INFO  # 改为 INFO 级别，不输出 DEBUG 日志
+    com.hngy.cvs.mapper: WARN  # Mapper 层只输出警告和错误，不输出 SQL
+    org.springframework.security: INFO  # Security 也改为 INFO
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"

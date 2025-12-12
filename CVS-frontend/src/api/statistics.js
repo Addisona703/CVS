@@ -1,7 +1,7 @@
 import request from '@/utils/request'
 
 export const statisticsAPI = {
-  // 获取管理员仪表板统计
+  // 获取学工处仪表板统计
   getAdminDashboardStats() {
     return request({
       url: '/statistics/admin-dashboard',

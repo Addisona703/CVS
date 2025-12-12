@@ -28,7 +28,7 @@
         
         <div v-else class="image-preview">
           <img 
-            :src="imageUrl" 
+            :src="displayUrl" 
             :alt="fileName" 
             class="preview-image" 
             @error="handleImageError"
@@ -60,7 +60,7 @@
     <!-- 图片预览对话框 -->
     <el-dialog v-model="previewVisible" title="图片预览" width="60%" center>
       <div class="preview-dialog">
-        <img :src="imageUrl" :alt="fileName" class="preview-dialog-image" />
+        <img :src="displayUrl" :alt="fileName" class="preview-dialog-image" />
       </div>
     </el-dialog>
   </div>
@@ -88,6 +88,21 @@ const uploadRef = ref()
 const uploading = ref(false)
 const previewVisible = ref(false)
 const fileName = ref('')
+
+// 用于显示的完整URL
+const displayUrl = computed(() => {
+  if (!props.modelValue) return ''
+  
+  // 如果已经是完整URL，直接返回
+  if (props.modelValue.includes('://')) {
+    return props.modelValue
+  }
+  
+  // 如果是相对路径，拼接API基础URL
+  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'
+  const baseUrl = apiBaseUrl.replace('/api', '')
+  return baseUrl + props.modelValue
+})
 
 const imageUrl = computed({
   get: () => props.modelValue,
@@ -132,9 +147,22 @@ const handleSuccess = (response) => {
   uploading.value = false
   console.log('上传响应:', response)
   if (response.code === 200) {
-    imageUrl.value = response.data.fileUrl
+    let fileUrl = response.data.fileUrl
+    
+    // 如果返回的是完整URL，只保存路径部分
+    if (fileUrl && fileUrl.includes('://')) {
+      try {
+        const url = new URL(fileUrl)
+        fileUrl = url.pathname // 只保存路径部分，例如：/uploads/images/xxx.jpg
+        console.log('提取路径:', fileUrl)
+      } catch (error) {
+        console.error('URL解析失败:', error)
+      }
+    }
+    
+    imageUrl.value = fileUrl
     fileName.value = response.data.originalFileName
-    console.log('图片URL:', response.data.fileUrl)
+    console.log('保存的图片路径:', fileUrl)
     ElMessage.success('上传成功')
   } else {
     console.error('上传失败:', response)
@@ -162,12 +190,16 @@ const removeImage = () => {
 
 // 图片加载成功
 const handleImageLoad = () => {
-  console.log('图片加载成功:', imageUrl.value)
+  console.log('图片加载成功')
+  console.log('存储的路径:', imageUrl.value)
+  console.log('显示的URL:', displayUrl.value)
 }
 
 // 图片加载失败
 const handleImageError = (event) => {
-  console.error('图片加载失败:', imageUrl.value)
+  console.error('图片加载失败')
+  console.error('存储的路径:', imageUrl.value)
+  console.error('显示的URL:', displayUrl.value)
   ElMessage.error('图片加载失败，请检查图片路径')
 }
 

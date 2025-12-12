@@ -74,6 +74,26 @@
         LIMIT #{limit}
     </select>
 
+    <!-- 统计已核销的兑换数量 -->
+    <select id="countVerifiedRedemptions" resultType="java.lang.Long">
+        SELECT COUNT(*)
+        FROM redemption_twb
+        WHERE status = 1
+        <if test="startDate != null">
+            AND verified_at >= #{startDate}
+        </if>
+        <if test="endDate != null">
+            AND verified_at &lt;= #{endDate}
+        </if>
+    </select>
+
+    <!-- 统计待核销的兑换数量 -->
+    <select id="countPendingRedemptions" resultType="java.lang.Long">
+        SELECT COUNT(*)
+        FROM redemption_twb
+        WHERE status = 0
+    </select>
+
     <!-- 导出兑换记录 -->
     <select id="selectRedemptionsForExport" resultType="com.hngy.cvs.dto.response.RedemptionVO">
         SELECT 

@@ -45,10 +45,10 @@ public class UserController {
         return Result.success(userVO);
     }
 
-    // 2. 所有用户的列表（管理员端），不包含管理员账户，可以筛选老师或学生
+    // 2. 所有用户的列表（学工处），不包含学工处账户，可以筛选老师或学生
     @PostMapping("/search")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "分页查询用户列表", description = "管理员端用户管理，支持按用户名、姓名、角色等条件筛选，不包含管理员账户")
+    @Operation(summary = "分页查询用户列表", description = "学工处用户管理，支持按用户名、姓名、角色等条件筛选，不包含学工处账户")
     public Result<PageVO<UserVO>> getUserList(@Valid @RequestBody PageDTO<UserSearchDTO> pageRequest) {
         PageVO<UserVO> result = userService.getUserList(pageRequest);
         return Result.success(result);
@@ -57,7 +57,7 @@ public class UserController {
     // 3. 修改个人资料
     @PutMapping
     @PreAuthorize("hasRole('ADMIN') or #userPrincipal.userId == #request.id")
-    @Operation(summary = "更新用户信息", description = "用户可以修改自己的资料，管理员可以修改任何用户的资料")
+    @Operation(summary = "更新用户信息", description = "用户可以修改自己的资料，学工处可以修改任何用户的资料")
     public Result<UserVO> updateUser(
             @Valid @RequestBody UserUpdateDTO request,
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
@@ -65,10 +65,10 @@ public class UserController {
         return Result.success("更新成功", userVO);
     }
 
-    // 4. 删除用户（仅管理员）
+    // 4. 删除用户（仅学工处）
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "删除用户", description = "仅管理员可以删除用户账户，不能删除管理员账户和自己")
+    @Operation(summary = "删除用户", description = "仅学工处可以删除用户账户，不能删除学工处账户和自己")
     public Result<Void> deleteUser(
             @Parameter(description = "用户ID") @PathVariable Long id,
             @AuthenticationPrincipal UserPrincipal userPrincipal) {

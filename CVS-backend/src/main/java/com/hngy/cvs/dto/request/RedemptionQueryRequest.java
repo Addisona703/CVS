@@ -48,12 +48,7 @@ public class RedemptionQueryRequest {
     private String productName;
 
     /**
-     * 页码
+     * 凭证编号（可选，用于模糊搜索）
      */
-    private Integer pageNum = 1;
-
-    /**
-     * 每页大小
-     */
-    private Integer pageSize = 10;
+    private String voucherCode;
 }

@@ -442,3 +442,275 @@
     background-color: var(--el-color-primary);
   }
 }
+
+// 消息框组件（MessageBox）
+.el-message-box {
+  border-radius: var(--el-border-radius-large, 12px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+  border: none;
+  overflow: hidden;
+  
+  // 头部样式
+  .el-message-box__header {
+    padding: var(--space-5, 20px) var(--space-6, 24px);
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border-bottom: 1px solid var(--border-color-lighter, #ebeef5);
+    
+    .el-message-box__title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-color-primary, #303133);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .el-message-box__headerbtn {
+      top: 20px;
+      right: 20px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      transition: all 0.3s ease;
+      
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.06);
+        transform: rotate(90deg);
+        
+        .el-message-box__close {
+          color: var(--text-color-primary, #303133);
+        }
+      }
+      
+      .el-message-box__close {
+        font-size: 18px;
+        color: var(--text-color-secondary, #909399);
+        transition: color 0.3s ease;
+      }
+    }
+  }
+  
+  // 内容区域
+  .el-message-box__content {
+    padding: var(--space-6, 24px);
+    
+    .el-message-box__container {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      
+      .el-message-box__status {
+        flex-shrink: 0;
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        
+        svg {
+          width: 28px;
+          height: 28px;
+        }
+        
+        // 警告图标样式
+        &.el-message-box-icon--warning {
+          background: linear-gradient(135deg, #fff7e6 0%, #ffefd5 100%);
+          color: #e6a23c;
+          animation: pulse 2s ease-in-out infinite;
+        }
+        
+        // 错误图标样式
+        &.el-message-box-icon--error {
+          background: linear-gradient(135deg, #fef0f0 0%, #fde2e2 100%);
+          color: #f56c6c;
+        }
+        
+        // 成功图标样式
+        &.el-message-box-icon--success {
+          background: linear-gradient(135deg, #f0f9ff 0%, #e1f5fe 100%);
+          color: #67c23a;
+        }
+        
+        // 信息图标样式
+        &.el-message-box-icon--info {
+          background: linear-gradient(135deg, #f4f4f5 0%, #e9ecef 100%);
+          color: var(--el-color-primary);
+        }
+      }
+      
+      .el-message-box__message {
+        flex: 1;
+        padding-top: 4px;
+        
+        p {
+          margin: 0;
+          font-size: 15px;
+          line-height: 1.6;
+          color: var(--text-color-regular, #606266);
+          font-weight: 500;
+        }
+      }
+    }
+  }
+  
+  // 按钮区域
+  .el-message-box__btns {
+    padding: var(--space-4, 16px) var(--space-6, 24px);
+    background-color: #f8f9fa;
+    border-top: 1px solid var(--border-color-lighter, #ebeef5);
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    
+    .el-button {
+      min-width: 80px;
+      padding: 10px 20px;
+      font-weight: 500;
+      border-radius: 6px;
+      transition: all 0.3s ease;
+      
+      // 取消按钮
+      &.el-button--default {
+        background-color: #ffffff;
+        border: 1px solid #dcdfe6;
+        color: #606266 !important;
+        
+        span {
+          color: #606266 !important;
+        }
+        
+        &:hover {
+          background-color: #f5f7fa;
+          border-color: #c0c4cc;
+          color: #303133 !important;
+          
+          span {
+            color: #303133 !important;
+          }
+        }
+        
+        &:active {
+          background-color: #e9ecef;
+        }
+      }
+      
+      // 确认按钮（主要按钮）
+      &.el-button--primary {
+        background: linear-gradient(135deg, #409eff 0%, #3a8ee6 100%);
+        border: none;
+        color: #ffffff !important;
+        box-shadow: 0 4px 12px rgba(64, 158, 255, 0.35);
+        font-weight: 600;
+        
+        span {
+          color: #ffffff !important;
+          font-weight: 600;
+        }
+        
+        &:hover {
+          background: linear-gradient(135deg, #66b1ff 0%, #409eff 100%);
+          box-shadow: 0 6px 16px rgba(64, 158, 255, 0.45);
+          transform: translateY(-2px);
+          color: #ffffff !important;
+          
+          span {
+            color: #ffffff !important;
+          }
+        }
+        
+        &:active {
+          background: linear-gradient(135deg, #3a8ee6 0%, #337ecc 100%);
+          transform: translateY(0);
+          box-shadow: 0 2px 8px rgba(64, 158, 255, 0.3);
+          color: #ffffff !important;
+          
+          span {
+            color: #ffffff !important;
+          }
+        }
+      }
+    }
+  }
+}
+
+// 脉冲动画
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.9;
+  }
+}
+
+// 全局确保 MessageBox 主要按钮文字为白色
+.el-message-box__btns {
+  .el-button--primary {
+    color: #ffffff !important;
+    
+    span {
+      color: #ffffff !important;
+    }
+    
+    &:hover,
+    &:focus,
+    &:active {
+      color: #ffffff !important;
+      
+      span {
+        color: #ffffff !important;
+      }
+    }
+  }
+}
+
+// 响应式优化
+@media (max-width: 768px) {
+  .el-message-box {
+    width: 90% !important;
+    margin: 0 auto;
+    
+    .el-message-box__header {
+      padding: var(--space-4, 16px);
+      
+      .el-message-box__title {
+        font-size: 16px;
+      }
+    }
+    
+    .el-message-box__content {
+      padding: var(--space-4, 16px);
+      
+      .el-message-box__container {
+        gap: 12px;
+        
+        .el-message-box__status {
+          width: 40px;
+          height: 40px;
+          
+          svg {
+            width: 24px;
+            height: 24px;
+          }
+        }
+        
+        .el-message-box__message p {
+          font-size: 14px;
+        }
+      }
+    }
+    
+    .el-message-box__btns {
+      padding: var(--space-3, 12px) var(--space-4, 16px);
+      
+      .el-button {
+        min-width: 70px;
+        padding: 8px 16px;
+        font-size: 14px;
+      }
+    }
+  }
+}

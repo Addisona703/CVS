@@ -33,10 +33,10 @@
               活动审核
             </t-menu-item>
 
-            <t-menu-item value="/admin/signups">
+            <!-- <t-menu-item value="/admin/signups">
               <template #icon><t-icon name="user-checked" /></template>
               报名审核
-            </t-menu-item>
+            </t-menu-item> -->
 
             <t-menu-item value="/admin/records">
               <template #icon><t-icon name="assignment" /></template>

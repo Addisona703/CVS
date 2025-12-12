@@ -3,12 +3,16 @@ import { ref, reactive } from 'vue'
 /**
  * 分页功能组合式函数
  * @param {Object} options 配置选项
+ * @param {number} options.defaultPageSize 默认每页条数
+ * @param {number} options.defaultCurrent 默认当前页
+ * @param {Function} options.onPageChange 分页变化时的回调函数
  * @returns {Object} 分页相关的响应式数据和方法
  */
 export function usePagination(options = {}) {
   const {
     defaultPageSize = 10,
-    defaultCurrent = 1
+    defaultCurrent = 1,
+    onPageChange = null
   } = options
 
   // 加载状态
@@ -28,6 +32,10 @@ export function usePagination(options = {}) {
    */
   const handleCurrentChange = (page) => {
     pagination.current = page
+    // 如果提供了回调函数，则调用
+    if (onPageChange && typeof onPageChange === 'function') {
+      onPageChange()
+    }
   }
 
   /**
@@ -37,6 +45,10 @@ export function usePagination(options = {}) {
   const handleSizeChange = (size) => {
     pagination.size = size
     pagination.current = 1 // 重置到第一页
+    // 如果提供了回调函数，则调用
+    if (onPageChange && typeof onPageChange === 'function') {
+      onPageChange()
+    }
   }
 
   /**
@@ -44,11 +56,13 @@ export function usePagination(options = {}) {
    * @param {Object} pageData 分页数据
    */
   const updatePagination = (pageData) => {
+    console.log('updatePagination 接收到的数据:', pageData)
     if (pageData) {
       pagination.current = pageData.pageNum || pageData.current || 1
       pagination.size = pageData.pageSize || pageData.size || defaultPageSize
       pagination.total = pageData.total || 0
       pagination.totalPages = pageData.totalPages || pageData.pages || 0
+      console.log('更新后的分页信息:', pagination)
     }
   }
 

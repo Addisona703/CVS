@@ -101,6 +101,14 @@ public class StatisticsController {
         return Result.success("获取库存预警列表成功", lowStockProducts);
     }
 
+    @GetMapping("/verify-stats")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "获取核销统计数据")
+    public Result<com.hngy.cvs.dto.response.VerifyStatisticsVO> getVerifyStatistics() {
+        com.hngy.cvs.dto.response.VerifyStatisticsVO stats = statisticsService.getVerifyStatistics();
+        return Result.success("获取核销统计数据成功", stats);
+    }
+
     @GetMapping("/export")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "导出兑换记录Excel")

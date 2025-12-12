@@ -42,13 +42,18 @@ const remainingSeconds = ref(0)
 let timer = null
 
 const renderQr = async () => {
-  if (!canvasRef.value || !props.value) return
+  if (!canvasRef.value || !props.value) {
+    console.log('QrDisplay: 无法渲染二维码', { hasCanvas: !!canvasRef.value, hasValue: !!props.value })
+    return
+  }
   try {
+    console.log('QrDisplay: 开始生成二维码', { value: props.value, type: typeof props.value, length: props.value.length })
     await QRCode.toCanvas(canvasRef.value, props.value, {
       margin: 1,
       width: props.size,
       errorCorrectionLevel: 'M'
     })
+    console.log('QrDisplay: 二维码生成成功')
   } catch (error) {
     console.error('二维码渲染失败:', error)
     ElMessage.error('二维码生成失败，请稍后重试')

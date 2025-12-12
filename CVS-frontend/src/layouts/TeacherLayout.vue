@@ -79,6 +79,10 @@ const handleMenuChange = (value) => {
 }
 </script>
 
+<style lang="scss">
+@use '@/styles/teacher-theme.scss';
+</style>
+
 <style lang="scss" scoped>
 .teacher-layout {
   height: 100vh;

@@ -246,7 +246,7 @@ const fetchOverviewStats = async () => {
   try {
     const response = await statisticsAPI.getAdminDashboardStats()
     if (response.code === 200) {
-      // 适配管理员仪表板数据到统计页面的显示格式
+      // 适配学工处仪表板数据到统计页面的显示格式
       Object.assign(overviewStats, {
         totalUsers: response.data.totalUsers || 0,
         totalActivities: response.data.totalActivities || 0,

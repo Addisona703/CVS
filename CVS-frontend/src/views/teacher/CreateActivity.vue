@@ -106,7 +106,7 @@ const router = useRouter()
 const route = useRoute()
 const authStore = useAuthStore()
 
-// 判断是否为管理员
+// 判断是否为学工处
 const isAdmin = computed(() => authStore.user?.role === 'ADMIN')
 
 const activityFormRef = ref()
@@ -143,9 +143,9 @@ const fillTestData = () => {
   activityForm.points = 5
   activityForm.requirements = '测试要求：准时到场，保持课堂纪律。'
   activityForm.contactInfo = '张老师 13800000000'
-  activityForm.registrationDeadline = addMinutes(1)
-  activityForm.startTime = addMinutes(2)
-  activityForm.endTime = addMinutes(4)
+  activityForm.registrationDeadline = addMinutes(2)
+  activityForm.startTime = addMinutes(3)
+  activityForm.endTime = addMinutes(5)
 
   activityFormRef.value?.clearValidate?.()
   ElMessage.success('已填充测试数据')

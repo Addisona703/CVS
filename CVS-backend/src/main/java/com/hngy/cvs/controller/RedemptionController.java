@@ -2,6 +2,7 @@ package com.hngy.cvs.controller;
 
 import com.hngy.cvs.common.result.Result;
 import com.hngy.cvs.common.security.UserPrincipal;
+import com.hngy.cvs.dto.request.PageDTO;
 import com.hngy.cvs.dto.request.RedemptionQueryRequest;
 import com.hngy.cvs.dto.request.RedemptionRequest;
 import com.hngy.cvs.dto.request.VerifyRedemptionRequest;
@@ -45,7 +46,7 @@ public class RedemptionController {
     @PreAuthorize("hasRole('STUDENT')")
     @Operation(summary = "获取我的兑换记录")
     public Result<PageVO<RedemptionVO>> getMyRedemptions(
-            @Valid @RequestBody RedemptionQueryRequest request,
+            @Valid @RequestBody PageDTO<RedemptionQueryRequest> request,
             @AuthenticationPrincipal UserPrincipal principal) {
         PageVO<RedemptionVO> redemptions = redemptionService.getUserRedemptions(principal.getUserId(), request);
         return Result.success(redemptions);
@@ -82,9 +83,9 @@ public class RedemptionController {
 
     @PostMapping("/all")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "获取所有兑换记录（学工处端）")
+    @Operation(summary = "获取所有兑换记录（学工处）")
     public Result<PageVO<RedemptionVO>> getAllRedemptions(
-            @Valid @RequestBody RedemptionQueryRequest request) {
+            @Valid @RequestBody PageDTO<RedemptionQueryRequest> request) {
         PageVO<RedemptionVO> redemptions = redemptionService.getAllRedemptions(request);
         return Result.success(redemptions);
     }
@@ -96,5 +97,16 @@ public class RedemptionController {
             @Parameter(description = "凭证编号") @PathVariable String voucherCode) {
         RedemptionVO redemption = redemptionService.getRedemptionByVoucherCode(voucherCode);
         return Result.success(redemption);
+    }
+
+    @PostMapping("/by-status")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "根据状态获取兑换记录列表", description = "支持筛选今日核销、累计核销、待核销")
+    public Result<PageVO<RedemptionVO>> getRedemptionsByStatus(
+            @Valid @RequestBody PageDTO<RedemptionQueryRequest> request,
+            @Parameter(description = "状态类型：TODAY(今日核销)、VERIFIED(累计核销)、PENDING(待核销)")
+            @RequestParam(required = false) String statusType) {
+        PageVO<RedemptionVO> redemptions = redemptionService.getRedemptionsByStatus(request, statusType);
+        return Result.success(redemptions);
     }
 }

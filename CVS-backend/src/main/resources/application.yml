@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: dev
+    active: twb
   application:
     name: cvs
 
@@ -24,7 +24,7 @@ spring:
 mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    # log-impl: org.apache.ibatis.logging.stdout.StdOutImpl  # 禁用SQL日志输出
   global-config:
     db-config:
       id-type: auto

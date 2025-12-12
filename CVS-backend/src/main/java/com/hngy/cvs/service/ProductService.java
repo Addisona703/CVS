@@ -43,9 +43,10 @@ public interface ProductService extends IService<Product> {
      *
      * @param request 查询请求
      * @param userId 用户ID（可选，用于判断是否可兑换）
+     * @param userRole 用户角色（可选，用于权限筛选）
      * @return 分页商品列表
      */
-    PageVO<ProductVO> getProductList(ProductQueryRequest request, Long userId);
+    PageVO<ProductVO> getProductList(ProductQueryRequest request, Long userId, String userRole);
 
     /**
      * 获取商品详情

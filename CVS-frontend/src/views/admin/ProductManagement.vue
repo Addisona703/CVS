@@ -88,8 +88,8 @@
           :total="pagination.total"
           :page-sizes="[10, 20, 50, 100]"
           layout="total, sizes, prev, pager, next, jumper"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
+          @size-change="onSizeChange"
+          @current-change="onCurrentChange"
         />
       </div>
     </el-card>
@@ -174,8 +174,6 @@ import { formatDateTime } from '@/utils/format'
 import { usePagination } from '@/composables/usePagination'
 import ImageUpload from '@/components/ImageUpload.vue'
 
-const { loading, pagination, handleSizeChange, handleCurrentChange, updatePagination } = usePagination()
-
 const productList = ref([])
 const categories = ref([])
 const dialogVisible = ref(false)
@@ -220,19 +218,43 @@ const rules = {
   ]
 }
 
+// 使用 usePagination
+const { loading, pagination, handleSizeChange, handleCurrentChange, updatePagination } = usePagination()
+
 // 获取商品列表
 const fetchProductList = async () => {
   loading.value = true
   try {
+    // 构建符合后端PageDTO格式的参数
     const params = {
       pageNum: pagination.current,
       pageSize: pagination.size,
-      ...searchForm
+      // 查询条件直接作为顶层字段（因为ProductQueryRequest继承了PageDTO）
+      keyword: searchForm.keyword || undefined,
+      categoryId: searchForm.categoryId || undefined,
+      status: searchForm.status !== '' ? searchForm.status : undefined
     }
+    
+    // 移除undefined的字段
+    Object.keys(params).forEach(key => {
+      if (params[key] === undefined) {
+        delete params[key]
+      }
+    })
+    
+    console.log('获取商品列表，参数:', params)
     const response = await mallAPI.getProductList(params)
+    console.log('商品列表响应:', response)
     if (response.code === 200) {
       productList.value = response.data.records
+      console.log('商品列表数据:', productList.value)
+      console.log('商品数量:', productList.value.length)
+      console.log('总记录数:', response.data.total)
+      console.log('当前页:', response.data.current)
       updatePagination(response.data)
+    } else {
+      console.error('获取商品列表失败，响应码:', response.code)
+      ElMessage.error(response.message || '获取商品列表失败')
     }
   } catch (error) {
     console.error('获取商品列表失败:', error)
@@ -266,6 +288,17 @@ const handleReset = () => {
     status: ''
   })
   handleSearch()
+}
+
+// 分页事件处理
+const onSizeChange = (size) => {
+  handleSizeChange(size)
+  fetchProductList()
+}
+
+const onCurrentChange = (page) => {
+  handleCurrentChange(page)
+  fetchProductList()
 }
 
 // 显示添加对话框
@@ -315,16 +348,44 @@ const handleSubmit = async () => {
     await formRef.value.validate()
     submitting.value = true
     
+    console.log('提交表单数据:', form)
+    
     if (isEdit.value) {
-      await mallAPI.updateProduct(form.id, form)
+      const response = await mallAPI.updateProduct(form.id, form)
+      console.log('更新响应:', response)
       ElMessage.success('更新成功')
     } else {
-      await mallAPI.createProduct(form)
+      const response = await mallAPI.createProduct(form)
+      console.log('创建响应:', response)
       ElMessage.success('创建成功')
     }
     
     dialogVisible.value = false
-    fetchProductList()
+    
+    // 创建新商品后跳转到第一页
+    if (!isEdit.value) {
+      pagination.current = 1
+      console.log('创建新商品，跳转到第一页')
+      
+      // 清空搜索条件，确保能看到新商品
+      searchForm.keyword = ''
+      searchForm.categoryId = ''
+      searchForm.status = ''
+      console.log('已清空搜索条件')
+    }
+    
+    console.log('开始刷新商品列表')
+    await fetchProductList()
+    console.log('商品列表刷新完成，当前商品数量:', productList.value.length)
+    
+    // 如果是创建新商品，显示提示
+    if (!isEdit.value) {
+      ElMessage.success({
+        message: '商品创建成功！请在列表中查找新商品',
+        duration: 3000,
+        showClose: true
+      })
+    }
   } catch (error) {
     if (error !== false) { // 不是表单验证错误
       console.error('提交失败:', error)

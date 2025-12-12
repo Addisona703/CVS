@@ -254,7 +254,6 @@ public class PointsServiceImpl
         // 参数校验
         AssertUtils.notNull(userId, "用户ID不能为空");
         AssertUtils.notNull(points, "积分数量不能为空");
-        AssertUtils.isTrue(points > 0, "积分数量必须大于0");
 
         // 验证用户存在性和有效性
         User user = userMapper.selectById(userId);

@@ -1,6 +1,7 @@
 package com.hngy.cvs.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.hngy.cvs.dto.request.PageDTO;
 import com.hngy.cvs.dto.request.RedemptionQueryRequest;
 import com.hngy.cvs.dto.request.RedemptionRequest;
 import com.hngy.cvs.dto.response.PageVO;
@@ -30,7 +31,7 @@ public interface RedemptionService extends IService<Redemption> {
      * @param queryRequest 查询请求
      * @return 分页的兑换记录
      */
-    PageVO<RedemptionVO> getUserRedemptions(Long userId, RedemptionQueryRequest queryRequest);
+    PageVO<RedemptionVO> getUserRedemptions(Long userId, PageDTO<RedemptionQueryRequest> queryRequest);
 
     /**
      * 获取兑换详情
@@ -63,7 +64,7 @@ public interface RedemptionService extends IService<Redemption> {
      * @param queryRequest 查询请求
      * @return 分页的兑换记录
      */
-    PageVO<RedemptionVO> getAllRedemptions(RedemptionQueryRequest queryRequest);
+    PageVO<RedemptionVO> getAllRedemptions(PageDTO<RedemptionQueryRequest> queryRequest);
 
     /**
      * 根据凭证编号获取兑换记录
@@ -79,4 +80,13 @@ public interface RedemptionService extends IService<Redemption> {
      * @return 凭证编号
      */
     String generateVoucherCode();
+
+    /**
+     * 根据状态类型获取兑换记录列表
+     *
+     * @param pageRequest 分页请求
+     * @param statusType 状态类型：TODAY(今日核销)、VERIFIED(累计核销)、PENDING(待核销)
+     * @return 分页的兑换记录
+     */
+    PageVO<RedemptionVO> getRedemptionsByStatus(PageDTO<RedemptionQueryRequest> pageRequest, String statusType);
 }

@@ -10,7 +10,7 @@
       </div>
     </div>
 
-    <el-result v-if="!canAccess" icon="warning" title="权限不足" sub-title="仅教师与管理员可访问此页面" />
+    <el-result v-if="!canAccess" icon="warning" title="权限不足" sub-title="仅教师与学工处可访问此页面" />
     <template v-else>
       <!-- 筛选搜索 -->
       <el-card class="search-card">

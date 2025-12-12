@@ -76,7 +76,7 @@
             <!-- 商品图片 -->
             <div class="product-image-container">
               <img 
-                :src="product.imageUrl || '/default-product.svg'" 
+                :src="getProductImageUrl(product.imageUrl)" 
                 :alt="product.name"
                 class="product-image" 
                 @error="handleImageError" />
@@ -155,7 +155,7 @@
       <div class="redeem-dialog-content" v-if="selectedProduct">
         <div class="product-summary">
           <img 
-            :src="selectedProduct.imageUrl || '/src/assets/images/default-product.png'" 
+            :src="getProductImageUrl(selectedProduct.imageUrl)" 
             :alt="selectedProduct.name"
             class="dialog-product-image" />
           <div class="product-details">
@@ -209,7 +209,7 @@ import { mallAPI } from '@/api'
 import { usePagination } from '@/composables/usePagination'
 
 const router = useRouter()
-const { loading, pagination, updatePagination } = usePagination()
+const { loading, pagination, updatePagination } = usePagination({ defaultPageSize: 12 })
 
 // 响应式数据
 const userPoints = ref(0)
@@ -358,6 +358,24 @@ const confirmRedeem = async () => {
   } finally {
     redeeming.value = false
   }
+}
+
+// 拼接完整图片URL
+const getProductImageUrl = (url) => {
+  if (!url) return '/default-product.svg'
+  
+  // 如果已经是完整URL，直接返回
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url
+  }
+  
+  // 如果是相对路径，拼接基础URL
+  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'
+  const baseUrl = apiBaseUrl.replace('/api', '')
+  
+  // 确保路径以 / 开头
+  const path = url.startsWith('/') ? url : `/${url}`
+  return `${baseUrl}${path}`
 }
 
 const handleImageError = (event) => {

@@ -259,6 +259,14 @@ onUnmounted(() => {
       font-weight: 600;
       color: var(--text-color-primary, #303133);
     }
+
+    :deep(.el-button.is-text) {
+      &:hover,
+      &:focus {
+        background-color: transparent !important;
+        color: var(--primary-color, #409eff) !important;
+      }
+    }
   }
 
   .empty-state {
@@ -360,6 +368,14 @@ onUnmounted(() => {
     padding: var(--space-2, 8px) var(--space-4, 16px);
     border-top: 1px solid var(--border-color-lighter, #ebeef5);
     text-align: center;
+
+    :deep(.el-button.is-text) {
+      &:hover,
+      &:focus {
+        background-color: transparent !important;
+        color: var(--primary-color, #409eff) !important;
+      }
+    }
   }
 }
 </style>

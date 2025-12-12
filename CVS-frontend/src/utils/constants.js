@@ -92,7 +92,7 @@ export const STATUS_COLORS = {
 
 // 角色标签映射
 export const ROLE_LABELS = {
-  [USER_ROLES.ADMIN]: '管理员',
+  [USER_ROLES.ADMIN]: '学工处',
   [USER_ROLES.TEACHER]: '教师',
   [USER_ROLES.STUDENT]: '学生'
 }

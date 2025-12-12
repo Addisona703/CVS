@@ -135,9 +135,16 @@ public class CertificateController {
                 UserRole.fromCode(principal.getRole())
         );
         
-        // 设置响应头
+        // 获取证书信息
+        CertificateVO certificate = certificateService.getCertificateById(id);
+        String filename = "志愿服务证书_" + certificate.getUsername() + ".pdf";
+        
+        // 设置响应头（inline 表示在浏览器中预览，而不是下载）
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDispositionFormData("inline", 
+                new String(filename.getBytes(StandardCharsets.UTF_8), 
+                          StandardCharsets.ISO_8859_1));
         
         return ResponseEntity.ok()
                 .headers(headers)
@@ -159,7 +166,7 @@ public class CertificateController {
         
         // 获取证书信息以获取学号
         CertificateVO certificate = certificateService.getCertificateById(id);
-        String filename = "志愿服务证书-" + certificate.getUsername() + ".pdf";
+        String filename = "志愿服务证书_" + certificate.getUsername() + ".pdf";
         
         // 设置响应头
         HttpHeaders headers = new HttpHeaders();

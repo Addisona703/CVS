@@ -34,18 +34,16 @@ public class NotificationTask {
     private static final String AUTO_REJECT_REASON = "超时未审核";
 
     /**
-     * 检查活动开始时间并发送通知（每分钟执行一次）
+     * 检查活动开始时间并发送通知（每秒执行一次）
      * 需求: 1.1 - WHEN 活动开始时间到达, THE CVS系统 SHALL 向活动发起人发送活动开始通知
      */
-    @Scheduled(cron = "0 * * * * ?")
+    @Scheduled(cron = "* * * * * ?")
     public void checkActivityStart() {
         try {
             LocalDateTime now = LocalDateTime.now();
-            // 检查当前时间前后1分钟内开始的活动
-            LocalDateTime startTime = now.minusMinutes(1);
-            LocalDateTime endTime = now.plusMinutes(1);
-
-            log.debug("检查活动开始时间: {} 到 {}", startTime, endTime);
+            // 检查过去5秒内开始的活动（只检查已经开始的活动）
+            LocalDateTime startTime = now.minusSeconds(5);
+            LocalDateTime endTime = now;
 
             // 查询在指定时间范围内开始的已发布活动
             List<Activity> activities = activityMapper.selectList(
@@ -53,6 +51,11 @@ public class NotificationTask {
                             .eq(Activity::getStatus, ActivityStatus.PUBLISHED)
                             .between(Activity::getStartTime, startTime, endTime)
             );
+
+            // 只有找到活动时才输出日志
+            if (activities.isEmpty()) {
+                return;
+            }
 
             int successCount = 0;
             int failureCount = 0;
@@ -78,10 +81,8 @@ public class NotificationTask {
                 }
             }
 
-            if (!activities.isEmpty()) {
-                log.info("活动开始/进行中通知检查完成: 总数={}, 成功={}, 失败={}", 
-                        activities.size(), successCount, failureCount);
-            }
+            log.info("活动开始/进行中通知检查完成: 总数={}, 成功={}, 失败={}", 
+                    activities.size(), successCount, failureCount);
 
         } catch (Exception e) {
             log.error("检查活动开始时间任务执行异常", e);
@@ -144,18 +145,16 @@ public class NotificationTask {
     }
 
     /**
-     * 检查活动结束时间并发送通知（每分钟执行一次）
+     * 检查活动结束时间并发送通知（每秒执行一次）
      * 需求: 1.2 - WHEN 活动结束时间到达, THE CVS系统 SHALL 向活动发起人发送活动结束通知
      */
-    @Scheduled(cron = "0 * * * * ?")
+    @Scheduled(cron = "* * * * * ?")
     public void checkActivityEnd() {
         try {
             LocalDateTime now = LocalDateTime.now();
-            // 检查当前时间前后1分钟内结束的活动
-            LocalDateTime startTime = now.minusMinutes(1);
-            LocalDateTime endTime = now.plusMinutes(1);
-
-            log.debug("检查活动结束时间: {} 到 {}", startTime, endTime);
+            // 检查过去5秒内结束的活动（只检查已经结束的活动）
+            LocalDateTime startTime = now.minusSeconds(5);
+            LocalDateTime endTime = now;
 
             // 查询在指定时间范围内结束的活动（已发布或进行中状态）
             List<Activity> activities = activityMapper.selectList(
@@ -163,6 +162,11 @@ public class NotificationTask {
                             .in(Activity::getStatus, ActivityStatus.PUBLISHED, ActivityStatus.ONGOING)
                             .between(Activity::getEndTime, startTime, endTime)
             );
+
+            // 只有找到活动时才输出日志
+            if (activities.isEmpty()) {
+                return;
+            }
 
             int successCount = 0;
             int failureCount = 0;
@@ -186,10 +190,8 @@ public class NotificationTask {
                 }
             }
 
-            if (activities.size() > 0) {
-                log.info("活动结束通知检查完成: 总数={}, 成功={}, 失败={}", 
-                        activities.size(), successCount, failureCount);
-            }
+            log.info("活动结束通知检查完成: 总数={}, 成功={}, 失败={}", 
+                    activities.size(), successCount, failureCount);
 
         } catch (Exception e) {
             log.error("检查活动结束时间任务执行异常", e);

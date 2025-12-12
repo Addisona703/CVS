@@ -97,7 +97,7 @@
                 </template>
               </t-list-item-meta>
               <template #action>
-                <t-button theme="primary" @click="viewActivity(activity.id)">
+                <t-button theme="success" @click="viewActivity(activity.id)">
                   查看
                 </t-button>
               </template>
@@ -135,7 +135,7 @@
                 </template>
               </t-list-item-meta>
               <template #action>
-                <t-button theme="primary" @click="viewActivity(activity.id)">
+                <t-button theme="success" @click="viewActivity(activity.id)">
                   查看
                 </t-button>
               </template>
@@ -420,7 +420,7 @@ onMounted(() => {
           }
 
           &.signups {
-            background: var(--stat-gradient-primary, linear-gradient(135deg, #409eff 0%, #66b1ff 100%));
+            background: linear-gradient(135deg, #67c23a 0%, #85ce61 100%);
             color: #ffffff;
           }
 
@@ -510,18 +510,20 @@ onMounted(() => {
         }
       }
 
-      .t-button--theme-primary {
-        background-color: #67c23a;
-        border-color: #67c23a;
-
+      :deep(.t-button--theme-primary),
+      :deep(.t-button.t-button--theme-primary) {
+        background-color: #67c23a !important;
+        border-color: #67c23a !important;
+        color: #ffffff !important;
+        
         &:hover {
-          background-color: #85ce61;
-          border-color: #85ce61;
+          background-color: #85ce61 !important;
+          border-color: #85ce61 !important;
         }
 
         &:active {
-          background-color: #5daf34;
-          border-color: #5daf34;
+          background-color: #5daf34 !important;
+          border-color: #5daf34 !important;
         }
       }
     }

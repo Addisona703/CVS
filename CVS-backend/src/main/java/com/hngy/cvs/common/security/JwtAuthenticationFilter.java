@@ -65,13 +65,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     /**
-     * 从请求头中获取JWT Token
+     * 从请求头或URL参数中获取JWT Token
+     * 优先从Header中获取，如果没有则从URL参数中获取（用于H5环境的预览/下载）
      */
     private String getJwtFromRequest(HttpServletRequest request) {
+        // 1. 优先从Header中获取
         String bearerToken = request.getHeader("Authorization");
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7);
         }
+        
+        // 2. 如果Header中没有，尝试从URL参数中获取（用于H5环境）
+        String tokenParam = request.getParameter("token");
+        if (StringUtils.hasText(tokenParam)) {
+            return tokenParam;
+        }
+        
         return null;
     }
 }

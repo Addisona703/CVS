@@ -63,10 +63,11 @@ public class ProductController {
     public Result<PageVO<ProductVO>> getProductList(
             @Valid @RequestBody ProductQueryRequest request,
             @AuthenticationPrincipal UserPrincipal principal) {
-        // 如果用户已登录，传递用户ID用于判断是否可兑换
+        // 如果用户已登录，传递用户ID和角色用于判断是否可兑换和筛选数据
         Long userId = principal != null ? principal.getUserId() : null;
+        String userRole = principal != null ? principal.getRole() : null;
         
-        PageVO<ProductVO> products = productService.getProductList(request, userId);
+        PageVO<ProductVO> products = productService.getProductList(request, userId, userRole);
         return Result.success(products);
     }
 

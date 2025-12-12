@@ -1,0 +1,16 @@
+# 忽略目录
+node_modules/
+dist/
+unpackage/
+.hbuilderx/
+
+# 忽略文件
+*.min.js
+*.min.css
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# 配置文件
+manifest.json
+pages.json

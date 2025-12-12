@@ -62,6 +62,22 @@ public interface RedemptionMapper extends BaseMapper<Redemption> {
     List<ProductRankingVO> selectProductRanking(@Param("limit") Integer limit);
 
     /**
+     * 统计已核销的兑换数量
+     *
+     * @param startDate 开始日期
+     * @param endDate 结束日期
+     * @return 已核销数量
+     */
+    Long countVerifiedRedemptions(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
+
+    /**
+     * 统计待核销的兑换数量
+     *
+     * @return 待核销数量
+     */
+    Long countPendingRedemptions();
+
+    /**
      * 导出兑换记录
      *
      * @param startDate 开始日期

@@ -16,7 +16,7 @@ export const pointsAPI = {
     return request.post('/points/records/all', data)
   },
 
-  // 4. 发放积分（管理员功能）
+  // 4. 发放积分（学工处功能）
   awardPoints: (data) => {
     return request.post('/points/award', data)
   }

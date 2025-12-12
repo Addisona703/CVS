@@ -3,7 +3,6 @@
     <el-card class="tool-card">
       <header class="card-header">
         <div class="title">
-          <el-icon><Postcard /></el-icon>
           <div>
             <h2>活动签到 / 签退二维码</h2>
             <p>生成临时二维码口令，供学生扫码完成签到签退</p>
@@ -13,13 +12,33 @@
       </header>
 
       <el-form :model="form" label-width="100px" class="form-area">
-        <el-form-item label="活动编号">
-          <el-input
+        <el-form-item label="选择活动">
+          <el-select
             v-model="form.activityId"
-            placeholder="请输入活动编号"
+            placeholder="请选择进行中的活动"
             clearable
-            maxlength="50"
-          />
+            filterable
+            :loading="activitiesLoading"
+            style="width: 100%"
+          >
+            <el-option
+              v-for="activity in activities"
+              :key="activity.id"
+              :label="`${activity.title} (${formatDate(activity.startTime)})`"
+              :value="activity.id"
+            >
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span>{{ activity.title }}</span>
+                <el-tag size="small" type="success">进行中</el-tag>
+              </div>
+            </el-option>
+            <template #empty>
+              <div style="padding: 20px; text-align: center; color: #909399;">
+                <p style="margin: 0;">暂无进行中的活动</p>
+                <p style="margin: 8px 0 0; font-size: 12px;">只有已开始且未结束的活动才会显示</p>
+              </div>
+            </template>
+          </el-select>
         </el-form-item>
         <el-form-item label="操作">
           <el-space wrap>
@@ -90,10 +109,10 @@
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue'
+import { reactive, ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
-import { Postcard } from '@element-plus/icons-vue'
 import { checkAPI } from '@/api/check'
+import { activityAPI } from '@/api'
 import QrDisplay from '@/components/QrDisplay.vue'
 
 const EXPIRY_MINUTES_DEFAULT = 3
@@ -102,6 +121,8 @@ const form = reactive({
   activityId: ''
 })
 const expiryMinutes = ref(EXPIRY_MINUTES_DEFAULT)
+const activities = ref([])
+const activitiesLoading = ref(false)
 
 const checkinToken = ref('')
 const checkoutToken = ref('')
@@ -110,17 +131,44 @@ const checkoutExpiresAt = ref(0)
 const checkinLoading = ref(false)
 const checkoutLoading = ref(false)
 
+// 获取进行中的活动列表
+const fetchOngoingActivities = async () => {
+  activitiesLoading.value = true
+  try {
+    const response = await activityAPI.getMyActivities({
+      pageNum: 1,
+      pageSize: 100,
+      params: {
+        status: 'ONGOING'
+      }
+    })
+    if (response.code === 200) {
+      activities.value = response.data.records || []
+    }
+  } catch (error) {
+    console.error('获取活动列表失败:', error)
+    ElMessage.error('获取活动列表失败')
+  } finally {
+    activitiesLoading.value = false
+  }
+}
+
+const formatDate = (dateStr) => {
+  const date = new Date(dateStr)
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  const hours = String(date.getHours()).padStart(2, '0')
+  const minutes = String(date.getMinutes()).padStart(2, '0')
+  return `${month}-${day} ${hours}:${minutes}`
+}
+
 const generateToken = async (type) => {
   if (!form.activityId) {
-    ElMessage.warning('请先输入活动编号')
+    ElMessage.warning('请先选择活动')
     return
   }
 
-  const activityId = form.activityId.trim()
-  if (!activityId) {
-    ElMessage.warning('活动编号不能为空')
-    return
-  }
+  const activityId = form.activityId
 
   const isCheckin = type === 'checkin'
   const loadingRef = isCheckin ? checkinLoading : checkoutLoading
@@ -159,6 +207,10 @@ const copyToken = async (token) => {
     ElMessage.error('复制失败，请手动复制')
   }
 }
+
+onMounted(() => {
+  fetchOngoingActivities()
+})
 </script>
 
 <style lang="scss" scoped>
@@ -207,7 +259,7 @@ const copyToken = async (token) => {
 
         :deep(svg) {
           font-size: 34px;
-          color: #1f6bff;
+          color: #67c23a;
           padding: 12px;
           border-radius: 16px;
           background: linear-gradient(135deg, rgba(31, 107, 255, 0.18), rgba(31, 107, 255, 0.06));
@@ -245,6 +297,11 @@ const copyToken = async (token) => {
 
         .copy-btn {
           margin-top: -4px;
+          
+          &:hover {
+            color: #85ce61 !important;
+            background-color: transparent !important;
+          }
         }
       }
     }

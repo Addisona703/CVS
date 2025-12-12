@@ -1,0 +1,50 @@
+@font-face {
+  font-family: "iconfont"; /* Project id 5067943 */
+  src: url('./iconfont.woff2?t=1763444114032') format('woff2'),
+       url('./iconfont.woff?t=1763444114032') format('woff'),
+       url('./iconfont.ttf?t=1763444114032') format('truetype');
+}
+
+.iconfont {
+  font-family: "iconfont" !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 项目中使用的图标映射 */
+.icon-house:before { content: "\e99f"; } /* home */
+.icon-magnifying-glass:before { content: "\e941"; } /* search */
+.icon-bell:before { content: "\ea07"; } /* 通知 - fuwuguwen */
+.icon-user:before { content: "\e869"; } /* customer */
+.icon-users:before { content: "\e852"; } /* 活动卡片人数 - customer-bussinessman */
+.icon-gear:before { content: "\e94a"; } /* settings */
+.icon-calendar:before { content: "\e8f2"; }
+.icon-clock:before { content: "\e8d9"; } /* time */
+.icon-timer:before { content: "\e8e2"; } /* time-task */
+.icon-map-pin:before { content: "\e92a"; } /* location */
+.icon-file-text:before { content: "\e9e6"; } /* 活动报名 - table-fill */
+.icon-clipboard-text:before { content: "\e9e6"; } /* 活动报名 - table-fill */
+.icon-list:before { content: "\e848"; } /* 服务记录 - catalog */
+.icon-list-bullets:before { content: "\e848"; } /* 服务记录 - catalog */
+.icon-folder:before { content: "\e996"; }
+.icon-check:before { content: "\e900"; } /* confirm */
+.icon-check-circle:before { content: "\ea03"; } /* 签到签退 - writing */
+.icon-x:before { content: "\e904"; } /* close */
+.icon-x-circle:before { content: "\e904"; } /* close */
+.icon-plus:before { content: "\e8e5"; } /* add */
+.icon-qr-code:before { content: "\e9c4"; }
+.icon-image:before { content: "\e90e"; } /* gallery */
+.icon-funnel:before { content: "\e8f9"; } /* filter */
+.icon-gift:before { content: "\e9e5"; } /* 积分商城 - store */
+.icon-star:before { content: "\e901"; } /* 积分 - favorites */
+.icon-star-fill:before { content: "\e901"; } /* 积分填充版 - favorites */
+.icon-medal:before { content: "\ea27"; } /* 服务证明 - zhengshuyanzhen */
+.icon-shopping-cart:before { content: "\e844"; } /* cart-full */
+.icon-chart-line:before { content: "\e843"; } /* charts-line */
+.icon-chart-bar:before { content: "\e84c"; } /* charts-bar */
+.icon-caret-right:before { content: "\e936"; } /* right */
+.icon-caret-left:before { content: "\e915"; } /* left */
+.icon-caret-up:before { content: "\e958"; } /* up */
+.icon-caret-down:before { content: "\e903"; } /* down */

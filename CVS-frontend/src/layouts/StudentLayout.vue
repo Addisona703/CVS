@@ -22,13 +22,6 @@
               活动列表
             </t-menu-item>
 
-            <t-menu-item value="/student/check">
-              <template #icon><el-icon>
-                  <Location />
-                </el-icon></template>
-              快速签到
-            </t-menu-item>
-
             <t-menu-item value="/student/signups">
               <template #icon><el-icon>
                   <Tickets />

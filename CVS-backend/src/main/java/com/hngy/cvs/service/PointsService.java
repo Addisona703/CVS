@@ -44,7 +44,6 @@ public interface PointsService {
      *
      * @param userId 用户ID，不能为空
      * @param points 要发放的积分数量，必须大于0
-     * @throws BusinessException 当用户不存在或参数无效时抛出
      */
     void awardPoints(Long userId, Integer points);
 
@@ -62,7 +61,6 @@ public interface PointsService {
      * @param userId 用户ID
      * @param points 要扣除的积分数量
      * @param reason 扣除原因
-     * @throws BusinessException 当积分不足或参数无效时抛出
      */
     void deductPoints(Long userId, Integer points, String reason);
 

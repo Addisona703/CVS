@@ -246,7 +246,7 @@ public class CertificateServiceImpl implements CertificateService {
         Certificate certificate = certificateMapper.selectById(certificateId);
         com.hngy.cvs.common.util.AssertUtils.notNull(certificate, "证书不存在");
         
-        // 管理员可以访问所有证书
+        // 学工处可以访问所有证书
         if (role == com.hngy.cvs.entity.enums.UserRole.ADMIN) {
             return;
         }
@@ -264,6 +264,25 @@ public class CertificateServiceImpl implements CertificateService {
     }
 
     private CertificateVO convertToVO(Certificate certificate) {
-        return BeanUtil.to(certificate, CertificateVO.class);
+        CertificateVO vo = BeanUtil.to(certificate, CertificateVO.class);
+        
+        // 填充用户信息（username 和 name）
+        if (certificate.getUserId() != null) {
+            com.hngy.cvs.entity.User user = userMapper.selectById(certificate.getUserId());
+            if (user != null) {
+                vo.setUsername(user.getUsername());
+                vo.setName(user.getName());
+            }
+        }
+        
+        // 填充审批人姓名
+        if (certificate.getApproverId() != null) {
+            com.hngy.cvs.entity.User approver = userMapper.selectById(certificate.getApproverId());
+            if (approver != null) {
+                vo.setApproverName(approver.getName());
+            }
+        }
+        
+        return vo;
     }
 }

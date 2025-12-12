@@ -1,0 +1,364 @@
+{
+  "easycom": {
+    "autoscan": true,
+    "custom": {
+      "^u-(.*)": "uview-plus/components/u-$1/u-$1.vue"
+    }
+  },
+  "pages": [
+    {
+      "path": "pages/student-sub/dashboard/dashboard",
+      "style": {
+        "navigationBarTitleText": "首页",
+        "navigationStyle": "custom",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages/student/activities/activities",
+      "style": {
+        "navigationBarTitleText": "活动列表",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/student/my-signups/my-signups",
+      "style": {
+        "navigationBarTitleText": "我的报名",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/student/profile/profile",
+      "style": {
+        "navigationBarTitleText": "个人资料"
+      }
+    },
+    {
+      "path": "pages/index/index",
+      "style": {
+        "navigationBarTitleText": "登录",
+        "navigationStyle": "custom"
+      }
+    }
+  ],
+  "subPackages": [
+    {
+      "root": "pages/student-sub",
+      "pages": [
+        {
+          "path": "check-in/check-in",
+          "style": {
+            "navigationBarTitleText": "扫码签到"
+          }
+        },
+        {
+          "path": "my-records/my-records",
+          "style": {
+            "navigationBarTitleText": "我的记录",
+            "enablePullDownRefresh": false
+          }
+        },
+        {
+          "path": "points/points",
+          "style": {
+            "navigationBarTitleText": "积分中心",
+            "enablePullDownRefresh": false
+          }
+        },
+        {
+          "path": "certificates/certificates",
+          "style": {
+            "navigationBarTitleText": "证明管理",
+            "enablePullDownRefresh": false
+          }
+        },
+        {
+          "path": "mall/mall",
+          "style": {
+            "navigationStyle": "custom",
+            "enablePullDownRefresh": true
+          }
+        },
+        {
+          "path": "product-detail/product-detail",
+          "style": {
+            "navigationBarTitleText": "商品详情"
+          }
+        },
+        {
+          "path": "my-redemptions/my-redemptions",
+          "style": {
+            "navigationBarTitleText": "我的兑换",
+            "enablePullDownRefresh": false
+          }
+        },
+        {
+          "path": "voucher-detail/voucher-detail",
+          "style": {
+            "navigationBarTitleText": "兑换凭证"
+          }
+        }
+      ]
+    },
+    {
+      "root": "pages/teacher",
+      "pages": [
+        {
+          "path": "dashboard/dashboard",
+          "style": {
+            "navigationBarTitleText": "教师首页",
+            "enablePullDownRefresh": true
+          }
+        },
+        {
+          "path": "my-activities/my-activities",
+          "style": {
+            "navigationBarTitleText": "我的活动",
+            "enablePullDownRefresh": true
+          }
+        },
+        {
+          "path": "create-activity/create-activity",
+          "style": {
+            "navigationBarTitleText": "创建活动"
+          }
+        },
+        {
+          "path": "signup-management/signup-management",
+          "style": {
+            "navigationBarTitleText": "报名管理",
+            "enablePullDownRefresh": true
+          }
+        },
+        {
+          "path": "check-qrcode/check-qrcode",
+          "style": {
+            "navigationBarTitleText": "签到二维码"
+          }
+        },
+        {
+          "path": "review-signout/review-signout",
+          "style": {
+            "navigationBarTitleText": "签退审核",
+            "enablePullDownRefresh": true
+          }
+        },
+        {
+          "path": "certificate-approval/certificate-approval",
+          "style": {
+            "navigationBarTitleText": "证明审核",
+            "enablePullDownRefresh": true
+          }
+        },
+        {
+          "path": "profile/profile",
+          "style": {
+            "navigationBarTitleText": "个人资料"
+          }
+        }
+      ]
+    },
+    {
+      "root": "pages/admin",
+      "pages": [
+        {
+          "path": "dashboard/dashboard",
+          "style": {
+            "navigationStyle": "custom",
+            "enablePullDownRefresh": true
+          }
+        },
+        {
+          "path": "user-management/user-management",
+          "style": {
+            "navigationBarTitleText": "用户管理",
+            "enablePullDownRefresh": true
+          }
+        },
+        {
+          "path": "activity-management/activity-management",
+          "style": {
+            "navigationBarTitleText": "活动管理",
+            "enablePullDownRefresh": true
+          }
+        },
+        {
+          "path": "activity-approval/activity-approval",
+          "style": {
+            "navigationBarTitleText": "活动审核",
+            "enablePullDownRefresh": true
+          }
+        },
+        {
+          "path": "product-management/product-management",
+          "style": {
+            "navigationBarTitleText": "商品管理",
+            "enablePullDownRefresh": true
+          }
+        },
+        {
+          "path": "category-management/category-management",
+          "style": {
+            "navigationBarTitleText": "分类管理",
+            "enablePullDownRefresh": true
+          }
+        },
+        {
+          "path": "product-edit/product-edit",
+          "style": {
+            "navigationBarTitleText": "编辑商品"
+          }
+        },
+        {
+          "path": "product-detail/product-detail",
+          "style": {
+            "navigationBarTitleText": "商品详情"
+          }
+        },
+        {
+          "path": "redemption-verify/redemption-verify",
+          "style": {
+            "navigationBarTitleText": "兑换核销"
+          }
+        },
+        {
+          "path": "redemption-list/redemption-list",
+          "style": {
+            "navigationBarTitleText": "兑换记录",
+            "enablePullDownRefresh": false
+          }
+        },
+        {
+          "path": "redemption-statistics/redemption-statistics",
+          "style": {
+            "navigationBarTitleText": "兑换统计",
+            "enablePullDownRefresh": true
+          }
+        },
+        {
+          "path": "statistics/statistics",
+          "style": {
+            "navigationBarTitleText": "统计分析",
+            "enablePullDownRefresh": true
+          }
+        },
+        {
+          "path": "service-records/service-records",
+          "style": {
+            "navigationBarTitleText": "服务记录管理",
+            "enablePullDownRefresh": true
+          }
+        },
+        {
+          "path": "points-management/points-management",
+          "style": {
+            "navigationBarTitleText": "积分管理",
+            "enablePullDownRefresh": true
+          }
+        },
+        {
+          "path": "management/management",
+          "style": {
+            "navigationBarTitleText": "管理",
+            "enablePullDownRefresh": true
+          }
+        },
+        {
+          "path": "profile/profile",
+          "style": {
+            "navigationBarTitleText": "我的",
+            "enablePullDownRefresh": true
+          }
+        }
+      ]
+    },
+    {
+      "root": "pages/common",
+      "pages": [
+        {
+          "path": "onboarding/onboarding",
+          "style": {
+            "navigationBarTitleText": "欢迎",
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "activity-detail/activity-detail",
+          "style": {
+            "navigationBarTitleText": "活动详情"
+          }
+        },
+        {
+          "path": "notifications/notifications",
+          "style": {
+            "navigationBarTitleText": "通知中心",
+            "enablePullDownRefresh": false
+          }
+        },
+        {
+          "path": "forgot-password/forgot-password",
+          "style": {
+            "navigationBarTitleText": "忘记密码"
+          }
+        },
+        {
+          "path": "reset-password/reset-password",
+          "style": {
+            "navigationBarTitleText": "重置密码"
+          }
+        }
+      ]
+    },
+    {
+      "root": "pages/auth",
+      "pages": [
+        {
+          "path": "register/register",
+          "style": {
+            "navigationBarTitleText": "注册"
+          }
+        }
+      ]
+    }
+  ],
+  "globalStyle": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "CVS志愿服务",
+    "navigationBarBackgroundColor": "#FFFFFF",
+    "backgroundColor": "#F7FAFC",
+    "backgroundTextStyle": "light",
+    "enablePullDownRefresh": false
+  },
+
+  "tabBar": {
+    "custom": true,
+    "color": "#999999",
+    "selectedColor": "#0052d9",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/student-sub/dashboard/dashboard",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/student/activities/activities",
+        "text": "发现"
+      },
+      {
+        "pagePath": "pages/student/my-signups/my-signups",
+        "text": "我的报名"
+      },
+      {
+        "pagePath": "pages/student/profile/profile",
+        "text": "我的"
+      }
+    ]
+  },
+
+  "condition": {
+    "current": 0,
+    "list": []
+  }
+}

@@ -84,6 +84,10 @@
             <a v-if="canCancel(signup)" href="javascript:void(0)" class="danger" @click="cancelSignup(signup)">
               取消报名
             </a>
+            <a v-if="signup.status === 'APPROVED' && !signup.recordCreated" href="javascript:void(0)" class="primary"
+              @click="openCheckDialog">
+              签到/签退
+            </a>
             <a v-if="signup.status === 'APPROVED' && signup.recordCreated" href="javascript:void(0)" class="success"
               @click="viewRecord(signup.recordId)">
               查看记录
@@ -104,6 +108,7 @@
     <el-empty v-if="!loading && signupList.length === 0" description="暂无报名记录" />
 
     <SignupDetailDialog v-model="detailDialogVisible" :signup="selectedSignup" />
+    <CheckInOutDialog v-model="checkDialogVisible" @success="handleCheckSuccess" />
   </div>
 </template>
 
@@ -117,6 +122,7 @@ import { formatDateTime } from '@/utils/format'
 import { STATUS_LABELS, STATUS_COLORS } from '@/utils/constants'
 import { usePagination } from '@/composables/usePagination'
 import SignupDetailDialog from './components/SignupDetailDialog.vue'
+import CheckInOutDialog from './components/CheckInOutDialog.vue'
 
 const router = useRouter()
 const { loading, pagination, handleSizeChange, handleCurrentChange, updatePagination } = usePagination()
@@ -125,6 +131,7 @@ const signupList = ref([])
 const statusFilter = ref('')
 const detailDialogVisible = ref(false)
 const selectedSignup = ref(null)
+const checkDialogVisible = ref(false)
 
 const getStatusLabel = (status) => {
   return STATUS_LABELS[status] || status
@@ -220,6 +227,17 @@ const cancelSignup = async (signup) => {
       ElMessage.error(error.response?.data?.message || '取消报名失败，请稍后重试')
     }
   }
+}
+
+const openCheckDialog = () => {
+  checkDialogVisible.value = true
+}
+
+const handleCheckSuccess = (type) => {
+  // 签到或签退成功后刷新列表
+  setTimeout(() => {
+    fetchSignupList()
+  }, 1500)
 }
 
 onMounted(() => {
@@ -370,6 +388,15 @@ onMounted(() => {
 
             &:hover {
               color: #f78989;
+            }
+          }
+
+          &.primary {
+            color: #409eff;
+            font-weight: 600;
+
+            &:hover {
+              color: #66b1ff;
             }
           }
 

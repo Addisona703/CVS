@@ -1,0 +1,85 @@
+server:
+  port: 8010
+  servlet:
+    context-path: /
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/cvs_db?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&cachePrepStmts=true&useServerPrepStmts=true&prepStmtCacheSize=250&prepStmtCacheSqlLimit=2048&rewriteBatchedStatements=true
+    username: root
+    password: 123456
+    hikari:
+      # 连接池性能优化配置
+      maximum-pool-size: 25              # 最大连接数（根据通知系统并发需求调整）
+      minimum-idle: 8                    # 最小空闲连接数
+      connection-timeout: 20000          # 连接超时时间（20秒）
+      idle-timeout: 300000               # 空闲连接超时时间（5分钟）
+      max-lifetime: 1200000              # 连接最大生命周期（20分钟）
+      validation-timeout: 5000           # 连接验证超时时间
+      leak-detection-threshold: 60000    # 连接泄漏检测阈值（60秒）
+      # 性能优化参数
+      connection-init-sql: "SET SESSION sql_mode='STRICT_TRANS_TABLES,NO_ZERO_DATE,NO_ZERO_IN_DATE,ERROR_FOR_DIVISION_BY_ZERO'"
+      data-source-properties:
+        cachePrepStmts: true
+        prepStmtCacheSize: 250
+        prepStmtCacheSqlLimit: 2048
+        useServerPrepStmts: true
+        rewriteBatchedStatements: true
+        cacheResultSetMetadata: true
+        cacheServerConfiguration: true
+        elideSetAutoCommits: true
+        maintainTimeStats: false
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: 123456
+      database: 0
+      timeout: 10000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-wait: -1ms
+          max-idle: 8
+          min-idle: 0
+
+  jackson:
+    date-format: yyyy-MM-dd HH:mm
+    time-zone: GMT+8
+    serialization:
+      write-dates-as-timestamps: false
+    deserialization:
+      fail-on-unknown-properties: false
+
+  # 邮件配置
+  mail:
+    host: smtp.qq.com                     # SMTP 服务器
+    port: 587                             # 启用 STARTTLS 的标准端口
+    username: tan.050403@qq.com           # 发件邮箱
+    password: bycumkfggzxldcba            # 授权码（非邮箱密码）
+    default-encoding: UTF-8               # 邮件编码
+    properties:
+      mail:
+        smtp:
+          auth: true                      # 是否开启认证
+          starttls:
+            enable: true                  # 启用 STARTTLS
+            required: true                # 要求使用 STARTTLS
+          timeout: 5000                   # 连接超时（毫秒）
+          connectiontimeout: 5000         # 建立连接超时
+          writetimeout: 5000              # 写超时
+
+app:
+  frontend-base-url: http://localhost:3000
+  password-reset:
+    token-expiration-minutes: 5
+
+logging:
+  level:
+    com.hngy.cvs: INFO  # 改为 INFO 级别，不输出 DEBUG 日志
+    com.hngy.cvs.mapper: WARN  # Mapper 层只输出警告和错误，不输出 SQL
+    org.springframework.security: INFO  # Security 也改为 INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"

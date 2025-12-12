@@ -26,7 +26,7 @@ export const activityAPI = {
     return request.post(`/activities/${id}/publish`)
   },
 
-  // 审核活动（管理员）
+  // 审核活动（学工处）
   approveActivity: (id, approved, rejectReason) => {
     return request.post(`/activities/${id}/approve`, null, {
       params: { approved, rejectReason }

@@ -123,8 +123,9 @@ public class ActivityServiceImpl implements ActivityService {
         Activity activity = activityMapper.selectById(id);
         AssertUtils.notNull(activity, ResultCode.ACTIVITY_NOT_FOUND);
         
-        // 根据时间自动更新活动状态
-        updateActivityStatusByTime(activity);
+        // 注释掉查询时的自动状态更新，完全依赖定时任务来更新状态
+        // 这样可以避免时间精度问题导致的提前更新
+        // updateActivityStatusByTime(activity);
         
         ActivityVO activityVO = BeanUtil.to(activity, ActivityVO.class);
         // 为单个活动也补充组织者名字
@@ -134,7 +135,9 @@ public class ActivityServiceImpl implements ActivityService {
     
     /**
      * 根据当前时间自动更新活动状态
+     * @deprecated 已废弃，改为完全依赖定时任务更新状态，避免时间精度问题
      */
+    @Deprecated
     private void updateActivityStatusByTime(Activity activity) {
         LocalDateTime now = LocalDateTime.now();
         ActivityStatus currentStatus = activity.getStatus();
@@ -258,18 +261,18 @@ public class ActivityServiceImpl implements ActivityService {
         // AssertUtils.isFalse(activity.getStartTime().isBefore(LocalDateTime.now()),
         //                    ResultCode.ACTIVITY_START_TIME_INVALID);
 
-        // 获取当前用户信息，判断是否为管理员
+        // 获取当前用户信息，判断是否为学工处
         com.hngy.cvs.entity.User currentUser = userMapper.selectById(currentUserId);
         boolean isAdmin = currentUser != null && currentUser.getRole() == com.hngy.cvs.entity.enums.UserRole.ADMIN;
 
         if (isAdmin) {
-            // 管理员创建的活动直接发布，不需要审核
+            // 学工处创建的活动直接发布，不需要审核
             activity.setStatus(ActivityStatus.PUBLISHED);
-            activity.setApproverId(currentUserId); // 管理员自己审核
+            activity.setApproverId(currentUserId); // 学工处自己审核
             activity.setApprovedAt(LocalDateTime.now());
             activity.setRejectReason(null);
             activityMapper.updateById(activity);
-            log.info("管理员直接发布活动: {}, 活动ID: {}", currentUserId, id);
+            log.info("学工处直接发布活动: {}, 活动ID: {}", currentUserId, id);
         } else {
             // 教师创建的活动需要提交审核
             activity.setStatus(ActivityStatus.PENDING_APPROVAL);
@@ -277,7 +280,7 @@ public class ActivityServiceImpl implements ActivityService {
             activityMapper.updateById(activity);
             log.info("教师提交活动审核: {}, 活动ID: {}", currentUserId, id);
 
-            // 发送通知给管理员
+            // 发送通知给学工处
             notificationService.sendActivityApprovalNotification(id);
         }
     }
@@ -371,11 +374,11 @@ public class ActivityServiceImpl implements ActivityService {
         List<Long> activityIds = activityVOs.stream().map(ActivityVO::getId).toList();
 
         // 组织者ID -> 姓名
-        Map<Long, String> organizerNameMap = userMapper.selectList(
+        Map<Long, User> organizerMap = userMapper.selectList(
                 new LambdaQueryWrapper<User>()
                         .in(User::getId, activityVOs.stream().map(ActivityVO::getOrganizerId).toList())
-                        .select(User::getId, User::getName)
-        ).stream().collect(Collectors.toMap(User::getId, User::getName));
+                        .select(User::getId, User::getName, User::getUsername)
+        ).stream().collect(Collectors.toMap(User::getId, u -> u));
 
         // 查询所有相关的报名记录
         List<Signup> signups = signupMapper.selectList(
@@ -400,7 +403,12 @@ public class ActivityServiceImpl implements ActivityService {
 
         // 填充 VO
         activityVOs.forEach(vo -> {
-            String organizerName = organizerNameMap.getOrDefault(vo.getOrganizerId(), "未知");
+            User organizer = organizerMap.get(vo.getOrganizerId());
+            String organizerName = organizer != null
+                    ? (organizer.getName() != null && !organizer.getName().isBlank()
+                        ? organizer.getName()
+                        : organizer.getUsername())
+                    : "未知";
             vo.setOrganizerName(organizerName);
             vo.setCurrentParticipants(signupCountMap.getOrDefault(vo.getId(), 0L).intValue());
             vo.setCheckinCount(checkinCountMap.getOrDefault(vo.getId(), 0L).intValue());

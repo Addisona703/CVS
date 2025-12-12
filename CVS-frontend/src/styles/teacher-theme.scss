@@ -1,0 +1,250 @@
+// 教师端绿色主题样式覆盖
+// 在教师布局中引入此文件，统一覆盖主题色
+
+// 主色调定义
+$teacher-primary: #67c23a;
+$teacher-primary-light: #85ce61;
+$teacher-primary-lighter: #95d475;
+$teacher-primary-dark: #5daf34;
+$teacher-hover-bg: #e8f9f0;
+
+// Element Plus 按钮覆盖
+.teacher-layout {
+  // CSS 变量定义（用于共用组件）
+  --primary-color: #{$teacher-primary};
+  --primary-color-light: #{$teacher-primary-light};
+  --primary-color-dark: #{$teacher-primary-dark};
+  --primary-color-light-bg: #{$teacher-hover-bg};
+  --primary-border: rgba(103, 194, 58, 0.08);
+  --info-bg-gradient: linear-gradient(180deg, #f0fdf4 0%, #ffffff 100%);
+  // Primary 按钮
+  :deep(.el-button--primary) {
+    background-color: $teacher-primary;
+    border-color: $teacher-primary;
+
+    &:hover,
+    &:focus {
+      background-color: $teacher-primary-light;
+      border-color: $teacher-primary-light;
+    }
+
+    &:active {
+      background-color: $teacher-primary-dark;
+      border-color: $teacher-primary-dark;
+    }
+
+    &.is-disabled {
+      background-color: #a0cfff;
+      border-color: #a0cfff;
+    }
+  }
+
+  // Plain 按钮
+  :deep(.el-button--primary.is-plain) {
+    color: $teacher-primary;
+    background-color: #e8f9f0;
+    border-color: #b3e19d;
+
+    &:hover,
+    &:focus {
+      color: #ffffff;
+      background-color: $teacher-primary;
+      border-color: $teacher-primary;
+    }
+  }
+
+  // Text 按钮
+  :deep(.el-button--primary.is-text) {
+    color: $teacher-primary;
+
+    &:hover,
+    &:focus {
+      color: $teacher-primary-light;
+      background-color: transparent;
+    }
+  }
+
+  // 通用 text 按钮悬停修复
+  :deep(.el-button.is-text) {
+    &:hover,
+    &:focus {
+      background-color: transparent !important;
+    }
+  }
+
+  // Link 按钮
+  :deep(.el-button--primary.is-link) {
+    color: $teacher-primary;
+
+    &:hover,
+    &:focus {
+      color: $teacher-primary-light;
+    }
+  }
+
+  // 链接颜色
+  :deep(a) {
+    color: $teacher-primary;
+
+    &:hover {
+      color: $teacher-primary-light;
+    }
+  }
+
+  // 评分组件
+  :deep(.el-rate) {
+    .el-rate__icon {
+      color: #c0c4cc;
+
+      &.is-active {
+        color: $teacher-primary;
+      }
+    }
+  }
+
+  // 标签
+  :deep(.el-tag--success) {
+    background-color: #e8f9f0;
+    border-color: #b3e19d;
+    color: $teacher-primary-dark;
+  }
+
+  // 进度条
+  :deep(.el-progress__text) {
+    color: $teacher-primary;
+  }
+
+  :deep(.el-progress-bar__inner) {
+    background-color: $teacher-primary;
+  }
+
+  // 开关
+  :deep(.el-switch.is-checked .el-switch__core) {
+    background-color: $teacher-primary;
+    border-color: $teacher-primary;
+  }
+
+  // 复选框
+  :deep(.el-checkbox__input.is-checked .el-checkbox__inner) {
+    background-color: $teacher-primary;
+    border-color: $teacher-primary;
+  }
+
+  // 单选框
+  :deep(.el-radio__input.is-checked .el-radio__inner) {
+    background-color: $teacher-primary;
+    border-color: $teacher-primary;
+  }
+
+  // 输入框焦点
+  :deep(.el-input__wrapper.is-focus) {
+    box-shadow: 0 0 0 1px $teacher-primary inset;
+  }
+
+  :deep(.el-textarea__inner:focus) {
+    border-color: $teacher-primary;
+  }
+
+  // 选择器
+  :deep(.el-select .el-input.is-focus .el-input__wrapper) {
+    box-shadow: 0 0 0 1px $teacher-primary inset;
+  }
+
+  // 日期选择器
+  :deep(.el-date-editor.is-active) {
+    box-shadow: 0 0 0 1px $teacher-primary inset;
+  }
+
+  // 分页
+  :deep(.el-pagination) {
+    .el-pager li.is-active {
+      background-color: $teacher-primary;
+      color: #ffffff;
+    }
+
+    .btn-next,
+    .btn-prev {
+      &:hover {
+        color: $teacher-primary;
+      }
+    }
+  }
+
+  // 表格
+  :deep(.el-table) {
+    .el-table__header th {
+      background-color: #f5f7fa;
+    }
+
+    .el-table__row:hover > td {
+      background-color: $teacher-hover-bg !important;
+    }
+  }
+
+  // 对话框
+  :deep(.el-dialog__header) {
+    border-bottom: 2px solid $teacher-hover-bg;
+  }
+
+  // 卡片悬停效果
+  :deep(.el-card) {
+    &:hover {
+      box-shadow: 0 4px 12px rgba(103, 194, 58, 0.15);
+    }
+  }
+
+  // 统计卡片
+  .stat-card {
+    &.signups {
+      background: linear-gradient(135deg, $teacher-primary 0%, $teacher-primary-light 100%) !important;
+    }
+  }
+
+  // TDesign 按钮
+  :deep(.t-button--theme-primary),
+  :deep(.t-button.t-button--theme-primary) {
+    background-color: $teacher-primary !important;
+    border-color: $teacher-primary !important;
+    color: #ffffff !important;
+
+    &:hover {
+      background-color: $teacher-primary-light !important;
+      border-color: $teacher-primary-light !important;
+    }
+
+    &:active {
+      background-color: $teacher-primary-dark !important;
+      border-color: $teacher-primary-dark !important;
+    }
+  }
+
+  // 图标颜色
+  .logo-icon,
+  .title-icon {
+    :deep(svg) {
+      color: $teacher-primary !important;
+    }
+  }
+
+  // 面包屑样式
+  :deep(.el-breadcrumb) {
+    .el-breadcrumb__item {
+      .el-breadcrumb__inner {
+        &:hover {
+          color: $teacher-primary !important;
+        }
+      }
+
+      &:last-child {
+        .el-breadcrumb__inner {
+          color: $teacher-primary !important;
+        }
+      }
+    }
+  }
+
+  // 菜单激活状态（已在 TeacherLayout 中定义，这里作为备份）
+  :deep(.t-menu__item.t-is-active) {
+    background-color: $teacher-primary;
+  }
+}

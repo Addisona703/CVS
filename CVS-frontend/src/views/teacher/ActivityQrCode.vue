@@ -100,7 +100,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { ArrowLeft, DocumentCopy, Refresh } from '@element-plus/icons-vue'
 import { activityAPI } from '@/api'
@@ -108,6 +108,7 @@ import { checkAPI } from '@/api/check'
 import QrDisplay from '@/components/QrDisplay.vue'
 
 const route = useRoute()
+const router = useRouter()
 
 const activityId = computed(() => route.params.id)
 const isCheckout = computed(() => route.query.type === 'checkout')
@@ -130,10 +131,40 @@ const fetchActivity = async () => {
     const response = await activityAPI.getActivityById(activityId.value)
     if (response.code === 200) {
       activity.value = response.data
+      
+      // 检查活动是否已结束
+      checkActivityStatus()
     }
   } catch (error) {
     console.error('获取活动详情失败:', error)
     ElMessage.error('获取活动信息失败')
+  }
+}
+
+// 检查活动状态，如果已结束则跳转回详情页
+const checkActivityStatus = () => {
+  if (!activity.value) return
+  
+  // 检查活动状态是否为已完成或已取消
+  const isActivityEnded = activity.value.status === 'COMPLETED' || activity.value.status === 'CANCELLED'
+  
+  // 或者检查时间是否已过期
+  const now = Date.now()
+  const endTime = new Date(activity.value.endTime).getTime()
+  const isTimeExpired = now > endTime
+  
+  // 如果活动已结束或时间已过期，提示并跳转回活动详情页
+  if (isActivityEnded || isTimeExpired) {
+    ElMessage.warning('活动已结束，无法继续生成二维码')
+    
+    // 延迟跳转，让用户看到提示
+    setTimeout(() => {
+      router.push({
+        name: 'ActivityDetail',
+        params: { id: activityId.value },
+        query: { tab: 'checkin' }
+      })
+    }, 1500)
   }
 }
 
@@ -162,6 +193,20 @@ const fetchPendingStudents = async () => {
 // 生成二维码
 const generateToken = async () => {
   if (!activityId.value) return
+  
+  // 在生成前检查活动是否已结束
+  if (activity.value) {
+    const isActivityEnded = activity.value.status === 'COMPLETED' || activity.value.status === 'CANCELLED'
+    const now = Date.now()
+    const endTime = new Date(activity.value.endTime).getTime()
+    const isTimeExpired = now > endTime
+    
+    if (isActivityEnded || isTimeExpired) {
+      ElMessage.warning('活动已结束，无法生成二维码')
+      return
+    }
+  }
+  
   loading.value = true
   try {
     const response = isCheckout.value
@@ -212,6 +257,19 @@ const setupAutoRefresh = () => {
   // 在二维码过期前30秒自动刷新
   const refreshTime = (EXPIRY_MINUTES * 60 - 30) * 1000
   refreshTimer = setTimeout(() => {
+    // 刷新前再次检查活动是否已结束
+    if (activity.value) {
+      const isActivityEnded = activity.value.status === 'COMPLETED' || activity.value.status === 'CANCELLED'
+      const now = Date.now()
+      const endTime = new Date(activity.value.endTime).getTime()
+      const isTimeExpired = now > endTime
+      
+      if (isActivityEnded || isTimeExpired) {
+        ElMessage.warning('活动已结束，停止自动刷新二维码')
+        return
+      }
+    }
+    
     generateToken()
   }, refreshTime)
 }
@@ -237,7 +295,7 @@ onMounted(() => {
   generateToken()
   fetchPendingStudents()
 
-  // 定期同步未签到/未签退名单
+  // 定期同步未签到/未签退名单，并检查活动状态
   refreshInterval = setInterval(() => {
     fetchActivity()
     fetchPendingStudents()

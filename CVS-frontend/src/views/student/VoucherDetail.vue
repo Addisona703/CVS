@@ -40,9 +40,9 @@
           
           <div class="qr-container">
             <QrDisplay 
-              :value="redemption.voucherCode"
+              :value="String(redemption.voucherCode || redemption.id)"
               :size="200"
-              :caption="`凭证编号：${redemption.voucherCode}`" />
+              :caption="`凭证编号：${redemption.voucherCode || redemption.id}`" />
             
             <div class="qr-instructions">
               <el-alert
@@ -69,7 +69,7 @@
           <div class="product-info">
             <div class="product-image-container">
               <img 
-                :src="redemption.productImageUrl || '/default-product.svg'" 
+                :src="getProductImageUrl(redemption.productImageUrl)" 
                 :alt="redemption.productName"
                 class="product-image"
                 @error="handleImageError" />
@@ -287,6 +287,9 @@ const loadRedemptionDetail = async () => {
     const response = await mallAPI.getRedemptionDetail(redemptionId)
     if (response.code === 200) {
       redemption.value = response.data
+      console.log('网页端兑换详情数据:', redemption.value)
+      console.log('网页端二维码内容(voucherCode):', redemption.value.voucherCode)
+      console.log('网页端二维码内容类型:', typeof redemption.value.voucherCode)
     } else {
       ElMessage.error(response.message || '获取兑换详情失败')
     }
@@ -357,6 +360,24 @@ const goBack = () => {
 
 const goToMall = () => {
   router.push('/student/mall')
+}
+
+// 拼接完整图片URL
+const getProductImageUrl = (url) => {
+  if (!url) return '/default-product.svg'
+  
+  // 如果已经是完整URL，直接返回
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url
+  }
+  
+  // 如果是相对路径，拼接基础URL
+  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'
+  const baseUrl = apiBaseUrl.replace('/api', '')
+  
+  // 确保路径以 / 开头
+  const path = url.startsWith('/') ? url : `/${url}`
+  return `${baseUrl}${path}`
 }
 
 const handleImageError = (event) => {

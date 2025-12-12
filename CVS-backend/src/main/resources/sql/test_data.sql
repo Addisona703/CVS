@@ -16,8 +16,8 @@ SET FOREIGN_KEY_CHECKS = 1;
 
 -- 插入用户数据
 INSERT INTO `user_twb` (`id`, `username`, `password`, `name`, `role`, `email`, `phone`, `created_at`, `updated_at`, `deleted`) VALUES
--- 管理员
-(1, 'admin', '$2a$10$bJ/7XR8wTltapmgnPjmE2.0./qnxziHQynJC2iv/3T88IUEFVL1pC', '系统管理员', 'ADMIN', 'admin@university.edu.cn', '13800138000', NOW(), NOW(), 0),
+-- 学工处
+(1, 'admin', '$2a$10$bJ/7XR8wTltapmgnPjmE2.0./qnxziHQynJC2iv/3T88IUEFVL1pC', '学工处管理员', 'ADMIN', 'admin@university.edu.cn', '13800138000', NOW(), NOW(), 0),
 
 -- 教师
 (2, 'teacher001', '$2a$10$bJ/7XR8wTltapmgnPjmE2.0./qnxziHQynJC2iv/3T88IUEFVL1pC', '张老师', 'TEACHER', 'teacher001@university.edu.cn', '13800138001', NOW(), NOW(), 0),
@@ -60,31 +60,54 @@ INSERT INTO `activity_twb` (`id`, `title`, `description`, `location`, `start_tim
 
 -- 插入活动报名数据
 INSERT INTO `signup_twb` (`id`, `activity_id`, `user_id`, `status`, `reason`, `reject_reason`, `signed_in`, `signed_out`, `sign_in_time`, `sign_out_time`, `created_at`, `updated_at`) VALUES
-(1, 1, 4, 'APPROVED', '我对环保很感兴趣，希望能为环境保护贡献自己的力量', NULL, 1, 1, '2024-03-01 08:50:00', '2024-03-01 17:10:00', NOW(), NOW()),
-(2, 1, 5, 'APPROVED', '想通过志愿活动提高自己的环保意识', NULL, 1, 0, '2024-03-01 08:55:00', NULL, NOW(), NOW()),
-(3, 1, 6, 'REJECTED', '希望参与环保活动，学习环保知识', '超时未审核', 0, 0, NULL, NULL, NOW(), NOW()),
-(4, 2, 4, 'APPROVED', '我很喜欢和老人聊天，希望能给他们带来快乐', NULL, 0, 0, NULL, NULL, NOW(), NOW()),
-(5, 2, 7, 'APPROVED', '想要关爱老人，传递温暖', NULL, 1, 1, '2024-03-05 13:50:00', '2024-03-05 18:05:00', NOW(), NOW()),
-(6, 3, 5, 'APPROVED', '我经常去图书馆，熟悉图书分类', NULL, 0, 0, NULL, NULL, NOW(), NOW()),
-(7, 3, 8, 'REJECTED', '想要帮助图书馆整理书籍', '时间冲突，无法参加', 0, 0, NULL, NULL, NOW(), NOW()),
-(8, 5, 6, 'REJECTED', '希望参与交通安全宣传，提高大家的安全意识', '超时未审核', 0, 0, NULL, NULL, NOW(), NOW());
+-- 已完成的报名（有签到签退）
+(1, 1, 4, 'APPROVED', '我对环保很感兴趣，希望能为环境保护贡献自己的力量', NULL, 1, 1, DATE_SUB(NOW(), INTERVAL 6 DAY) + INTERVAL 8 HOUR, DATE_SUB(NOW(), INTERVAL 6 DAY) + INTERVAL 16 HOUR, DATE_SUB(NOW(), INTERVAL 7 DAY), DATE_SUB(NOW(), INTERVAL 6 DAY)),
+(2, 2, 7, 'APPROVED', '想要关爱老人，传递温暖', NULL, 1, 1, DATE_SUB(NOW(), INTERVAL 5 DAY) + INTERVAL 13 HOUR, DATE_SUB(NOW(), INTERVAL 5 DAY) + INTERVAL 17 HOUR, DATE_SUB(NOW(), INTERVAL 6 DAY), DATE_SUB(NOW(), INTERVAL 5 DAY)),
+(3, 5, 4, 'APPROVED', '希望参与校园清洁，美化校园环境', NULL, 1, 1, DATE_SUB(NOW(), INTERVAL 2 DAY) + INTERVAL 8 HOUR, DATE_SUB(NOW(), INTERVAL 2 DAY) + INTERVAL 13 HOUR, DATE_SUB(NOW(), INTERVAL 3 DAY), DATE_SUB(NOW(), INTERVAL 2 DAY)),
+(4, 8, 5, 'APPROVED', '想参与植树活动，为环保做贡献', NULL, 1, 1, DATE_SUB(NOW(), INTERVAL 15 DAY) + INTERVAL 8 HOUR, DATE_SUB(NOW(), INTERVAL 15 DAY) + INTERVAL 14 HOUR, DATE_SUB(NOW(), INTERVAL 16 DAY), DATE_SUB(NOW(), INTERVAL 15 DAY)),
 
--- 插入服务记录数据
+-- 已签到但未签退的报名
+(5, 1, 5, 'APPROVED', '想通过志愿活动提高自己的环保意识', NULL, 1, 0, DATE_SUB(NOW(), INTERVAL 6 DAY) + INTERVAL 8 HOUR, NULL, DATE_SUB(NOW(), INTERVAL 7 DAY), DATE_SUB(NOW(), INTERVAL 6 DAY)),
+
+-- 已通过但未签到的报名
+(6, 6, 6, 'APPROVED', '我喜欢和小朋友相处，希望能给他们带来快乐', NULL, 0, 0, NULL, NULL, DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_SUB(NOW(), INTERVAL 2 DAY)),
+(7, 7, 8, 'APPROVED', '想参与社区义诊，学习医疗知识', NULL, 0, 0, NULL, NULL, DATE_SUB(NOW(), INTERVAL 1 DAY), DATE_SUB(NOW(), INTERVAL 1 DAY)),
+
+-- 待审核的报名
+(8, 6, 4, 'PENDING', '我很喜欢和小朋友相处，希望能陪伴他们', NULL, 0, 0, NULL, NULL, DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_SUB(NOW(), INTERVAL 2 DAY)),
+(9, 7, 5, 'PENDING', '想参与社区义诊活动', NULL, 0, 0, NULL, NULL, DATE_SUB(NOW(), INTERVAL 1 DAY), DATE_SUB(NOW(), INTERVAL 1 DAY)),
+
+-- 被拒绝的报名
+(10, 3, 6, 'REJECTED', '希望参与图书馆志愿服务', '名额已满', 0, 0, NULL, NULL, DATE_SUB(NOW(), INTERVAL 5 DAY), DATE_SUB(NOW(), INTERVAL 4 DAY)),
+(11, 4, 8, 'REJECTED', '想参与交通安全宣传', '活动已取消', 0, 0, NULL, NULL, DATE_SUB(NOW(), INTERVAL 4 DAY), DATE_SUB(NOW(), INTERVAL 3 DAY));
+
+-- 插入服务记录数据（只有完成签到签退的才有服务记录）
 INSERT INTO `record_twb` (`id`, `user_id`, `activity_id`, `duration_minutes`, `description`, `evaluation`, `rating`, `points_earned`, `created_at`, `updated_at`) VALUES
-(1, 4, 1, 480, '参与了整天的环保活动，清理了大量垃圾，向市民宣传环保知识', '表现积极，工作认真负责，是优秀的志愿者', 5, 10, NOW(), NOW()),
-(2, 7, 2, 240, '在敬老院陪伴老人，为老人表演了节目，帮助打扫卫生', '与老人相处融洽，服务态度很好', 4, 8, NOW(), NOW());
+(1, 4, 1, 480, '参与了整天的环保活动，清理了大量垃圾，向市民宣传环保知识', '表现积极，工作认真负责，是优秀的志愿者', 5, 10, DATE_SUB(NOW(), INTERVAL 6 DAY), DATE_SUB(NOW(), INTERVAL 6 DAY)),
+(2, 7, 2, 240, '在敬老院陪伴老人，为老人表演了节目，帮助打扫卫生', '与老人相处融洽，服务态度很好', 4, 8, DATE_SUB(NOW(), INTERVAL 5 DAY), DATE_SUB(NOW(), INTERVAL 5 DAY)),
+(3, 4, 5, 300, '参与校园清洁日活动，清理校园垃圾，维护校园环境', '工作积极主动，不怕脏不怕累', 5, 5, DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_SUB(NOW(), INTERVAL 2 DAY)),
+(4, 5, 8, 360, '参与植树节活动，种植树苗，为绿化环境做贡献', '认真负责，体力劳动表现出色', 5, 12, DATE_SUB(NOW(), INTERVAL 15 DAY), DATE_SUB(NOW(), INTERVAL 15 DAY));
 
+-- 插入积分数据（总积分 = 服务记录积分 + 额外奖励/扣除 - 兑换消耗）
 INSERT INTO `points_twb` (`id`, `user_id`, `points`) VALUES
-(1, 4, 15),  -- 王小明：当前总积分15（含服务积分10与额外奖励5）
-(2, 5, 0),   -- 李小红：暂未获得积分
-(3, 6, 0),   -- 张小华：暂未获得积分
-(4, 7, 8),   -- 刘小强：服务记录累计8分
-(5, 8, 0);   -- 陈小美：暂未获得积分
+(1, 4, 185),  -- 王小明：服务积分15(10+5) + 额外奖励200 - 兑换消耗30(50-20退回) = 185
+(2, 5, 12),   -- 李小红：服务积分12
+(3, 6, 50),   -- 张小华：额外奖励50（用于测试兑换）
+(4, 7, 8),    -- 刘小强：服务积分8
+(5, 8, 100);  -- 陈小美：额外奖励100（用于测试兑换）
 
 -- 插入志愿证明数据
 INSERT INTO `cert_twb` (`id`, `user_id`, `purpose`, `start_date`, `end_date`, `status`, `reject_reason`, `approver_id`, `approved_at`, `certificate_number`, `created_at`, `updated_at`) VALUES
-(1, 4, '申请奖学金需要', '2024-01-01', '2024-03-01', 'APPROVED', NULL, 1, NOW(), 'CVS202400001', NOW(), NOW()),
-(2, 7, '求职简历使用', '2024-02-01', '2024-03-05', 'PENDING', NULL, NULL, NULL, NULL, NOW(), NOW());
+-- 已批准的证明
+(1, 4, '申请奖学金需要', DATE_SUB(NOW(), INTERVAL 90 DAY), DATE_SUB(NOW(), INTERVAL 6 DAY), 'APPROVED', NULL, 1, DATE_SUB(NOW(), INTERVAL 5 DAY), 'CVS202400001', DATE_SUB(NOW(), INTERVAL 10 DAY), DATE_SUB(NOW(), INTERVAL 5 DAY)),
+(2, 5, '保研材料使用', DATE_SUB(NOW(), INTERVAL 60 DAY), DATE_SUB(NOW(), INTERVAL 15 DAY), 'APPROVED', NULL, 1, DATE_SUB(NOW(), INTERVAL 14 DAY), 'CVS202400002', DATE_SUB(NOW(), INTERVAL 20 DAY), DATE_SUB(NOW(), INTERVAL 14 DAY)),
+
+-- 待审核的证明
+(3, 7, '求职简历使用', DATE_SUB(NOW(), INTERVAL 30 DAY), DATE_SUB(NOW(), INTERVAL 5 DAY), 'PENDING', NULL, NULL, NULL, NULL, DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_SUB(NOW(), INTERVAL 2 DAY)),
+(4, 4, '实习证明材料', DATE_SUB(NOW(), INTERVAL 20 DAY), NOW(), 'PENDING', NULL, NULL, NULL, NULL, DATE_SUB(NOW(), INTERVAL 1 DAY), DATE_SUB(NOW(), INTERVAL 1 DAY)),
+
+-- 被拒绝的证明
+(5, 6, '申请奖学金', DATE_SUB(NOW(), INTERVAL 30 DAY), NOW(), 'REJECTED', '服务时长不足，需要至少20小时志愿服务时长', 1, DATE_SUB(NOW(), INTERVAL 3 DAY), NULL, DATE_SUB(NOW(), INTERVAL 5 DAY), DATE_SUB(NOW(), INTERVAL 3 DAY));
 
 -- 插入通知数据
 INSERT INTO `notification_twb` (`id`, `user_id`, `type`, `title`, `content`, `link_url`, `is_read`, `created_time`, `read_time`) VALUES
@@ -137,7 +160,7 @@ INSERT INTO `product_twb` (`id`, `name`, `description`, `points_required`, `stoc
 -- 图书音像
 (13, '畅销书籍', '当季热门畅销书籍（随机发放）', 300, 40, '/images/products/bestseller-book.jpg', 4, 1, 10, NOW(), NOW(), 0),
 (14, '专业书籍', '各专业经典教材和参考书', 400, 30, '/images/products/textbook.jpg', 4, 1, 10, NOW(), NOW(), 0),
-(15, '英语学习资料', '英语四六级、雅思托福学习资料', 200, 50, '/images/products/english-material.jpg', 4, 1, 10, NOW(), NOW(), 0),
+(15, '英语学习资料', '新概念英语（全4册）', 200, 50, '/images/products/english-material.jpg', 4, 1, 10, NOW(), NOW(), 0),
 
 -- 优惠券
 (16, '校园书店20元代金券', '可在校园书店使用，满50元可用', 150, 100, '/images/products/bookstore-coupon.jpg', 5, 1, 20, NOW(), NOW(), 0),
@@ -155,15 +178,19 @@ INSERT INTO `product_twb` (`id`, `name`, `description`, `points_required`, `stoc
 
 -- 插入兑换记录数据
 INSERT INTO `redemption_twb` (`id`, `user_id`, `product_id`, `points_spent`, `voucher_code`, `status`, `verified_by`, `verified_at`, `created_at`, `updated_at`) VALUES
--- 已领取的兑换记录
-(1, 4, 1, 50, 'VOUCHER20240001', 1, 2, NOW() - INTERVAL 2 DAY, NOW() - INTERVAL 5 DAY, NOW() - INTERVAL 2 DAY),
-(2, 4, 17, 80, 'VOUCHER20240002', 1, 2, NOW() - INTERVAL 1 DAY, NOW() - INTERVAL 3 DAY, NOW() - INTERVAL 1 DAY),
-(3, 7, 5, 200, 'VOUCHER20240003', 1, 3, NOW() - INTERVAL 3 DAY, NOW() - INTERVAL 7 DAY, NOW() - INTERVAL 3 DAY),
+-- 已核销的兑换记录（今日核销 - 用于测试今日核销统计）
+(1, 4, 17, 80, 'MALL20240001', 1, 1, NOW() - INTERVAL 2 HOUR, NOW() - INTERVAL 1 DAY, NOW() - INTERVAL 2 HOUR),
+(2, 5, 2, 80, 'MALL20240002', 1, 1, NOW() - INTERVAL 1 HOUR, NOW() - INTERVAL 2 HOUR, NOW() - INTERVAL 1 HOUR),
 
--- 待领取的兑换记录
-(4, 4, 16, 150, 'VOUCHER20240004', 0, NULL, NULL, NOW() - INTERVAL 1 DAY, NOW() - INTERVAL 1 DAY),
-(5, 5, 2, 80, 'VOUCHER20240005', 0, NULL, NULL, NOW() - INTERVAL 2 HOUR, NOW() - INTERVAL 2 HOUR),
-(6, 7, 18, 100, 'VOUCHER20240006', 0, NULL, NULL, NOW() - INTERVAL 5 HOUR, NOW() - INTERVAL 5 HOUR),
+-- 已核销的兑换记录（历史核销 - 用于测试累计核销统计）
+(3, 4, 1, 50, 'MALL20240003', 1, 1, DATE_SUB(NOW(), INTERVAL 5 DAY), DATE_SUB(NOW(), INTERVAL 7 DAY), DATE_SUB(NOW(), INTERVAL 5 DAY)),
+(4, 7, 18, 100, 'MALL20240004', 1, 1, DATE_SUB(NOW(), INTERVAL 3 DAY), DATE_SUB(NOW(), INTERVAL 5 DAY), DATE_SUB(NOW(), INTERVAL 3 DAY)),
+(5, 6, 7, 100, 'MALL20240005', 1, 1, DATE_SUB(NOW(), INTERVAL 10 DAY), DATE_SUB(NOW(), INTERVAL 12 DAY), DATE_SUB(NOW(), INTERVAL 10 DAY)),
 
--- 已取消的兑换记录
-(7, 6, 10, 500, 'VOUCHER20240007', 2, NULL, NULL, NOW() - INTERVAL 10 DAY, NOW() - INTERVAL 8 DAY);
+-- 待核销的兑换记录（用于测试待核销统计和核销功能）
+(6, 4, 16, 150, 'MALL20240006', 0, NULL, NULL, NOW() - INTERVAL 3 HOUR, NOW() - INTERVAL 3 HOUR),
+(7, 8, 5, 200, 'MALL20240007', 0, NULL, NULL, NOW() - INTERVAL 5 HOUR, NOW() - INTERVAL 5 HOUR),
+(8, 6, 18, 100, 'MALL20240008', 0, NULL, NULL, NOW() - INTERVAL 1 DAY, NOW() - INTERVAL 1 DAY),
+
+-- 已取消的兑换记录（积分已退回）
+(9, 4, 10, 500, 'MALL20240009', 2, NULL, NULL, DATE_SUB(NOW(), INTERVAL 20 DAY), DATE_SUB(NOW(), INTERVAL 18 DAY));

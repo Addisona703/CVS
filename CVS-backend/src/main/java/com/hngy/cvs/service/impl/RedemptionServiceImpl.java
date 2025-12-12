@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hngy.cvs.common.util.AssertUtils;
 import com.hngy.cvs.common.util.PageUtil;
+import com.hngy.cvs.dto.request.PageDTO;
 import com.hngy.cvs.dto.request.RedemptionQueryRequest;
 import com.hngy.cvs.dto.request.RedemptionRequest;
 import com.hngy.cvs.dto.response.PageVO;
@@ -27,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -110,11 +112,16 @@ public class RedemptionServiceImpl extends ServiceImpl<RedemptionMapper, Redempt
     }
 
     @Override
-    public PageVO<RedemptionVO> getUserRedemptions(Long userId, RedemptionQueryRequest queryRequest) {
+    public PageVO<RedemptionVO> getUserRedemptions(Long userId, PageDTO<RedemptionQueryRequest> queryRequest) {
         // 参数校验
         AssertUtils.notNull(userId, "用户ID不能为空");
         if (queryRequest == null) {
-            queryRequest = new RedemptionQueryRequest();
+            queryRequest = new PageDTO<>();
+        }
+        
+        RedemptionQueryRequest params = queryRequest.getParams();
+        if (params == null) {
+            params = new RedemptionQueryRequest();
         }
 
         log.debug("获取用户 {} 的兑换记录", userId);
@@ -124,16 +131,16 @@ public class RedemptionServiceImpl extends ServiceImpl<RedemptionMapper, Redempt
         wrapper.eq(Redemption::getUserId, userId);
 
         // 状态筛选
-        if (queryRequest.getStatus() != null) {
-            wrapper.eq(Redemption::getStatus, queryRequest.getStatus());
+        if (params.getStatus() != null) {
+            wrapper.eq(Redemption::getStatus, params.getStatus());
         }
 
         // 时间范围筛选
-        if (queryRequest.getStartTime() != null) {
-            wrapper.ge(Redemption::getCreatedAt, queryRequest.getStartTime());
+        if (params.getStartTime() != null) {
+            wrapper.ge(Redemption::getCreatedAt, params.getStartTime());
         }
-        if (queryRequest.getEndTime() != null) {
-            wrapper.le(Redemption::getCreatedAt, queryRequest.getEndTime());
+        if (params.getEndTime() != null) {
+            wrapper.le(Redemption::getCreatedAt, params.getEndTime());
         }
 
         // 分页查询
@@ -163,7 +170,7 @@ public class RedemptionServiceImpl extends ServiceImpl<RedemptionMapper, Redempt
         Redemption redemption = this.getById(id);
         AssertUtils.notNull(redemption, "兑换记录不存在");
 
-        // 权限检查（只能查看自己的兑换记录，或者管理员可以查看所有）
+        // 权限检查（只能查看自己的兑换记录，或者学工处可以查看所有）
         User currentUser = userMapper.selectById(userId);
         AssertUtils.notNull(currentUser, "用户不存在");
         
@@ -250,44 +257,49 @@ public class RedemptionServiceImpl extends ServiceImpl<RedemptionMapper, Redempt
     }
 
     @Override
-    public PageVO<RedemptionVO> getAllRedemptions(RedemptionQueryRequest queryRequest) {
+    public PageVO<RedemptionVO> getAllRedemptions(PageDTO<RedemptionQueryRequest> queryRequest) {
         if (queryRequest == null) {
-            queryRequest = new RedemptionQueryRequest();
+            queryRequest = new PageDTO<>();
+        }
+        
+        RedemptionQueryRequest params = queryRequest.getParams();
+        if (params == null) {
+            params = new RedemptionQueryRequest();
         }
 
-        log.debug("获取所有兑换记录，查询条件: {}", queryRequest);
+        log.debug("获取所有兑换记录，查询条件: {}", params);
 
         // 构建查询条件
         LambdaQueryWrapper<Redemption> wrapper = new LambdaQueryWrapper<>();
 
         // 用户筛选
-        if (queryRequest.getUserId() != null) {
-            wrapper.eq(Redemption::getUserId, queryRequest.getUserId());
+        if (params.getUserId() != null) {
+            wrapper.eq(Redemption::getUserId, params.getUserId());
         }
 
         // 商品筛选
-        if (queryRequest.getProductId() != null) {
-            wrapper.eq(Redemption::getProductId, queryRequest.getProductId());
+        if (params.getProductId() != null) {
+            wrapper.eq(Redemption::getProductId, params.getProductId());
         }
 
         // 状态筛选
-        if (queryRequest.getStatus() != null) {
-            wrapper.eq(Redemption::getStatus, queryRequest.getStatus());
+        if (params.getStatus() != null) {
+            wrapper.eq(Redemption::getStatus, params.getStatus());
         }
 
         // 时间范围筛选
-        if (queryRequest.getStartTime() != null) {
-            wrapper.ge(Redemption::getCreatedAt, queryRequest.getStartTime());
+        if (params.getStartTime() != null) {
+            wrapper.ge(Redemption::getCreatedAt, params.getStartTime());
         }
-        if (queryRequest.getEndTime() != null) {
-            wrapper.le(Redemption::getCreatedAt, queryRequest.getEndTime());
+        if (params.getEndTime() != null) {
+            wrapper.le(Redemption::getCreatedAt, params.getEndTime());
         }
 
         // 用户姓名模糊搜索
-        if (StringUtils.hasText(queryRequest.getUserName())) {
+        if (StringUtils.hasText(params.getUserName())) {
             List<Long> userIds = userMapper.selectList(
                     new LambdaQueryWrapper<User>()
-                            .like(User::getName, queryRequest.getUserName())
+                            .like(User::getName, params.getUserName())
                             .eq(User::getDeleted, 0)
             ).stream().map(User::getId).collect(Collectors.toList());
             
@@ -300,10 +312,10 @@ public class RedemptionServiceImpl extends ServiceImpl<RedemptionMapper, Redempt
         }
 
         // 商品名称模糊搜索
-        if (StringUtils.hasText(queryRequest.getProductName())) {
+        if (StringUtils.hasText(params.getProductName())) {
             List<Long> productIds = productMapper.selectList(
                     new LambdaQueryWrapper<Product>()
-                            .like(Product::getName, queryRequest.getProductName())
+                            .like(Product::getName, params.getProductName())
                             .eq(Product::getDeleted, 0)
             ).stream().map(Product::getId).collect(Collectors.toList());
             
@@ -463,5 +475,97 @@ public class RedemptionServiceImpl extends ServiceImpl<RedemptionMapper, Redempt
             default:
                 return "兑换状态异常";
         }
+    }
+
+    @Override
+    public PageVO<RedemptionVO> getRedemptionsByStatus(PageDTO<RedemptionQueryRequest> pageRequest, String statusType) {
+        // 参数校验
+        AssertUtils.notNull(pageRequest, "分页请求不能为空");
+
+        log.debug("根据状态类型查询兑换记录，statusType: {}", statusType);
+
+        // 构建分页对象
+        Page<Redemption> page = new Page<>(pageRequest.getPageNum(), pageRequest.getPageSize());
+
+        // 构建查询条件
+        LambdaQueryWrapper<Redemption> wrapper = new LambdaQueryWrapper<>();
+        
+        // 根据状态类型筛选
+        if (StringUtils.hasText(statusType)) {
+            switch (statusType.toUpperCase()) {
+                case "TODAY":
+                    // 今日核销：状态为已核销，且核销时间在今天
+                    LocalDateTime todayStart = LocalDateTime.now().toLocalDate().atStartOfDay();
+                    LocalDateTime todayEnd = LocalDateTime.now().toLocalDate().atTime(23, 59, 59);
+                    wrapper.eq(Redemption::getStatus, RedemptionStatus.VERIFIED.getCode())
+                           .between(Redemption::getVerifiedAt, todayStart, todayEnd);
+                    break;
+                case "VERIFIED":
+                    // 累计核销：状态为已核销
+                    wrapper.eq(Redemption::getStatus, RedemptionStatus.VERIFIED.getCode());
+                    break;
+                case "PENDING":
+                    // 待核销：状态为待核销
+                    wrapper.eq(Redemption::getStatus, RedemptionStatus.PENDING.getCode());
+                    break;
+                default:
+                    log.warn("未知的状态类型: {}", statusType);
+                    break;
+            }
+        }
+
+        // 其他查询条件
+        RedemptionQueryRequest params = pageRequest.getParams();
+        if (params != null) {
+            // 用户名搜索
+            if (StringUtils.hasText(params.getUserName())) {
+                List<User> users = userMapper.selectList(
+                    new LambdaQueryWrapper<User>()
+                        .like(User::getName, params.getUserName())
+                );
+                if (!users.isEmpty()) {
+                    Set<Long> userIds = users.stream().map(User::getId).collect(Collectors.toSet());
+                    wrapper.in(Redemption::getUserId, userIds);
+                } else {
+                    // 没有匹配的用户，返回空结果
+                    return PageUtil.empty(pageRequest.getPageNum(), pageRequest.getPageSize());
+                }
+            }
+
+            // 商品名搜索
+            if (StringUtils.hasText(params.getProductName())) {
+                List<Product> products = productMapper.selectList(
+                    new LambdaQueryWrapper<Product>()
+                        .like(Product::getName, params.getProductName())
+                );
+                if (!products.isEmpty()) {
+                    Set<Long> productIds = products.stream().map(Product::getId).collect(Collectors.toSet());
+                    wrapper.in(Redemption::getProductId, productIds);
+                } else {
+                    // 没有匹配的商品，返回空结果
+                    return PageUtil.empty(pageRequest.getPageNum(), pageRequest.getPageSize());
+                }
+            }
+
+            // 状态筛选（如果没有使用statusType）
+            if (!StringUtils.hasText(statusType) && params.getStatus() != null) {
+                wrapper.eq(Redemption::getStatus, params.getStatus());
+            }
+        }
+
+        // 按创建时间倒序排列
+        wrapper.orderByDesc(Redemption::getCreatedAt);
+
+        // 执行查询
+        IPage<Redemption> result = this.page(page, wrapper);
+
+        // 构建VO列表
+        List<RedemptionVO> voList = buildRedemptionVOList(result.getRecords());
+
+        // 构造分页结果
+        Page<RedemptionVO> resultPage = new Page<>(pageRequest.getPageNum(), pageRequest.getPageSize(), result.getTotal());
+        resultPage.setRecords(voList);
+
+        return PageUtil.convert(resultPage);
     }
 }

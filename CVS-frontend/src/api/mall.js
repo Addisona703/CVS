@@ -68,6 +68,11 @@ export const mallAPI = {
     return request.get(`/redemptions/voucher/${voucherCode}`)
   },
 
+  // 根据状态获取兑换记录（学工处）
+  getRedemptionsByStatus: (data, statusType) => {
+    return request.post(`/redemptions/by-status?statusType=${statusType}`, data)
+  },
+
   // 分类相关API
   // 获取所有分类
   getCategories: () => {

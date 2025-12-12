@@ -1,5 +1,6 @@
 package com.hngy.cvs.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -11,6 +12,7 @@ import lombok.Data;
  * @param <Q> 查询条件类型
  */
 @Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class PageDTO<Q> {
 
     @NotNull(message = "页码不能为空")

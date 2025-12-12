@@ -68,14 +68,25 @@ request.interceptors.response.use(
             {
               confirmButtonText: '重新登录',
               cancelButtonText: '取消',
-              type: 'warning'
+              type: 'warning',
+              closeOnClickModal: false,
+              closeOnPressEscape: false,
+              showClose: true
             }
           ).then(() => {
+            // 关闭所有 MessageBox
+            ElMessageBox.close()
+            
             const authStore = useAuthStore()
             authStore.logout()
-            router.push('/auth/login')
+            
+            // 使用 nextTick 确保 MessageBox 完全关闭后再跳转
+            setTimeout(() => {
+              router.push('/auth/login')
+            }, 100)
           }).catch(() => {
-            // 用户取消
+            // 用户取消，关闭 MessageBox
+            ElMessageBox.close()
           })
           break
         case 403:

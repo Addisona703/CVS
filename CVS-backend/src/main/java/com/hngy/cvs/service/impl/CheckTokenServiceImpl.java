@@ -58,23 +58,45 @@ public class CheckTokenServiceImpl implements CheckTokenService {
 
     @Override
     public CheckToken consumeToken(String token, SignActionType expectedType) {
+        log.info("=== 开始验证token ===");
+        log.info("Token: {}", token);
+        log.info("期望类型: {}", expectedType);
+        
         AssertUtils.notEmpty(token, ResultCode.TOKEN_INVALID);
 
         String key = buildKey(token);
-        // 使用 GET + DELETE 组合替代 GETDEL（兼容 Redis 6.2 以下版本）
+        log.info("Redis Key: {}", key);
+        
+        // 只获取token，不删除，允许在有效期内重复使用
         String payload = stringRedisTemplate.opsForValue().get(key);
+        log.info("从Redis获取的payload: {}", payload);
+        
+        if (payload == null || payload.isEmpty()) {
+            log.warn("Token不存在或已过期: {}", token);
+        }
+        
         AssertUtils.notEmpty(payload, ResultCode.TOKEN_INVALID);
         
-        // 获取成功后立即删除，确保一次性使用
-        stringRedisTemplate.delete(key);
+        // 注释掉删除操作，允许token在有效期内被多个学生使用
+        // stringRedisTemplate.delete(key);
 
         try {
             CheckToken checkToken = objectMapper.readValue(payload, CheckToken.class);
+            log.info("解析后的CheckToken: {}", checkToken);
+            
             AssertUtils.notNull(checkToken, ResultCode.TOKEN_INVALID);
+            
+            log.info("Token类型: {}, 期望类型: {}", checkToken.getType(), expectedType);
             AssertUtils.isTrue(checkToken.getType() == expectedType, ResultCode.TOKEN_INVALID);
+            
+            log.info("ActivityId: {}", checkToken.getActivityId());
             AssertUtils.isTrue(checkToken.getActivityId() != null, ResultCode.TOKEN_INVALID);
+            
+            log.info("过期时间: {}, 当前时间: {}", checkToken.getExpiresAt(), LocalDateTime.now());
             AssertUtils.isTrue(checkToken.getExpiresAt() == null || checkToken.getExpiresAt().isAfter(LocalDateTime.now()),
                     ResultCode.TOKEN_EXPIRED);
+            
+            log.info("=== Token验证成功 ===");
             return checkToken;
         } catch (JsonProcessingException e) {
             log.error("Failed to deserialize check token {}", token, e);

@@ -11,7 +11,7 @@ export const userAPI = {
     return request.put('/users', data)
   },
 
-  // 分页查询用户列表（管理员端）
+  // 分页查询用户列表（学工处）
   getUserList: (params) => {
     return request.post('/users/search', params)
   },

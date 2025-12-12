@@ -2,11 +2,11 @@
   <div class="activity-detail">
     <div class="page-header">
       <div class="header-left">
-        <el-button class="back-button" text @click="$router.back()">
+        <el-button class="back-button" text @click="goBackToList">
           <el-icon>
             <ArrowLeft />
           </el-icon>
-          返回上一页
+          返回
         </el-button>
         <div class="header-text">
           <h1 class="page-title">活动详情</h1>
@@ -19,9 +19,9 @@
       <div class="activity-header">
         <h1 class="activity-title">{{ activity.title }}</h1>
         <div class="activity-meta">
-          <el-tag :type="getTypeColor(activity.type)">
+          <!-- <el-tag :type="getTypeColor(activity.type)">
             {{ getTypeLabel(activity.type) }}
-          </el-tag>
+          </el-tag> -->
           <el-tag :type="getStatusType(activity.status)">
             {{ getStatusLabel(activity.status) }}
           </el-tag>
@@ -548,6 +548,30 @@ const goToQrPage = (type = 'checkin') => {
   })
 }
 
+// 返回活动列表
+const goBackToList = () => {
+  if (isStudent.value) {
+    // 学生返回到"我的报名"页面
+    router.push({ name: 'MySignups' })
+  } else if (isTeacher.value) {
+    // 教师端智能返回
+    // 检查历史记录中上一页是否是二维码页面
+    const historyState = window.history.state
+    const previousRoute = historyState?.back
+    
+    // 如果上一页是二维码页面，返回到"我的活动"
+    if (previousRoute && previousRoute.includes('/qrcode')) {
+      router.push({ name: 'MyActivities' })
+    } else {
+      // 否则返回上一页
+      router.back()
+    }
+  } else {
+    // 其他情况返回上一页
+    router.back()
+  }
+}
+
 // 初始化标签页
 const initializeTab = () => {
   const tab = route.query.tab
@@ -593,7 +617,7 @@ onMounted(async () => {
       font-size: 14px;
       font-weight: 500;
       border-radius: 999px;
-      color: #165dff;
+      color: var(--primary-color, #165dff);
       transition: background-color 0.2s ease, color 0.2s ease;
 
       :deep(.el-icon) {
@@ -601,8 +625,8 @@ onMounted(async () => {
       }
 
       &:hover {
-        background-color: rgba(22, 93, 255, 0.08);
-        color: #0c42b4;
+        background-color: var(--primary-color-light-bg, rgba(22, 93, 255, 0.08));
+        color: var(--primary-color-dark, #0c42b4);
       }
     }
 
@@ -687,13 +711,13 @@ onMounted(async () => {
     }
 
     :deep(.el-tabs__item.is-active) {
-      color: #165dff;
+      color: var(--primary-color, #165dff);
     }
 
     :deep(.el-tabs__active-bar) {
       height: 3px;
       border-radius: 2px;
-      background-color: #165dff;
+      background-color: var(--primary-color, #165dff);
     }
   }
 
@@ -720,10 +744,10 @@ onMounted(async () => {
     }
 
     .activity-info {
-      background: linear-gradient(180deg, #f7f9ff 0%, #ffffff 100%);
+      background: var(--info-bg-gradient, linear-gradient(180deg, #f7f9ff 0%, #ffffff 100%));
       padding: 24px;
       border-radius: 12px;
-      border: 1px solid rgba(22, 93, 255, 0.08);
+      border: 1px solid var(--primary-border, rgba(22, 93, 255, 0.08));
       margin-bottom: 24px;
 
       h3 {
@@ -745,7 +769,7 @@ onMounted(async () => {
           color: #4e5969;
 
           .el-icon {
-            color: #165dff;
+            color: var(--primary-color, #165dff);
             margin-right: 10px;
             font-size: 16px;
           }
@@ -777,7 +801,7 @@ onMounted(async () => {
     margin-top: 16px;
     padding: 16px;
     border-radius: 12px;
-    background: rgba(22, 93, 255, 0.04);
+    background: var(--primary-color-light-bg, rgba(22, 93, 255, 0.04));
   }
 
 

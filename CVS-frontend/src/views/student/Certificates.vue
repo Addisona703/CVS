@@ -184,7 +184,7 @@
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage, ElMessageBox, ElLoading } from 'element-plus'
 import { Plus, Download } from '@element-plus/icons-vue'
 import { certificateAPI } from '@/api'
 import { formatDateTime } from '@/utils/format'
@@ -290,8 +290,14 @@ const viewDetail = (certificate) => {
 }
 
 const previewCertificate = async (certificate) => {
+  // 显示加载提示
+  const loadingInstance = ElLoading.service({
+    lock: true,
+    text: '正在生成证书预览...',
+    background: 'rgba(0, 0, 0, 0.7)',
+  })
+  
   try {
-    loading.value = true
     const response = await certificateAPI.previewCertificate(certificate.id)
     
     // 创建Blob对象并在新窗口打开
@@ -303,17 +309,25 @@ const previewCertificate = async (certificate) => {
     setTimeout(() => {
       window.URL.revokeObjectURL(url)
     }, 100)
+    
+    ElMessage.success('证书预览已打开')
   } catch (error) {
     console.error('预览证书失败:', error)
     ElMessage.error('预览失败，请稍后重试')
   } finally {
-    loading.value = false
+    loadingInstance.close()
   }
 }
 
 const downloadCertificate = async (certificate) => {
+  // 显示加载提示
+  const loadingInstance = ElLoading.service({
+    lock: true,
+    text: '正在生成证书文件...',
+    background: 'rgba(0, 0, 0, 0.7)',
+  })
+  
   try {
-    loading.value = true
     const response = await certificateAPI.downloadCertificate(certificate.id)
     
     // 创建Blob对象
@@ -323,7 +337,7 @@ const downloadCertificate = async (certificate) => {
     // 创建临时a标签触发下载
     const link = document.createElement('a')
     link.href = url
-    link.download = `志愿服务证书-${certificate.certificateNumber || certificate.id}.pdf`
+    link.download = `志愿服务证书_${certificate.username || certificate.id}.pdf`
     document.body.appendChild(link)
     link.click()
     
@@ -337,12 +351,13 @@ const downloadCertificate = async (certificate) => {
     if (error.code === 'ERR_NETWORK' || error.response?.status === 204) {
       // IDM已经处理下载，不显示错误
       console.log('下载已被下载管理器接管')
+      ElMessage.success('证书下载已开始')
     } else {
       console.error('下载证书失败:', error)
       ElMessage.error('下载失败，请稍后重试')
     }
   } finally {
-    loading.value = false
+    loadingInstance.close()
   }
 }
 

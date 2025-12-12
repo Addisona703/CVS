@@ -33,10 +33,10 @@ export function setupRouterGuards(router) {
         return
       }
       
-      // 商城管理功能只允许管理员和教师访问
+      // 商城管理功能只允许学工处和教师访问
       const userRole = authStore.user.role
       if (!['ADMIN', 'TEACHER'].includes(userRole)) {
-        ElMessage.error('商城管理功能需要管理员或教师权限')
+        ElMessage.error('商城管理功能需要学工处或教师权限')
         next({ name: 'NotFound' })
         return
       }

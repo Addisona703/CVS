@@ -69,7 +69,7 @@ public class PointsController {
     @Operation(summary = "发放积分")
     public Result<Void> awardPoints(
             @Parameter(description = "用户ID") @RequestParam @NotNull Long userId,
-            @Parameter(description = "积分数量") @RequestParam @NotNull @Min(1) Integer points) {
+            @Parameter(description = "积分数量") @RequestParam @NotNull Integer points) {
         pointsService.awardPoints(userId, points);
         return Result.success();
     }

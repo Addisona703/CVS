@@ -1,0 +1,60 @@
+{
+  "name": "cvs-mobile",
+  "version": "1.0.0",
+  "description": "高校志愿服务数字化系统移动端应用",
+  "scripts": {
+    "dev:h5": "vite",
+    "dev:mp-weixin": "vite build --watch --mode development",
+    "build:h5": "vite build",
+    "build:mp-weixin": "vite build --mode production",
+    "lint": "eslint --ext .js,.vue --ignore-path .gitignore .",
+    "lint:fix": "eslint --ext .js,.vue --ignore-path .gitignore . --fix",
+    "format": "prettier --write \"**/*.{js,vue,json,css,scss,md}\"",
+    "icons:extract": "node scripts/extract-phosphor-icons.js",
+    "icons:setup": "node scripts/extract-phosphor-icons.js && echo 请查看 scripts/README-ICONFONT.md 完成后续步骤"
+  },
+  "keywords": [
+    "uni-app",
+    "vue3",
+    "volunteer",
+    "mobile"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@dcloudio/uni-app": "^3.0.0-4020920240930001",
+    "@dcloudio/uni-app-plus": "^3.0.0-4020920240930001",
+    "@dcloudio/uni-components": "^3.0.0-4020920240930001",
+    "@dcloudio/uni-h5": "^3.0.0-4020920240930001",
+    "@dcloudio/uni-mp-weixin": "^3.0.0-4020920240930001",
+    "@phosphor-icons/vue": "^2.2.1",
+    "@phosphor-icons/web": "^2.1.2",
+    "@qiun/ucharts": "^2.5.0-20230101",
+    "crypto-js": "^4.2.0",
+    "echarts": "^6.0.0",
+    "pinia": "^2.1.7",
+    "uqrcodejs": "^4.0.7",
+    "uview-plus": "^3.6.4",
+    "vue": "^3.4.21"
+  },
+  "devDependencies": {
+    "@dcloudio/types": "^3.4.8",
+    "@dcloudio/uni-automator": "^3.0.0-4020920240930001",
+    "@dcloudio/uni-cli-shared": "^3.0.0-4020920240930001",
+    "@dcloudio/uni-stacktracey": "^3.0.0-4020920240930001",
+    "@dcloudio/vite-plugin-uni": "^3.0.0-4020920240930001",
+    "@vitejs/plugin-vue": "^5.0.4",
+    "@vue/runtime-core": "^3.4.21",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-vue": "^9.20.1",
+    "husky": "^8.0.3",
+    "lint-staged": "^15.2.0",
+    "prettier": "^3.2.5",
+    "sass": "^1.93.2",
+    "vite": "^5.2.8"
+  },
+  "engines": {
+    "node": "^18.0.0 || >=20.0.0"
+  }
+}
