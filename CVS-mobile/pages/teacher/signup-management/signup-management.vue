@@ -188,8 +188,7 @@ const rejectSignup = (signup) => {
       if (res.confirm) {
         try {
           await rejectSignupApi(signup.id, {
-            status: 'REJECTED',
-            reviewNote: res.content || '不符合要求'
+            rejectReason: res.content || '不符合要求'
           })
           uni.showToast({
             title: '已拒绝',

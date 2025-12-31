@@ -92,16 +92,21 @@ const fileName = ref('')
 // 用于显示的完整URL
 const displayUrl = computed(() => {
   if (!props.modelValue) return ''
-  
+
   // 如果已经是完整URL，直接返回
   if (props.modelValue.includes('://')) {
     return props.modelValue
   }
-  
-  // 如果是相对路径，拼接API基础URL
-  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'
-  const baseUrl = apiBaseUrl.replace('/api', '')
-  return baseUrl + props.modelValue
+
+  // 拼接后端服务器地址
+  // 开发环境直接使用后端地址，生产环境使用配置的地址
+  const backendUrl = import.meta.env.MODE === 'production'
+    ? import.meta.env.VITE_API_BASE_URL.replace('/api', '')
+    : 'http://localhost:9100'
+
+  // 确保路径以 / 开头
+  const path = props.modelValue.startsWith('/') ? props.modelValue : `/${props.modelValue}`
+  return `${backendUrl}${path}`
 })
 
 const imageUrl = computed({

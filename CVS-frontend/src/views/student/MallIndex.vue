@@ -363,19 +363,21 @@ const confirmRedeem = async () => {
 // 拼接完整图片URL
 const getProductImageUrl = (url) => {
   if (!url) return '/default-product.svg'
-  
+
   // 如果已经是完整URL，直接返回
   if (url.startsWith('http://') || url.startsWith('https://')) {
     return url
   }
-  
-  // 如果是相对路径，拼接基础URL
-  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'
-  const baseUrl = apiBaseUrl.replace('/api', '')
-  
+
+  // 拼接后端服务器地址
+  // 开发环境使用代理，生产环境使用实际后端地址
+  const backendUrl = import.meta.env.MODE === 'production'
+    ? import.meta.env.VITE_API_BASE_URL.replace('/api', '')
+    : 'http://localhost:9100'
+
   // 确保路径以 / 开头
   const path = url.startsWith('/') ? url : `/${url}`
-  return `${baseUrl}${path}`
+  return `${backendUrl}${path}`
 }
 
 const handleImageError = (event) => {

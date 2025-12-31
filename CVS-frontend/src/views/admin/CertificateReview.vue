@@ -8,7 +8,7 @@
     <el-card>
       <el-table :data="certificateList" :loading="loading" stripe>
         <el-table-column prop="id" label="ID" width="80" />
-        <el-table-column prop="userName" label="申请人" width="120" />
+        <el-table-column prop="name" label="申请人" width="120" />
         <el-table-column prop="username" label="学号" width="120" />
         <el-table-column prop="certificateNumber" label="证书编号" width="180" />
         <el-table-column prop="purpose" label="申请目的" min-width="150" />
@@ -120,7 +120,7 @@ const fetchCertificateList = async () => {
 const handleApprove = async (row) => {
   try {
     await ElMessageBox.confirm(
-      `确定要通过 "${row.userName}" 的证书申请吗？`,
+      `确定要通过 "${row.name}" 的证书申请吗？`,
       '确认通过',
       {
         confirmButtonText: '确定',
@@ -128,7 +128,7 @@ const handleApprove = async (row) => {
         type: 'warning'
       }
     )
-    
+
     await approveCertificate(row.id)
   } catch (error) {
     if (error !== 'cancel') {

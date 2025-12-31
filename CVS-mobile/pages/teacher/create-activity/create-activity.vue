@@ -378,7 +378,7 @@ const saveDraft = async () => {
     }
 
     if (isEdit.value) {
-      await updateActivity(activityId.value, data)
+      await updateActivity({ id: activityId.value, ...data })
       uni.showToast({ title: '保存成功', icon: 'success' })
     } else {
       await createActivity(data)
@@ -404,7 +404,7 @@ const publish = async () => {
     const data = buildActivityData()
 
     if (isEdit.value) {
-      await updateActivity(activityId.value, data)
+      await updateActivity({ id: activityId.value, ...data })
       await publishActivity(activityId.value)
       uni.showToast({ title: '更新并发布成功', icon: 'success' })
     } else {

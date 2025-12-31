@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: twb
+    active: dev
   application:
     name: cvs
 
@@ -65,7 +65,7 @@ springdoc:
 file:
   upload:
     path: ./uploads
-    domain: http://localhost:8000
+    domain: http://localhost:9000
 
 # 证书配置
 certificate:
