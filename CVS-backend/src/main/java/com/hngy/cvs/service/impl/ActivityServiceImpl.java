@@ -105,9 +105,11 @@ public class ActivityServiceImpl implements ActivityService {
         Activity activity = activityMapper.selectById(id);
         AssertUtils.notNull(activity, ResultCode.ACTIVITY_NOT_FOUND);
 
-        // 检查权限
-        AssertUtils.isTrue(activity.getOrganizerId().equals(organizerId),
-                          ResultCode.INSUFFICIENT_PERMISSIONS);
+        // 检查权限：活动创建者或管理员可以删除
+        User currentUser = userMapper.selectById(organizerId);
+        boolean isAdmin = currentUser != null && currentUser.getRole() == com.hngy.cvs.entity.enums.UserRole.ADMIN;
+        boolean isOrganizer = activity.getOrganizerId().equals(organizerId);
+        AssertUtils.isTrue(isAdmin || isOrganizer, ResultCode.INSUFFICIENT_PERMISSIONS);
 
         // 检查活动状态
         AssertUtils.isFalse(activity.getStatus() == ActivityStatus.ONGOING || activity.getStatus() == ActivityStatus.COMPLETED,
@@ -115,7 +117,7 @@ public class ActivityServiceImpl implements ActivityService {
 
         // 使用MyBatis-Plus的逻辑删除功能
         activityMapper.deleteById(id);
-        log.info("删除活动成功: {}", id);
+        log.info("删除活动成功: {}, 操作者: {}", id, organizerId);
     }
 
     @Override
@@ -324,18 +326,22 @@ public class ActivityServiceImpl implements ActivityService {
         Activity activity = activityMapper.selectById(id);
         AssertUtils.notNull(activity, ResultCode.ACTIVITY_NOT_FOUND);
 
-        // 检查权限
-        AssertUtils.isTrue(activity.getOrganizerId().equals(organizerId),
-                          ResultCode.INSUFFICIENT_PERMISSIONS);
+        // 检查权限：活动创建者或管理员可以取消
+        User currentUser = userMapper.selectById(organizerId);
+        boolean isAdmin = currentUser != null && currentUser.getRole() == com.hngy.cvs.entity.enums.UserRole.ADMIN;
+        boolean isOrganizer = activity.getOrganizerId().equals(organizerId);
+        AssertUtils.isTrue(isAdmin || isOrganizer, ResultCode.INSUFFICIENT_PERMISSIONS);
 
         // 检查活动状态
         AssertUtils.isFalse(activity.getStatus() == ActivityStatus.COMPLETED,
                            ResultCode.ACTIVITY_STATUS_INVALID_FOR_CANCEL);
 
-        // 检查是否在报名时间内才可以取消
-        LocalDateTime now = LocalDateTime.now();
-        AssertUtils.isTrue(activity.getRegistrationDeadline() == null || now.isBefore(activity.getRegistrationDeadline()),
-                          ResultCode.ACTIVITY_REGISTRATION_DEADLINE_PASSED);
+        // 管理员可以取消任何时间的活动，教师只能在报名截止前取消
+        if (!isAdmin) {
+            LocalDateTime now = LocalDateTime.now();
+            AssertUtils.isTrue(activity.getRegistrationDeadline() == null || now.isBefore(activity.getRegistrationDeadline()),
+                              ResultCode.ACTIVITY_REGISTRATION_DEADLINE_PASSED);
+        }
 
         // 发送取消通知
         notificationService.sendActivityCancelNotification(id);
@@ -347,7 +353,7 @@ public class ActivityServiceImpl implements ActivityService {
 
         activity.setStatus(ActivityStatus.CANCELLED);
         activityMapper.updateById(activity);
-        log.info("取消活动成功: {}, 已删除 {} 条相关报名记录", id, deletedCount);
+        log.info("取消活动成功: {}, 已删除 {} 条相关报名记录, 操作者: {}", id, deletedCount, organizerId);
     }
 
     @Override

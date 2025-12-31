@@ -1,8 +1,8 @@
 <template>
   <div class="reset-password">
     <div class="form-header">
-      <h2>Set New Password</h2>
-      <p>Please set a secure new password.</p>
+      <h2 class="form-title">重置密码</h2>
+      <p class="form-subtitle">请设置一个安全的新密码</p>
     </div>
 
     <el-form
@@ -17,26 +17,34 @@
         <el-input
           v-model="resetForm.newPassword"
           type="password"
-          placeholder="New Password"
+          placeholder="请输入新密码"
           show-password
           clearable
-        />
+        >
+          <template #prefix>
+            <el-icon><Lock /></el-icon>
+          </template>
+        </el-input>
       </el-form-item>
 
       <el-form-item prop="confirmPassword">
         <el-input
           v-model="resetForm.confirmPassword"
           type="password"
-          placeholder="Confirm New Password"
+          placeholder="请确认新密码"
           show-password
           clearable
           @keyup.enter="handleSubmit"
-        />
+        >
+          <template #prefix>
+            <el-icon><Lock /></el-icon>
+          </template>
+        </el-input>
       </el-form-item>
 
       <div class="password-hints">
-        <span>• At least 6 characters</span>
-        <span>• Must contain letters</span>
+        <span>• 至少6个字符</span>
+        <span>• 必须包含字母</span>
       </div>
 
       <el-button
@@ -46,12 +54,14 @@
         :loading="loading"
         @click="handleSubmit"
       >
-        Complete Reset
+        完成重置
       </el-button>
 
-      <el-link type="primary" class="back-link" @click="router.push('/auth/login')">
-        Return to Login
-      </el-link>
+      <div class="form-footer">
+        <el-link type="primary" class="back-link" @click="router.push('/auth/login')">
+          返回登录
+        </el-link>
+      </div>
     </el-form>
   </div>
 </template>
@@ -60,6 +70,7 @@
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
+import { Lock } from '@element-plus/icons-vue'
 import { authAPI } from '@/api'
 
 const router = useRouter()
@@ -141,89 +152,99 @@ const handleSubmit = async () => {
 
 <style scoped lang="scss">
 .reset-password {
-  display: flex;
-  flex-direction: column;
-  gap: 32px;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
 }
 
 .form-header {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  margin-bottom: 24px;
+}
 
-  h2 {
-    margin: 0;
-    font-size: 32px;
-    font-weight: 700;
-    color: #1f2937;
-    letter-spacing: -0.01em;
-  }
+.form-title {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 600;
+  color: #1f2937;
+  letter-spacing: -0.01em;
+}
 
-  p {
-    margin: 0;
-    font-size: 14px;
-    color: #6b7280;
-  }
+.form-subtitle {
+  margin: 0;
+  font-size: 14px;
+  color: #6b7280;
 }
 
 .reset-form {
   display: flex;
   flex-direction: column;
-  gap: 28px;
+  gap: 20px;
 }
 
 .password-hints {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
   font-size: 13px;
   color: #9ca3af;
-  margin-top: -12px;
+  margin-top: -8px;
+  padding-left: 4px;
 }
 
 .primary-btn {
   width: 100%;
-  height: 52px;
-  border-radius: 18px;
+  height: 48px;
+  border-radius: 8px;
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 500;
   letter-spacing: 0.02em;
+  margin-top: 8px;
+  background-color: #409EFF !important;
+  border-color: #409EFF !important;
+  color: #FFFFFF !important;
+}
+
+.primary-btn:hover {
+  background-color: #66B1FF !important;
+  border-color: #66B1FF !important;
+}
+
+.primary-btn:active {
+  background-color: #3A8EE6 !important;
+  border-color: #3A8EE6 !important;
+}
+
+.form-footer {
+  text-align: center;
+  margin-top: 8px;
 }
 
 .back-link {
-  margin-top: 24px;
   font-size: 14px;
-  align-self: center;
+  text-decoration: none;
 }
 
 :deep(.el-form-item) {
   margin-bottom: 0;
 }
 
-:deep(.el-form-item__content) {
-  border-bottom: none;
-  padding-bottom: 0;
-}
-
-:deep(.el-form-item__inner) {
-  padding-bottom: 0;
-}
-
 :deep(.el-input__wrapper) {
-  border-radius: 18px;
-  border: 1px solid rgba(148, 163, 184, 0.35);
-  padding: 14px 18px;
-  background-color: rgba(249, 250, 251, 0.85);
+  border-radius: 8px;
+  padding: 12px 16px;
+  height: 48px;
   box-shadow: none;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: all 0.2s ease;
+}
 
-  &:hover {
-    border-color: rgba(37, 99, 235, 0.55);
-  }
+:deep(.el-input__inner) {
+  font-size: 15px;
+}
 
-  &.is-focus {
-    border-color: rgba(37, 99, 235, 0.85);
-    box-shadow: 0 12px 24px rgba(37, 99, 235, 0.15);
-  }
+:deep(.el-input__prefix) {
+  font-size: 16px;
+  color: #9ca3af;
 }
 </style>

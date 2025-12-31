@@ -191,19 +191,26 @@ const resetForm = () => {
 // 提交表单
 const handleSubmit = async () => {
   if (!formRef.value) return
-  
+
   try {
     await formRef.value.validate()
     submitting.value = true
-    
+
+    // 只提交需要的字段
+    const submitData = {
+      name: form.name,
+      description: form.description,
+      sortOrder: form.sortOrder
+    }
+
     if (isEdit.value) {
-      await mallAPI.updateCategory(form.id, form)
+      await mallAPI.updateCategory(form.id, submitData)
       ElMessage.success('更新成功')
     } else {
-      await mallAPI.createCategory(form)
+      await mallAPI.createCategory(submitData)
       ElMessage.success('创建成功')
     }
-    
+
     dialogVisible.value = false
     fetchCategoryList()
   } catch (error) {

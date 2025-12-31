@@ -343,41 +343,52 @@ const resetForm = () => {
 // 提交表单
 const handleSubmit = async () => {
   if (!formRef.value) return
-  
+
   try {
     await formRef.value.validate()
     submitting.value = true
-    
-    console.log('提交表单数据:', form)
-    
+
+    // 只提交需要的字段
+    const submitData = {
+      name: form.name,
+      description: form.description,
+      pointsRequired: form.pointsRequired,
+      stock: form.stock,
+      stockWarning: form.stockWarning,
+      categoryId: form.categoryId,
+      imageUrl: form.imageUrl
+    }
+
+    console.log('提交表单数据:', submitData)
+
     if (isEdit.value) {
-      const response = await mallAPI.updateProduct(form.id, form)
+      const response = await mallAPI.updateProduct(form.id, submitData)
       console.log('更新响应:', response)
       ElMessage.success('更新成功')
     } else {
-      const response = await mallAPI.createProduct(form)
+      const response = await mallAPI.createProduct(submitData)
       console.log('创建响应:', response)
       ElMessage.success('创建成功')
     }
-    
+
     dialogVisible.value = false
-    
+
     // 创建新商品后跳转到第一页
     if (!isEdit.value) {
       pagination.current = 1
       console.log('创建新商品，跳转到第一页')
-      
+
       // 清空搜索条件，确保能看到新商品
       searchForm.keyword = ''
       searchForm.categoryId = ''
       searchForm.status = ''
       console.log('已清空搜索条件')
     }
-    
+
     console.log('开始刷新商品列表')
     await fetchProductList()
     console.log('商品列表刷新完成，当前商品数量:', productList.value.length)
-    
+
     // 如果是创建新商品，显示提示
     if (!isEdit.value) {
       ElMessage.success({

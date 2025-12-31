@@ -30,10 +30,10 @@
               服务记录
             </t-menu-item>
 
-            <t-menu-item value="/teacher/check">
+            <!-- <t-menu-item value="/teacher/check">
               <template #icon><t-icon name="qrcode" /></template>
               签到二维码
-            </t-menu-item>
+            </t-menu-item> -->
 
             <t-menu-item value="/teacher/review">
               <template #icon><t-icon name="edit" /></template>
