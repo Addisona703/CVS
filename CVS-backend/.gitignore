@@ -188,6 +188,5 @@ Thumbs.db
 .dockerignore
 
 # Application specific
-uploads/
 logs/
 application-local.yml
